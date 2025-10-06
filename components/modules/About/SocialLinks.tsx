@@ -3,6 +3,8 @@ import CopyMail from "./CopyEmail";
 import { FaGithub } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa6";
 import { FaFacebook } from "react-icons/fa";
+import { FaWhatsapp } from "react-icons/fa";
+
 
 export default function SocialLinks({ content }: { content: any }) {
   console.log(content);
@@ -12,6 +14,7 @@ export default function SocialLinks({ content }: { content: any }) {
     github: <FaGithub className="text-2xl" />,
     linkedin: <FaLinkedin className="text-2xl" />,
     facebook: <FaFacebook className="text-2xl" />,
+    whatsapp: <FaWhatsapp className="text-2xl" />,
   };
 
   return (

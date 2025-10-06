@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+body {
+  background-color: #000319;
+  scroll-behavior: smooth;
+}
 
 @custom-variant dark (&:is(.dark *));
 

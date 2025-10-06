@@ -12,6 +12,7 @@ import {
   Journey,
 } from "@/interfaces/interface";
 import { useFieldArray, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export default function About() {
   const [loading, setLoading] = useState(true);
@@ -154,10 +155,12 @@ export default function About() {
         console.log("Sending only changed data:", changedData);
         console.log("aboutId", aboutId);
         result = await updateAbout(changedData, aboutId);
+        toast.success("About updated successfully");
       } else {
         // For POST: Send all data
         console.log("Creating new entry with all data");
         result = await createAbout(data);
+        toast.success("About created successfully");
       }
 
       console.log("Result:", result);

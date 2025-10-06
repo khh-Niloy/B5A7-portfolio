@@ -3,6 +3,7 @@ import { Journey } from "@/components/modules/About/Journey";
 import SocialLinks from "@/components/modules/About/SocialLinks";
 import Banner from "@/components/modules/Hero/Banner";
 import getAbout from "@/helper/getAbout";
+import TechStack from "@/components/modules/Tech/TechStack";
 
 export default async function Home() {
 
@@ -32,8 +33,8 @@ export default async function Home() {
         </div>
       </div>
 
-      <div>
-        {/* <TechStack /> */}
+      <div className="mt-20 ">
+        <TechStack />
       </div>
     </div>
     </>
