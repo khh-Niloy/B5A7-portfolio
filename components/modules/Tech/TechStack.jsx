@@ -18,7 +18,7 @@ export default async function TechStack() {
 
   return (
     <div className="px-8 py-12">
-      <div className="mb-12">
+      <div className="mb-16 flex items-center justify-center flex-col">
         <h1 className="text-4xl font-bold text-white mb-2">Tech Stack</h1>
         <div className="w-20 h-1 bg-gradient-to-r from-emerald-500 to-green-400 rounded-full"></div>
       </div>

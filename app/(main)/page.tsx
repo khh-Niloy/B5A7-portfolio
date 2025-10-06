@@ -4,9 +4,9 @@ import SocialLinks from "@/components/modules/About/SocialLinks";
 import Banner from "@/components/modules/Hero/Banner";
 import getAbout from "@/helper/getAbout";
 import TechStack from "@/components/modules/Tech/TechStack";
+import AllProjectList from "@/components/modules/Projects/AllProjectList";
 
 export default async function Home() {
-
   const aboutContent = await getAbout();
   console.log(aboutContent);
   const educationContent = {
@@ -21,22 +21,26 @@ export default async function Home() {
   return (
     <>
       <Banner />
-    <div className="w-[85%] mx-auto">
-      <div className="w-full mx-auto gap-3 flex mt-20">
-        <div className="w-1/2">
-          <Journey content={aboutContent.journey} />
+      <div className="w-[85%] mx-auto">
+        <div className="w-full mx-auto gap-3 flex mt-20">
+          <div className="w-1/2">
+            <Journey content={aboutContent.journey} />
+          </div>
+
+          <div className="w-1/2 flex flex-col gap-5">
+            <SocialLinks content={socialLinksContent} />
+            <Education content={educationContent} />
+          </div>
         </div>
 
-        <div className="w-1/2 flex flex-col gap-5">
-          <SocialLinks content={socialLinksContent} />
-          <Education content={educationContent} />
+        <div className="mt-20 ">
+          <TechStack />
+        </div>
+
+        <div className="mt-20 ">
+          <AllProjectList />
         </div>
       </div>
-
-      <div className="mt-20 ">
-        <TechStack />
-      </div>
-    </div>
     </>
   );
 }

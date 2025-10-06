@@ -34,8 +34,8 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
       ),
     },
     {
-      label: "Logout",
-      href: "#",
+      label: "Projects",
+      href: "/dashboard/projects",
       icon: (
         <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
@@ -46,7 +46,7 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
     <div
       className={cn(
         "flex w-full flex-1 flex-col overflow-hidden rounded-md border border-neutral-200 bg-gray-100 md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
-        "h-screen", // for your use case, use `h-screen` instead of `h-[60vh]`
+        "h-screen" // for your use case, use `h-screen` instead of `h-[60vh]`
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
