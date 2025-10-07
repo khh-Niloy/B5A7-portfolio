@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import React from "react";
 import AnimatedTooltipPreview from "./AnimatedTooltipPreview";
 import { LinkPreview } from "@/components/ui/link-preview";
+import { Modal } from "./Modal";
 
 export default function ProjectCard({
   image,
@@ -9,6 +10,7 @@ export default function ProjectCard({
   shortDes,
   techStack,
   liveSite,
+  id,
 }) {
   return (
     <div className="w-full bg-gradient-to-br from-[#04071D] to-[#0C0E23] border border-[#3637497D] rounded-xl p-5 relative hover:scale-[1.02] duration-500 transition-all">
@@ -30,12 +32,15 @@ export default function ProjectCard({
             <AnimatedTooltipPreview techStack={techStack} />
           </div>
 
-          <div className="">
+          <div className="flex gap-3 items-center">
             <LinkPreview liveSite={liveSite} className="font-bold">
               <h1 className="text-[#CBACF9] text-sm flex items-center">
                 Check Live Site <ArrowUpRight />
               </h1>
             </LinkPreview>
+
+            <Modal id={id} />
+
           </div>
         </div>
       </div>

@@ -5,6 +5,8 @@ import Banner from "@/components/modules/Hero/Banner";
 import getAbout from "@/helper/getAbout";
 import TechStack from "@/components/modules/Tech/TechStack";
 import AllProjectList from "@/components/modules/Projects/AllProjectList";
+import AllBlogList from "@/components/modules/Blog/AllBlogList";
+import Footer from "@/components/modules/Footer/Footer";
 
 export default async function Home() {
   const aboutContent = await getAbout();
@@ -39,6 +41,14 @@ export default async function Home() {
 
         <div className="mt-20 ">
           <AllProjectList />
+        </div>
+
+        <div className="mt-20 ">
+          <AllBlogList />
+        </div>
+
+        <div className="mt-20 ">
+          <Footer />
         </div>
       </div>
     </>

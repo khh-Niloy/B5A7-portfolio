@@ -1,52 +1,102 @@
 "use client";
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
-  IconArrowLeft,
+  IconHome,
   IconBrandTabler,
-  IconSettings,
-  IconUserBolt,
+  IconCode,
+  IconUser,
+  IconBulb,
+  IconArticle,
+  IconBrandFacebook,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export function SidebarDemo({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
   const links = [
     {
-      label: "Dashboard",
-      href: "/dashboard",
+      label: "Back to Home",
+      href: "/",
       icon: (
-        <IconBrandTabler className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconHome className={cn(
+          "h-5 w-5 shrink-0 transition-colors",
+          pathname === "/" 
+            ? "text-emerald-400" 
+            : "text-gray-400"
+        )} />
       ),
     },
     {
       label: "About",
       href: "/dashboard/about",
       icon: (
-        <IconUserBolt className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconUser className={cn(
+          "h-5 w-5 shrink-0 transition-colors",
+          pathname === "/dashboard/about" 
+            ? "text-emerald-400" 
+            : "text-gray-400"
+        )} />
       ),
     },
     {
       label: "Skills",
       href: "/dashboard/skills",
       icon: (
-        <IconSettings className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconBulb className={cn(
+          "h-5 w-5 shrink-0 transition-colors",
+          pathname === "/dashboard/skills" 
+            ? "text-emerald-400" 
+            : "text-gray-400"
+        )} />
       ),
     },
     {
       label: "Projects",
       href: "/dashboard/projects",
       icon: (
-        <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconCode className={cn(
+          "h-5 w-5 shrink-0 transition-colors",
+          pathname === "/dashboard/projects" 
+            ? "text-emerald-400" 
+            : "text-gray-400"
+        )} />
+      ),
+    },
+    {
+      label: "Blog",
+      href: "/dashboard/blog",
+      icon: (
+        <IconArticle className={cn(
+          "h-5 w-5 shrink-0 transition-colors",
+          pathname === "/dashboard/blog" 
+            ? "text-emerald-400" 
+            : "text-gray-400"
+        )} />
+      ),
+    },
+    {
+      label: "Footer & Socials",
+      href: "/dashboard/footer",
+      icon: (
+        <IconBrandFacebook className={cn(
+          "h-5 w-5 shrink-0 transition-colors",
+          pathname === "/dashboard/footer" 
+            ? "text-emerald-400" 
+            : "text-gray-400"
+        )} />
       ),
     },
   ];
-  const [open, setOpen] = useState(false);
   return (
     <div
       className={cn(
-        "flex w-full flex-1 flex-col overflow-hidden rounded-md border border-neutral-200 bg-gray-100 md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
-        "h-screen" // for your use case, use `h-screen` instead of `h-[60vh]`
+        "flex w-full flex-1 flex-col overflow-hidden md:flex-row",
+        "h-screen bg-[#000319]" // Match home page background
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
@@ -55,32 +105,24 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-2">
               {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
+                <SidebarLink 
+                  key={idx} 
+                  link={link} 
+                  className={cn(
+                    "rounded-lg px-3 py-2 transition-all duration-200",
+                      "hover:bg-white/5 border border-transparent hover:border-white/10 text-gray-300 hover:text-white"
+                  )}
+                />
               ))}
             </div>
-          </div>
-          <div>
-            <SidebarLink
-              link={{
-                label: "Manu Arora",
-                href: "#",
-                icon: (
-                  <img
-                    src="https://assets.aceternity.com/manu.png"
-                    className="h-7 w-7 shrink-0 rounded-full"
-                    width={50}
-                    height={50}
-                    alt="Avatar"
-                  />
-                ),
-              }}
-            />
           </div>
         </SidebarBody>
       </Sidebar>
       <div className="flex flex-1 overflow-hidden">
-        <div className="flex h-full w-full flex-1 flex-col gap-2 rounded-tl-2xl border border-neutral-200 bg-white p-2 md:p-10 dark:border-neutral-700 dark:bg-neutral-900 overflow-y-auto">
-          {children}
+        <div className="flex h-full w-full flex-1 flex-col bg-[#000319] p-6 md:p-12 overflow-y-auto">
+          <div className="max-w-7xl mx-auto w-full">
+            {children}
+          </div>
         </div>
       </div>
     </div>

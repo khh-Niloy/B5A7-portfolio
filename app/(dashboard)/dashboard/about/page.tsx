@@ -178,35 +178,35 @@ export default function About() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto"></div>
+          <p className="mt-4 text-gray-400">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold text-white">
           About
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-gray-400">
           Manage your contact information and academic background.
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Contacts Section */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-white">
               Contacts
             </h2>
             <button
               type="button"
               onClick={() => appendContact({ name: "", link: "" })}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all duration-200"
             >
               <Plus className="w-4 h-4" />
               Add Contact
@@ -217,29 +217,29 @@ export default function About() {
             {contactFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg dark:border-gray-600"
+                className="flex items-center gap-4 p-4 border border-white/10 rounded-lg bg-white/5"
               >
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Name
                     </label>
                     <input
                       {...register(`contacts.${index}.name` as const)}
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                       placeholder="Contact name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Link
                     </label>
                     <input
                       {...register(`contacts.${index}.link` as const)}
                       type="url"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                       placeholder="https://example.com"
                     />
                   </div>
@@ -248,7 +248,7 @@ export default function About() {
                 <button
                   type="button"
                   onClick={() => removeContact(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-md dark:hover:bg-red-900/20"
+                  className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -258,32 +258,32 @@ export default function About() {
         </div>
 
         {/* About Information Section */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <h2 className="text-xl font-semibold text-white mb-6">
             About Me
           </h2>
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email
               </label>
               <input
                 {...register("aboutInfo.email")}
                 type="email"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                 placeholder="your.email@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 My Mindset
               </label>
               <textarea
                 {...register("aboutInfo.sampleText")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                 placeholder="Write about your mindset, philosophy, values, or what drives you..."
                 rows={6}
               />
@@ -292,9 +292,9 @@ export default function About() {
         </div>
 
         {/* Journey Section */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-white">
               My Journey
             </h2>
             <button
@@ -302,7 +302,7 @@ export default function About() {
               onClick={() =>
                 appendJourney({ year: "", description: "", title: "" })
               }
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all duration-200"
             >
               <Plus className="w-4 h-4" />
               Add Journey Entry
@@ -313,40 +313,40 @@ export default function About() {
             {journeyFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg dark:border-gray-600"
+                className="flex items-center gap-4 p-4 border border-white/10 rounded-lg bg-white/5"
               >
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Year
                     </label>
                     <input
                       {...register(`journey.${index}.year` as const)}
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                       placeholder="e.g., 2019, 2020, 2022"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Title
                     </label>
                     <input
                       {...register(`journey.${index}.title` as const)}
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                       placeholder="e.g., Started Learning UI/UX Design"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       Description
                     </label>
                     <textarea
                       {...register(`journey.${index}.description` as const)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                       placeholder="e.g., I started designing, I learned React"
                       rows={3}
                     />
@@ -356,7 +356,7 @@ export default function About() {
                 <button
                   type="button"
                   onClick={() => removeJourney(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-md dark:hover:bg-red-900/20"
+                  className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -366,44 +366,44 @@ export default function About() {
         </div>
 
         {/* University Information Section */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <h2 className="text-xl font-semibold text-white mb-6">
             University Information
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 University Name
               </label>
               <input
                 type="text"
                 {...register(`universityInfo.varsity` as const)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                 placeholder="Enter university name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 Department
               </label>
               <input
                 type="text"
                 {...register(`universityInfo.department` as const)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                 placeholder="Enter department name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 Start Year
               </label>
               <input
                 type="number"
                 {...register(`universityInfo.startYear` as const)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                 placeholder="2020"
                 min="1900"
                 max="2100"
@@ -411,13 +411,13 @@ export default function About() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 End Year
               </label>
               <input
                 type="number"
                 {...register(`universityInfo.endYear` as const)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
                 placeholder="2024"
                 min="1900"
                 max="2100"
@@ -431,7 +431,7 @@ export default function About() {
           <button
             type="submit"
             disabled={!isDirty}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {!isDirty
               ? "No Changes"
