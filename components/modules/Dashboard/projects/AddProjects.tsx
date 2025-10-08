@@ -1,29 +1,17 @@
 "use client";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/ui/file-upload";
-import toast from "react-hot-toast";
+import { AlertCircle } from "lucide-react";
 import { createProject } from "@/actions/projects/createProject";
+import { projectSchema, type ProjectFormValues } from "@/lib/validation";
+import { withErrorHandling } from "@/lib/error-handler";
 
-interface ProjectFormValues {
-  // Main project fields
-  projectName: string;
-  shortDes: string;
-  techStack: string;
-  liveSite: string;
-  
-  // Details fields
-  tagline: string;
-  problemSolution: string;
-  features: string;
-  dependencies: string;
-  responsibilities: string;
-  githubRepo: string;
-}
 
 interface AddProjectsProps {
   files: File[];
@@ -31,11 +19,16 @@ interface AddProjectsProps {
 }
 
 export default function AddProjects({ files, setFiles }: AddProjectsProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const {
     register,
     handleSubmit,
-    formState: { isDirty },
+    formState: { errors },
+    reset,
   } = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectSchema),
+    mode: "onBlur",
     defaultValues: {
       projectName: "",
       shortDes: "",
@@ -52,59 +45,58 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
 
   const handleFileUpload = (uploadedFiles: File[]) => {
     setFiles(uploadedFiles);
-    // console.log("Uploaded files:", uploadedFiles);
   };
 
   const onSubmit = async (data: ProjectFormValues) => {
-    // console.log("Project data:", data);
-    // console.log("Uploaded image:", files[0]);
-
     if (files.length === 0) {
-      toast.error("Please upload a project image");
       return;
     }
 
-    // Create FormData for file upload
-    const formData = new FormData();
+    setIsSubmitting(true);
 
-    // Append the image file (backend expects "files" field)
-    formData.append("files", files[0]);
+    await withErrorHandling(
+      async () => {
+        const formData = new FormData();
+        formData.append("files", files[0]);
 
-    // Send plain strings; backend will parse
-    const techStackString = data.techStack ?? "";
-    const featuresString = data.features ?? "";
-    const dependenciesString = data.dependencies ?? "";
+        const techStackString = data.techStack ?? "";
+        const featuresString = data.features ?? "";
+        const dependenciesString = data.dependencies ?? "";
 
-    // Append flat fields per updated model (no nested details)
-    formData.append("projectName", data.projectName || "");
-    formData.append("shortDes", data.shortDes || "");
-    formData.append("techStack", techStackString);
-    formData.append("liveSite", data.liveSite || "");
-    formData.append("tagline", data.tagline || "");
-    formData.append("problemSolution", data.problemSolution || "");
-    formData.append("features", featuresString);
-    formData.append("dependencies", dependenciesString);
-    formData.append("responsibilities", data.responsibilities || "");
-    formData.append("githubRepo", data.githubRepo || "");
+        formData.append("projectName", data.projectName);
+        formData.append("shortDes", data.shortDes);
+        formData.append("techStack", techStackString);
+        formData.append("liveSite", data.liveSite || "");
+        formData.append("tagline", data.tagline);
+        formData.append("problemSolution", data.problemSolution);
+        formData.append("features", featuresString);
+        formData.append("dependencies", dependenciesString);
+        formData.append("responsibilities", data.responsibilities);
+        formData.append("githubRepo", data.githubRepo || "");
 
-    try {
-      const result = await createProject(formData);
-      // console.log("Result:", result);
+        const result = await createProject(formData);
 
-      if (result?.success) {
-        toast.success("Project created successfully! 🚀");
-      } else {
-        toast.error(result?.message || "Failed to create project");
+        if (!result?.success) {
+          throw new Error(result?.message || "Failed to create project");
+        }
+
+        return result;
+      },
+      {
+        successMessage: "Project created successfully! 🚀",
+        errorMessage: "Failed to create project. Please try again.",
+        onSuccess: () => {
+          reset();
+          setFiles([]);
+        },
       }
-    } catch (error) {
-      console.error("Failed to create project:", error);
-      toast.error("Failed to create project");
-    }
+    );
+
+    setIsSubmitting(false);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Image Upload Section */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <h2 className="text-xl font-semibold text-white mb-6">
           Project Image
@@ -114,7 +106,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
         </div>
       </div>
 
-      {/* Basic Project Information */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <h2 className="text-xl font-semibold text-white mb-6">
           Basic Information
@@ -127,9 +118,15 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               id="projectName"
               placeholder="e.g., MadChef - Restaurant Management App"
               {...register("projectName")}
-              className="mt-2"
-              
+              className={`mt-2 ${errors.projectName ? "border-red-500 focus:border-red-500" : ""}`}
+              disabled={isSubmitting}
             />
+            {errors.projectName && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.projectName.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -138,8 +135,15 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               id="tagline"
               placeholder="A catchy tagline for your project"
               {...register("tagline")}
-              className="mt-2"
+              className={`mt-2 ${errors.tagline ? "border-red-500 focus:border-red-500" : ""}`}
+              disabled={isSubmitting}
             />
+            {errors.tagline && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.tagline.message}
+              </p>
+            )}
           </div>
 
           <div className="md:col-span-2">
@@ -148,9 +152,15 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               id="shortDes"
               placeholder="Brief description of your project..."
               {...register("shortDes")}
-              className="mt-2 min-h-[80px]"
-              
+              className={`mt-2 min-h-[80px] ${errors.shortDes ? "border-red-500 focus:border-red-500" : ""}`}
+              disabled={isSubmitting}
             />
+            {errors.shortDes && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.shortDes.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -160,8 +170,15 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               type="url"
               placeholder="https://example.com"
               {...register("liveSite")}
-              className="mt-2"
+              className={`mt-2 ${errors.liveSite ? "border-red-500 focus:border-red-500" : ""}`}
+              disabled={isSubmitting}
             />
+            {errors.liveSite && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.liveSite.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -171,13 +188,19 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               type="url"
               placeholder="https://github.com/username/repo"
               {...register("githubRepo")}
-              className="mt-2"
+              className={`mt-2 ${errors.githubRepo ? "border-red-500 focus:border-red-500" : ""}`}
+              disabled={isSubmitting}
             />
+            {errors.githubRepo && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.githubRepo.message}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Detailed Information */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <h2 className="text-xl font-semibold text-white mb-6">
           Project Details
@@ -222,7 +245,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
         </div>
       </div>
 
-      {/* Technical Information */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <h2 className="text-xl font-semibold text-white mb-6">
           Technical Stack
@@ -258,14 +280,14 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
         </div>
       </div>
 
-      {/* Submit Button */}
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button
           type="submit"
           size="lg"
+          disabled={isSubmitting || files.length === 0}
           className="disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Project
+          {isSubmitting ? "Creating Project..." : "Create Project"}
         </Button>
       </div>
     </form>

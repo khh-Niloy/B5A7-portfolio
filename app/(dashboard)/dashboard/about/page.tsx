@@ -1,23 +1,27 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import * as Icons from "lucide-react";
 import { Plus, Trash2 } from "lucide-react";
 import { createAbout } from "@/actions/about/createAbout";
 import { updateAbout } from "@/actions/about/updateAbout";
+import type { Contact, UniversityInfo, AboutInfo, Journey } from "@/interfaces/interface";
 import getAbout from "@/helper/getAbout";
-import {
-  Contact,
-  UniversityInfo,
-  AboutInfo,
-  Journey,
-} from "@/interfaces/interface";
 import { useFieldArray, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { aboutSchema } from "@/lib/validation";
+import { withErrorHandling } from "@/lib/error-handler";
+
+interface AboutData {
+  contacts: Contact[];
+  universityInfo: UniversityInfo;
+  aboutInfo: AboutInfo;
+  journey: Journey[];
+}
 
 export default function About() {
   const [loading, setLoading] = useState(true);
   const [hasExistingData, setHasExistingData] = useState(false);
   const [aboutId, setAboutId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -27,6 +31,8 @@ export default function About() {
     watch,
     formState: { isDirty, dirtyFields },
   } = useForm({
+    resolver: zodResolver(aboutSchema),
+    mode: "onBlur",
     defaultValues: {
       contacts: [{ name: "", link: "" }],
       journey: [{ year: "", description: "", title: "" }],
@@ -37,7 +43,6 @@ export default function About() {
         endYear: "",
       },
       aboutInfo: { email: "", sampleText: "" },
-      // For experience, keep comma-separated strings for arrays; normalize on submit
       experience: [
         {
           companyName: "",
@@ -85,16 +90,16 @@ export default function About() {
     const fetchData = async () => {
       try {
         const data = await getAbout();
-        console.log("data", data);
         if (data) {
           setHasExistingData(true);
-          // Store the ID for updates
           setAboutId(data._id || null);
 
           reset(
             {
               contacts: data.contacts || [{ name: "", link: "" }],
-              journey: data.journey || [{ year: "", description: "", title: "" }],
+              journey: data.journey || [
+                { year: "", description: "", title: "" },
+              ],
               universityInfo: data.universityInfo || {
                 varsity: "",
                 department: "",
@@ -105,42 +110,40 @@ export default function About() {
                 email: data.aboutInfo?.email || "",
                 sampleText: data.aboutInfo?.sampleText?.join(", ") || "",
               },
-              experience:
-                (data.experience || []).map((exp: any) => ({
-                  companyName: exp.companyName || "",
-                  role: exp.role || "",
-                  // Convert dates to yyyy-mm-dd strings for input[type=date]
-                  startDate: exp.startDate
-                    ? new Date(exp.startDate).toISOString().slice(0, 10)
+              experience: (data.experience || []).map((exp: Record<string, unknown>) => ({
+                companyName: exp.companyName || "",
+                role: exp.role || "",
+                startDate: exp.startDate
+                  ? new Date(exp.startDate as string).toISOString().slice(0, 10)
+                  : "",
+                endDate:
+                  exp.endDate === "present"
+                    ? ""
+                    : exp.endDate
+                    ? new Date(exp.endDate as string).toISOString().slice(0, 10)
                     : "",
-                  endDate:
-                    exp.endDate === "present"
-                      ? ""
-                      : exp.endDate
-                      ? new Date(exp.endDate).toISOString().slice(0, 10)
-                      : "",
-                  location: exp.location || "remote",
-                  jobType: exp.jobType || "full-time",
-                  jobTechStack: Array.isArray(exp.jobTechStack)
-                    ? exp.jobTechStack.join(", ")
-                    : exp.jobTechStack || "",
-                  worked: Array.isArray(exp.worked)
-                    ? exp.worked.join(", ")
-                    : exp.worked || "",
-                  isCurrent: exp.endDate === "present",
-                })) || [
-                  {
-                    companyName: "",
-                    role: "",
-                    startDate: "",
-                    endDate: "",
-                    location: "remote",
-                    jobType: "full-time",
-                    jobTechStack: "",
-                    worked: "",
-                    isCurrent: false,
-                  },
-                ],
+                location: exp.location || "remote",
+                jobType: exp.jobType || "full-time",
+                jobTechStack: Array.isArray(exp.jobTechStack)
+                  ? exp.jobTechStack.join(", ")
+                  : exp.jobTechStack || "",
+                worked: Array.isArray(exp.worked)
+                  ? exp.worked.join(", ")
+                  : exp.worked || "",
+                isCurrent: exp.endDate === "present",
+              })) || [
+                {
+                  companyName: "",
+                  role: "",
+                  startDate: "",
+                  endDate: "",
+                  location: "remote",
+                  jobType: "full-time",
+                  jobTechStack: "",
+                  worked: "",
+                  isCurrent: false,
+                },
+              ],
             },
             {
               keepDirtyValues: false,
@@ -162,38 +165,37 @@ export default function About() {
     fetchData();
   }, [reset]);
 
-  // Helper function to extract only dirty fields
-  const getDirtyValues = (dirtyFields: any, allValues: any): any => {
-    const dirtyValues: any = {};
+  const getDirtyValues = (dirtyFields: Record<string, unknown>, allValues: Record<string, unknown>): Record<string, unknown> => {
+    const dirtyValues: Record<string, unknown> = {};
 
     Object.keys(dirtyFields).forEach((key) => {
       if (dirtyFields[key] === true) {
-        // Simple field changed
         dirtyValues[key] = allValues[key];
-      } else if (typeof dirtyFields[key] === "object" && !Array.isArray(dirtyFields[key])) {
-        // Nested object (like universityInfo or aboutInfo)
-        const nestedDirtyValues = getDirtyValues(dirtyFields[key], allValues[key]);
-        // Only add if the nested object has actual changes
+      } else if (
+        typeof dirtyFields[key] === "object" &&
+        !Array.isArray(dirtyFields[key])
+      ) {
+        const nestedDirtyValues = getDirtyValues(
+          dirtyFields[key] as Record<string, unknown>,
+          allValues[key] as Record<string, unknown>
+        );
         if (Object.keys(nestedDirtyValues).length > 0) {
           dirtyValues[key] = nestedDirtyValues;
         }
       } else if (Array.isArray(dirtyFields[key])) {
-        // Array field (like contacts or journey)
-        // Check if any item in the array actually has changes
-        const arrayDirtyFields = dirtyFields[key];
-        const hasDirtyItems = arrayDirtyFields.some((item: any) => {
-          // If item is an object, check if it has any keys (meaning some field changed)
+        const arrayDirtyFields = dirtyFields[key] as unknown[];
+        const hasDirtyItems = arrayDirtyFields.some((item: unknown) => {
           if (typeof item === "object" && item !== null) {
-            const keys = Object.keys(item);
-            // Check if any of those keys have a truthy value (meaning field is dirty)
-            return keys.some(k => item[k] === true || (typeof item[k] === 'object' && Object.keys(item[k]).length > 0));
+            const keys = Object.keys(item as Record<string, unknown>);
+            return keys.some(
+              (k) =>
+                (item as Record<string, unknown>)[k] === true ||
+                (typeof (item as Record<string, unknown>)[k] === "object" && Object.keys((item as Record<string, unknown>)[k] as Record<string, unknown>).length > 0)
+            );
           }
           return item === true;
         });
-        
-        console.log(`Array ${key} - hasDirtyItems:`, hasDirtyItems, "dirtyFields:", arrayDirtyFields);
-        
-        // Only include array if it has actual dirty items
+
         if (hasDirtyItems) {
           dirtyValues[key] = allValues[key];
         }
@@ -203,11 +205,10 @@ export default function About() {
     return dirtyValues;
   };
 
-  // Normalize payload (full or partial) to match backend schema
-  const normalizeAboutPayload = (values: any): any => {
-    const normalized: any = Array.isArray(values) ? [] : { ...values };
+  const normalizeAboutPayload = (values: Record<string, unknown>): Record<string, unknown> => {
+    const normalized: Record<string, unknown> = { ...values };
 
-    const splitCsv = (str: any) =>
+    const splitCsv = (str: unknown) =>
       typeof str === "string"
         ? str
             .split(",")
@@ -217,21 +218,26 @@ export default function About() {
         ? str
         : [];
 
-    const toDate = (d: any) =>
-      d instanceof Date ? d : typeof d === "string" && d ? new Date(d) : undefined;
+    const toDate = (d: unknown) =>
+      d instanceof Date
+        ? d
+        : typeof d === "string" && d
+        ? new Date(d)
+        : undefined;
 
-    // aboutInfo.sampleText as string -> string[]
-    if (normalized.aboutInfo && typeof normalized.aboutInfo.sampleText !== "undefined") {
+    if (
+      normalized.aboutInfo &&
+      typeof (normalized.aboutInfo as Record<string, unknown>).sampleText !== "undefined"
+    ) {
       normalized.aboutInfo = {
-        ...normalized.aboutInfo,
-        sampleText: splitCsv(normalized.aboutInfo.sampleText),
+        ...(normalized.aboutInfo as Record<string, unknown>),
+        sampleText: splitCsv((normalized.aboutInfo as Record<string, unknown>).sampleText),
       };
     }
 
-    // experience normalization if present
     if (Array.isArray(normalized.experience)) {
-      normalized.experience = normalized.experience.map((exp: any) => {
-        const next: any = { ...exp };
+      normalized.experience = (normalized.experience as Record<string, unknown>[]).map((exp: Record<string, unknown>) => {
+        const next: Record<string, unknown> = { ...exp };
         if (typeof next.jobTechStack !== "undefined") {
           next.jobTechStack = splitCsv(next.jobTechStack);
         }
@@ -257,37 +263,41 @@ export default function About() {
     return normalized;
   };
 
-  const onSubmit = async (data: any) => {
-    try {
-      // console.log("Full form data:", data);
+  const onSubmit = async (data: Record<string, unknown>) => {
+    setIsSubmitting(true);
 
-      let result;
-      if (hasExistingData && aboutId) {
-        // For PATCH: Send only changed fields
-        console.log("dirtyFields:", dirtyFields);
-        const changedData = getDirtyValues(dirtyFields, data);
-        const normalizedChanged = normalizeAboutPayload(changedData);
-        console.log("Sending only changed data:", changedData);
-        console.log("aboutId", aboutId);
-        result = await updateAbout(normalizedChanged, aboutId);
-        toast.success("About updated successfully");
-      } else {
-        // For POST: Send all data
-        console.log("Creating new entry with all data");
-        const normalizedData = normalizeAboutPayload(data);
-        result = await createAbout(normalizedData);
-        toast.success("About created successfully");
+    await withErrorHandling(
+      async () => {
+        let result;
+        if (hasExistingData && aboutId) {
+          const changedData = getDirtyValues(dirtyFields, data);
+          const normalizedChanged = normalizeAboutPayload(changedData);
+          result = await updateAbout(normalizedChanged as unknown as AboutData, aboutId);
+        } else {
+          const normalizedData = normalizeAboutPayload(data);
+          result = await createAbout(normalizedData as unknown as AboutData);
+        }
+
+        if (!result?.success) {
+          throw new Error(result?.message || "Failed to save about information");
+        }
+
+        if (!hasExistingData && result?.id) {
+          setHasExistingData(true);
+          setAboutId(result.id);
+        }
+
+        return result;
+      },
+      {
+        successMessage: hasExistingData 
+          ? "About information updated successfully! ✅" 
+          : "About information created successfully! ✅",
+        errorMessage: "Failed to save about information. Please try again.",
       }
+    );
 
-      console.log("Result:", result);
-
-      if (!hasExistingData && result?.id) {
-        setHasExistingData(true);
-        setAboutId(result.id);
-      }
-    } catch (error) {
-      console.error("Failed to submit:", error);
-    }
+    setIsSubmitting(false);
   };
 
   if (loading) {
@@ -304,21 +314,16 @@ export default function About() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-3xl font-bold text-white">
-          About
-        </h1>
+        <h1 className="text-3xl font-bold text-white">About</h1>
         <p className="mt-2 text-gray-400">
           Manage your contact information and academic background.
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Contacts Section */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">
-              Contacts
-            </h2>
+            <h2 className="text-xl font-semibold text-white">Contacts</h2>
             <button
               type="button"
               onClick={() => appendContact({ name: "", link: "" })}
@@ -373,11 +378,8 @@ export default function About() {
           </div>
         </div>
 
-        {/* About Information Section */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <h2 className="text-xl font-semibold text-white mb-6">
-            About Me
-          </h2>
+          <h2 className="text-xl font-semibold text-white mb-6">About Me</h2>
 
           <div className="space-y-6">
             <div>
@@ -407,12 +409,9 @@ export default function About() {
           </div>
         </div>
 
-        {/* Journey Section */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">
-              My Journey
-            </h2>
+            <h2 className="text-xl font-semibold text-white">My Journey</h2>
             <button
               type="button"
               onClick={() =>
@@ -481,12 +480,9 @@ export default function About() {
           </div>
         </div>
 
-        {/* Experience Section */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">
-              Experience
-            </h2>
+            <h2 className="text-xl font-semibold text-white">Experience</h2>
             <button
               type="button"
               onClick={() =>
@@ -560,12 +556,16 @@ export default function About() {
                         {...register(`experience.${index}.endDate` as const)}
                         type="date"
                         className="w-full px-4 py-2 border border-white/10 rounded-lg bg-transparent text-white placeholder:text-gray-400 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200 disabled:opacity-50"
-                        disabled={watch(`experience.${index}.isCurrent` as const)}
+                        disabled={watch(
+                          `experience.${index}.isCurrent` as const
+                        )}
                       />
                       <label className="inline-flex items-center gap-2 text-sm text-gray-300">
                         <input
                           type="checkbox"
-                          {...register(`experience.${index}.isCurrent` as const)}
+                          {...register(
+                            `experience.${index}.isCurrent` as const
+                          )}
                           className="rounded border-white/10 bg-transparent text-emerald-500 focus:ring-emerald-500/20"
                         />
                         Present
@@ -639,7 +639,6 @@ export default function About() {
           </div>
         </div>
 
-        {/* University Information Section */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <h2 className="text-xl font-semibold text-white mb-6">
             University Information
@@ -700,14 +699,15 @@ export default function About() {
           </div>
         </div>
 
-        {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={!isDirty}
+            disabled={!isDirty || isSubmitting}
             className="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {!isDirty
+            {isSubmitting
+              ? "Saving..."
+              : !isDirty
               ? "No Changes"
               : hasExistingData
               ? "Update Information"

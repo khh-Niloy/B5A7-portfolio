@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/ui/file-upload";
-import { Plus, Edit, Trash2, ExternalLink } from "lucide-react";
+import { Plus, Edit, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
 import { createProject } from "@/actions/projects/createProject";
 import getProjects from "@/helper/getProjects";
 import getEachProject from "@/helper/getEachProject";
+import Image from "next/image";
 
 interface Project {
   _id: string;
@@ -54,8 +55,7 @@ export default function Projects() {
     register,
     handleSubmit,
     reset,
-    setValue,
-    formState: { isDirty },
+    formState: {},
   } = useForm<ProjectFormValues>({
     defaultValues: {
       projectName: "",
@@ -71,7 +71,6 @@ export default function Projects() {
     },
   });
 
-  // Fetch projects
   const fetchProjects = async () => {
     setLoading(true);
     try {
@@ -104,10 +103,8 @@ export default function Projects() {
     setFiles([]);
 
     try {
-      // Fetch the freshest copy by id (flat schema)
       const fresh = await getEachProject(project._id);
-      console.log('fresh project:', JSON.stringify(fresh, null, 2));
-      const mapped = {
+      const resetValues = {
         projectName: fresh?.projectName || "",
         shortDes: fresh?.shortDes || "",
         liveSite: fresh?.liveSite || "",
@@ -115,43 +112,49 @@ export default function Projects() {
         problemSolution: fresh?.problemSolution || "",
         responsibilities: fresh?.responsibilities || "",
         githubRepo: fresh?.githubRepo || "",
-        features: Array.isArray(fresh?.features) ? fresh.features.join(", ") : "",
+        features: Array.isArray(fresh?.features)
+          ? fresh.features.join(", ")
+          : "",
         dependencies: fresh.dependencies ?? "",
-        techStack: Array.isArray(fresh?.techStack) ? fresh.techStack.join(", ") : "",
+        techStack: Array.isArray(fresh?.techStack)
+          ? fresh.techStack.join(", ")
+          : "",
       };
-      reset(mapped);
-      console.log('mapped form values:', mapped);
-    } catch (e) {
-      // Fallback to the list item if fetch fails (flat schema)
-      const mapped = {
+      reset(resetValues);
+    } catch {
+      const resetValues = {
         projectName: project.projectName || "",
         shortDes: project.shortDes || "",
         liveSite: project.liveSite || "",
-        tagline: (project as any).tagline || "",
-        problemSolution: (project as any).problemSolution || "",
-        responsibilities: (project as any).responsibilities || "",
-        githubRepo: (project as any).githubRepo || "",
-        features: Array.isArray((project as any).features) ? (project as any).features.join(", ") : "",
-        dependencies: Array.isArray((project as any).dependencies) ? (project as any).dependencies.join(", ") : "",
-        techStack: Array.isArray(project.techStack) ? project.techStack.join(", ") : "",
+        tagline: (project as unknown as Record<string, unknown>).tagline as string || "",
+        problemSolution: (project as unknown as Record<string, unknown>).problemSolution as string || "",
+        responsibilities: (project as unknown as Record<string, unknown>).responsibilities as string || "",
+        githubRepo: (project as unknown as Record<string, unknown>).githubRepo as string || "",
+        features: Array.isArray((project as unknown as Record<string, unknown>).features)
+          ? ((project as unknown as Record<string, unknown>).features as string[]).join(", ")
+          : "",
+        dependencies: Array.isArray((project as unknown as Record<string, unknown>).dependencies)
+          ? ((project as unknown as Record<string, unknown>).dependencies as string[]).join(", ")
+          : "",
+        techStack: Array.isArray(project.techStack)
+          ? project.techStack.join(", ")
+          : "",
       };
-      reset(mapped);
+      reset(resetValues);
     }
   };
 
-  const handleDelete = async (projectId: string) => {
-    if (confirm("Are you sure you want to delete this project?")) {
-      try {
-        // TODO: Implement delete project API
-        // const result = await deleteProject(projectId);
-        setProjects(projects.filter((project) => project._id !== projectId));
-        toast.success("Project deleted successfully!");
-      } catch (error) {
-        console.error("Failed to delete project:", error);
-        toast.error("Failed to delete project");
-      }
-    }
-  };
+  // const handleDelete = async (projectId: string) => {
+  //   if (confirm("Are you sure you want to delete this project?")) {
+  //     try {
+  //       setProjects(projects.filter((project) => project._id !== projectId));
+  //       toast.success("Project deleted successfully!");
+  //     } catch (error) {
+  //       console.error("Failed to delete project:", error);
+  //       toast.error("Failed to delete project");
+  //     }
+  //   }
+  // };
 
   const onSubmit = async (data: ProjectFormValues) => {
     try {
@@ -160,15 +163,12 @@ export default function Projects() {
         return;
       }
 
-      // Create FormData for file upload
       const formData = new FormData();
 
-      // Append image if new file is uploaded
       if (files.length > 0) {
         formData.append("files", files[0]);
       }
 
-      // Transform arrays
       const techStackArray = data.techStack
         .split(",")
         .map((tech) => tech.trim().replace(/\.$/, ""))
@@ -179,27 +179,19 @@ export default function Projects() {
         .map((feature) => feature.trim().replace(/\.$/, ""))
         .filter((feature) => feature !== "");
 
-      const dependenciesArray = data.dependencies
-        .split(",")
-        .map((dep) => dep.trim().replace(/\.$/, ""))
-        .filter((dep) => dep !== "");
-
-      // Append main project fields
       formData.append("projectName", data.projectName);
       formData.append("shortDes", data.shortDes);
       formData.append("techStack", JSON.stringify(techStackArray));
       formData.append("liveSite", data.liveSite);
 
-      // Append details fields
       formData.append("tagline", data.tagline);
       formData.append("problemSolution", data.problemSolution);
       formData.append("features", JSON.stringify(featuresArray));
-      formData.append("dependencies", JSON.stringify(dependenciesArray));
+      formData.append("dependencies", data.dependencies);
       formData.append("responsibilities", data.responsibilities);
       formData.append("githubRepo", data.githubRepo);
 
       if (isEditing && editingProject) {
-        // Send PATCH update with multipart/form-data
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_API}/projects/${editingProject._id}`,
           {
@@ -257,7 +249,6 @@ export default function Projects() {
 
   return (
     <div className="space-y-10">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Project Management</h1>
@@ -277,7 +268,6 @@ export default function Projects() {
         )}
       </div>
 
-      {/* Project Form */}
       {showForm && (
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
@@ -294,12 +284,11 @@ export default function Projects() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Project Image Upload */}
             <div>
               <Label>Project Image</Label>
               {isEditing && editingProject?.image && (
                 <div className="mt-2 mb-4">
-                  <img
+                  <Image
                     src={editingProject.image}
                     alt="Current project"
                     className="w-full max-w-md h-48 object-cover rounded-lg border border-white/10"
@@ -314,7 +303,6 @@ export default function Projects() {
               </div>
             </div>
 
-            {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="projectName">Project Name</Label>
@@ -460,7 +448,6 @@ export default function Projects() {
         </div>
       )}
 
-      {/* Projects List */}
       {!showForm && (
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <h2 className="text-xl font-semibold text-white mb-6">
@@ -486,10 +473,9 @@ export default function Projects() {
                   className="border border-white/10 rounded-xl p-6 bg-white/5 hover:bg-white/10 transition-all duration-200"
                 >
                   <div className="flex items-start gap-6">
-                    {/* Project Image Thumbnail */}
                     {project.image && (
                       <div className="flex-shrink-0">
-                        <img
+                        <Image
                           src={project.image}
                           alt={project.projectName}
                           className="w-32 h-32 object-cover rounded-xl border border-white/10"
@@ -523,14 +509,14 @@ export default function Projects() {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button
+                          {/* <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleDelete(project._id)}
                             className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                          </Button> */}
                         </div>
                       </div>
 
@@ -538,7 +524,6 @@ export default function Projects() {
                         {project.shortDes}
                       </p>
 
-                      {/* Tech Stack Pills */}
                       <div className="flex flex-wrap gap-2 mb-4">
                         {project.techStack?.slice(0, 6).map((tech, index) => (
                           <span
@@ -555,7 +540,6 @@ export default function Projects() {
                         )}
                       </div>
 
-                      {/* Links */}
                       <div className="flex items-center gap-4">
                         {project.liveSite && (
                           <a

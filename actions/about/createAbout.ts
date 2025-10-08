@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
 import {
   Contact,
   UniversityInfo,
@@ -18,7 +17,6 @@ interface AboutData {
 
 export const createAbout = async (data: AboutData) => {
   try {
-    console.log(data);
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/about/about-content`,
       {
@@ -29,19 +27,46 @@ export const createAbout = async (data: AboutData) => {
         body: JSON.stringify(data),
       }
     );
-    // console.log(res)
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        message: errorData.message || `HTTP ${res.status}: ${res.statusText}`,
+        status: res.status,
+      };
+    }
 
     const result = await res.json();
 
     if (result?.id) {
-      revalidateTag("ABOUT");
+      revalidateTag("about");
       revalidatePath("/");
-      redirect("/");
+      return {
+        success: true,
+        id: result.id,
+        message: "About information created successfully",
+      };
     }
-    console.log(result);
-    return result;
+    
+    return {
+      success: false,
+      message: "Failed to create about information",
+    };
   } catch (error) {
     console.error("Failed to submit:", error);
-    return { error: "Failed to submit" };
+    
+    // Network errors
+    if (error instanceof Error && error.message.includes("fetch")) {
+      return {
+        success: false,
+        message: "Network error. Please check your connection and try again.",
+      };
+    }
+    
+    return {
+      success: false,
+      message: "Failed to create about information. Please try again later.",
+    };
   }
 };

@@ -6,7 +6,6 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to About page by default
     router.replace('/dashboard/about');
   }, [router]);
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,15 +9,14 @@ import { FileUpload } from "@/components/ui/file-upload";
 import toast from "react-hot-toast";
 import getProjects from "@/helper/getProjects";
 import getEachProject from "@/helper/getEachProject";
+import Image from "next/image";
 
 interface ProjectFormValues {
-  // Main project fields
   projectName: string;
   shortDes: string;
   techStack: string;
   liveSite: string;
 
-  // Details fields
   tagline: string;
   problemSolution: string;
   features: string;
@@ -29,10 +28,10 @@ interface ProjectFormValues {
 interface UpdateProjectsProps {
   files: File[];
   setFiles: (files: File[]) => void;
-  projects: any[];
-  setProjects: (projects: any[]) => void;
-  selectedProject: any;
-  setSelectedProject: (project: any) => void;
+  projects: Record<string, unknown>[];
+  setProjects: (projects: Record<string, unknown>[]) => void;
+  selectedProject: Record<string, unknown> | null;
+  setSelectedProject: (project: Record<string, unknown> | null) => void;
   loadingProjects: boolean;
   setLoadingProjects: (loading: boolean) => void;
 }
@@ -50,7 +49,7 @@ export default function UpdateProjects({
   const {
     register,
     handleSubmit,
-    formState: { isDirty },
+    formState: {},
     reset,
     setValue,
   } = useForm<ProjectFormValues>({
@@ -68,13 +67,11 @@ export default function UpdateProjects({
     },
   });
 
-  // Fetch all projects when component mounts
   useEffect(() => {
     const fetchProjects = async () => {
       setLoadingProjects(true);
       try {
         const projectsData = await getProjects();
-        console.log(projectsData);
         setProjects(projectsData || []);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
@@ -87,7 +84,6 @@ export default function UpdateProjects({
     fetchProjects();
   }, [setProjects, setLoadingProjects]);
 
-  // Handle project selection
   const handleProjectSelect = async (projectId: string) => {
     if (!projectId) {
       setSelectedProject(null);
@@ -98,24 +94,17 @@ export default function UpdateProjects({
     try {
       const projectData = await getEachProject(projectId);
       setSelectedProject(projectData);
-      console.log(projectData);
-      console.log(projectData.features);
-      console.log(projectData.dependencies);
-      console.log(projectData.techStack);
 
-      // Populate form with project data (support both flat and legacy nested structures)
       if (projectData) {
         setValue("projectName", projectData.projectName || "");
         setValue("shortDes", projectData.shortDes || "");
         setValue("liveSite", projectData.liveSite || "");
 
-        // Prefer flat fields, fallback to legacy details.* if present
         setValue("tagline", projectData.tagline);
         setValue("problemSolution", projectData.problemSolution ?? "");
         setValue("responsibilities", projectData.responsibilities ?? "");
         setValue("githubRepo", projectData.githubRepo ?? "");
 
-        // Arrays → comma separated
         const featuresArr = projectData.features ?? "";
         setValue(
           "features",
@@ -125,7 +114,6 @@ export default function UpdateProjects({
         setValue("dependencies", projectData.dependencies ?? "");
         
 
-        // techStack
         setValue(
           "techStack",
           Array.isArray(projectData.techStack)
@@ -140,27 +128,22 @@ export default function UpdateProjects({
   };
 
   const onUpdateSubmit = async (data: ProjectFormValues) => {
-    console.log(data);
     if (!selectedProject) {
       toast.error("Please select a project to update");
       return;
     }
 
     try {
-      // Build FormData for PATCH (matches multerUpload.array("files"))
       const formData = new FormData();
 
-      // Include image if user uploaded a new one
       if (files && files.length > 0) {
         formData.append("files", files[0]);
       }
 
-      // Send plain strings; backend will parse
       const techStackString = data.techStack ?? "";
       const featuresString = data.features ?? "";
       const dependenciesString = data.dependencies ?? "";
 
-      // Append flat fields per your updated model
       formData.append("projectName", data.projectName || "");
       formData.append("shortDes", data.shortDes || "");
       formData.append("techStack", techStackString);
@@ -187,9 +170,7 @@ export default function UpdateProjects({
         toast.error(result?.message || "Failed to update project");
         return;
       }
-
       toast.success("Project updated successfully! 🚀");
-      // Refresh list and clear state
       setFiles([]);
       setSelectedProject(null);
       reset();
@@ -197,14 +178,13 @@ export default function UpdateProjects({
       const refreshed = await getProjects();
       setProjects(refreshed || []);
       setLoadingProjects(false);
-    } catch (err) {
+    } catch {
       toast.error("Failed to update project");
     }
   };
 
   return (
     <div className="space-y-8">
-      {/* Project Selection Section */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <h2 className="text-xl font-semibold text-white mb-6">
           Select Project to Update
@@ -225,11 +205,11 @@ export default function UpdateProjects({
               </option>
               {projects.map((project) => (
                 <option
-                  key={project._id}
-                  value={project._id}
+                  key={project._id as string}
+                  value={project._id as string}
                   className="bg-[#0a0f1e] text-white"
                 >
-                  {project.projectName}
+                  {project.projectName as string}
                 </option>
               ))}
             </select>
@@ -237,19 +217,17 @@ export default function UpdateProjects({
         </div>
       </div>
 
-      {/* Update Form Section */}
       {selectedProject ? (
         <form onSubmit={handleSubmit(onUpdateSubmit)} className="space-y-8">
-          {/* Current Project Image Display */}
           <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
             <h2 className="text-xl font-semibold text-white mb-6">
               Current Project Image
             </h2>
-            {selectedProject.image && (
+            {(selectedProject.image as string) && (
               <div className="mb-4">
-                <img
-                  src={selectedProject.image}
-                  alt={selectedProject.projectName}
+                <Image
+                  src={selectedProject.image as string}
+                  alt={selectedProject.projectName as string}
                   className="w-full max-w-md h-48 object-cover rounded-lg border"
                 />
               </div>
@@ -262,7 +240,6 @@ export default function UpdateProjects({
             </div>
           </div>
 
-          {/* Basic Information */}
           <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
             <h2 className="text-xl font-semibold text-white mb-6">
               Basic Information
@@ -328,7 +305,6 @@ export default function UpdateProjects({
             </div>
           </div>
 
-          {/* Detailed Information */}
           <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
             <h2 className="text-xl font-semibold text-white mb-6">
               Project Details
@@ -377,7 +353,6 @@ export default function UpdateProjects({
             </div>
           </div>
 
-          {/* Technical Information */}
           <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
             <h2 className="text-xl font-semibold text-white mb-6">
               Technical Stack
@@ -414,7 +389,6 @@ export default function UpdateProjects({
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
               type="button"

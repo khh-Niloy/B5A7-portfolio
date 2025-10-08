@@ -1,18 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/ui/file-upload";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
-import toast from "react-hot-toast";
+import { Plus, Edit, Trash2, AlertCircle } from "lucide-react";
 import { createBlog } from "@/actions/blog/createBlog";
 import { updateBlog } from "@/actions/blog/updateBlog";
 import { deleteBlog } from "@/actions/blog/deleteBlog";
 import getBlogs from "@/helper/getBlogs";
-import getEachBlog from "@/helper/getEachBlog";
+import { blogSchema, type BlogFormValues } from "@/lib/validation";
+import { withErrorHandling } from "@/lib/error-handler";
+import Image from "next/image";
 
 interface BlogPost {
   _id: string;
@@ -24,11 +26,6 @@ interface BlogPost {
   updatedAt: string;
 }
 
-interface BlogFormValues {
-  title: string;
-  content: string;
-  category: string;
-}
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -37,15 +34,17 @@ export default function Blog() {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
     setValue,
-    watch,
-    formState: { isDirty },
+    formState: { errors },
   } = useForm<BlogFormValues>({
+    resolver: zodResolver(blogSchema),
+    mode: "onBlur",
     defaultValues: {
       title: "",
       content: "",
@@ -53,7 +52,6 @@ export default function Blog() {
     },
   });
 
-  // Fetch blog posts
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -91,68 +89,70 @@ export default function Blog() {
 
   const handleDelete = async (postId: string) => {
     if (confirm("Are you sure you want to delete this blog post?")) {
-      try {
-        const result = await deleteBlog(postId);
-        if (result?.success) {
-          setPosts(posts.filter(post => post._id !== postId));
-          toast.success("Blog post deleted successfully!");
-        } else {
-          toast.error(result?.message || "Failed to delete blog post");
+      await withErrorHandling(
+        async () => {
+          const result = await deleteBlog(postId);
+          if (!result?.success) {
+            throw new Error(result?.message || "Failed to delete blog post");
+          }
+          setPosts(posts.filter((post) => post._id !== postId));
+          return result;
+        },
+        {
+          successMessage: "Blog post deleted successfully! 🗑️",
+          errorMessage: "Failed to delete blog post. Please try again.",
         }
-      } catch (error) {
-        console.error("Failed to delete post:", error);
-        toast.error("Failed to delete blog post");
-      }
+      );
     }
   };
 
   const onSubmit = async (data: BlogFormValues) => {
-    try {
-      if (files.length === 0 && !isEditing) {
-        toast.error("Please upload a cover image");
-        return;
-      }
-
-      // Create FormData for file upload
-      const formData = new FormData();
-      
-      // Append cover image if new file is uploaded
-      if (files.length > 0) {
-        formData.append("files", files[0]);
-      }
-
-      // Append other fields
-      formData.append("title", data.title);
-      formData.append("content", data.content);
-      formData.append("category", data.category);
-
-      if (isEditing && editingPost) {
-        const result = await updateBlog(editingPost._id, formData);
-        if (result?.success) {
-          toast.success("Blog post updated successfully! 🎉");
-          setShowForm(false);
-          setFiles([]);
-          reset();
-          fetchPosts(); // Refresh posts list
-        } else {
-          toast.error(result?.message || "Failed to update blog post");
-        }
-      } else {
-        const result = await createBlog(formData);
-        if (result?.success) {
-          toast.success("Blog post created successfully! 🎉");
-          setShowForm(false);
-          setFiles([]);
-          reset();
-          fetchPosts(); // Refresh posts list
-        } else {
-          toast.error(result?.message || "Failed to create blog post");
-        }
-      }
-    } catch (error) {
-      console.error("Failed to save post:", error);
-      toast.error("Failed to save blog post");
+    if (files.length === 0 && !isEditing) {
+      return;
     }
+
+    setIsSubmitting(true);
+
+    await withErrorHandling(
+      async () => {
+        const formData = new FormData();
+
+        if (files.length > 0) {
+          formData.append("files", files[0]);
+        }
+
+        formData.append("title", data.title);
+        formData.append("content", data.content);
+        formData.append("category", data.category);
+
+        let result;
+        if (isEditing && editingPost) {
+          result = await updateBlog(editingPost._id, formData);
+        } else {
+          result = await createBlog(formData);
+        }
+
+        if (!result?.success) {
+          throw new Error(result?.message || "Failed to save blog post");
+        }
+
+        return result;
+      },
+      {
+        successMessage: isEditing 
+          ? "Blog post updated successfully! 🎉" 
+          : "Blog post created successfully! 🎉",
+        errorMessage: "Failed to save blog post. Please try again.",
+        onSuccess: () => {
+          setShowForm(false);
+          setFiles([]);
+          reset();
+          fetchPosts();
+        },
+      }
+    );
+
+    setIsSubmitting(false);
   };
 
   const handleCancel = () => {
@@ -175,17 +175,14 @@ export default function Blog() {
 
   return (
     <div className="space-y-10">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">
-            Blog Management
-          </h1>
+          <h1 className="text-3xl font-bold text-white">Blog Management</h1>
           <p className="mt-2 text-gray-400">
             Create, edit, and manage your blog posts.
           </p>
         </div>
-        
+
         {!showForm && (
           <Button
             onClick={handleCreate}
@@ -197,7 +194,6 @@ export default function Blog() {
         )}
       </div>
 
-      {/* Blog Form */}
       {showForm && (
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-6">
@@ -214,17 +210,20 @@ export default function Blog() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Cover Image Upload */}
             <div>
               <Label>Cover Image</Label>
               {isEditing && editingPost?.coverImage && (
                 <div className="mt-2 mb-4">
-                  <img 
-                    src={editingPost.coverImage} 
+                  <Image
+                    width={80}
+                    height={80}
+                    src={editingPost.coverImage}
                     alt="Current cover"
                     className="w-full max-w-md h-48 object-cover rounded-lg border border-white/10"
                   />
-                  <p className="text-sm text-gray-400 mt-2">Current cover image</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Current cover image
+                  </p>
                 </div>
               )}
               <div className="mt-2">
@@ -239,9 +238,15 @@ export default function Blog() {
                   id="title"
                   placeholder="Enter blog post title"
                   {...register("title")}
-                  className="mt-2"
-                  required
+                  className={`mt-2 ${errors.title ? "border-red-500 focus:border-red-500" : ""}`}
+                  disabled={isSubmitting}
                 />
+                {errors.title && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.title.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -249,17 +254,46 @@ export default function Blog() {
                 <select
                   id="category"
                   {...register("category")}
-                  className="mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-2 text-white focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200"
-                  required
+                  className={`mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-2 text-white focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200 ${errors.category ? "border-red-500 focus:border-red-500" : ""}`}
+                  disabled={isSubmitting}
                 >
-                  <option value="" className="bg-[#0a0f1e] text-gray-400">Select a category</option>
-                  <option value="technology" className="bg-[#0a0f1e] text-white">Technology</option>
-                  <option value="programming" className="bg-[#0a0f1e] text-white">Programming</option>
-                  <option value="web-development" className="bg-[#0a0f1e] text-white">Web Development</option>
-                  <option value="tutorials" className="bg-[#0a0f1e] text-white">Tutorials</option>
-                  <option value="personal" className="bg-[#0a0f1e] text-white">Personal</option>
-                  <option value="career" className="bg-[#0a0f1e] text-white">Career</option>
+                  <option value="" className="bg-[#0a0f1e] text-gray-400">
+                    Select a category
+                  </option>
+                  <option
+                    value="technology"
+                    className="bg-[#0a0f1e] text-white"
+                  >
+                    Technology
+                  </option>
+                  <option
+                    value="programming"
+                    className="bg-[#0a0f1e] text-white"
+                  >
+                    Programming
+                  </option>
+                  <option
+                    value="web-development"
+                    className="bg-[#0a0f1e] text-white"
+                  >
+                    Web Development
+                  </option>
+                  <option value="tutorials" className="bg-[#0a0f1e] text-white">
+                    Tutorials
+                  </option>
+                  <option value="personal" className="bg-[#0a0f1e] text-white">
+                    Personal
+                  </option>
+                  <option value="career" className="bg-[#0a0f1e] text-white">
+                    Career
+                  </option>
                 </select>
+                {errors.category && (
+                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.category.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -269,9 +303,15 @@ export default function Blog() {
                 id="content"
                 placeholder="Write your blog post content here..."
                 {...register("content")}
-                className="mt-2 min-h-[300px]"
-                required
+                className={`mt-2 min-h-[300px] ${errors.content ? "border-red-500 focus:border-red-500" : ""}`}
+                disabled={isSubmitting}
               />
+              {errors.content && (
+                <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.content.message}
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
@@ -285,16 +325,19 @@ export default function Blog() {
               </Button>
               <Button
                 type="submit"
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
+                disabled={isSubmitting || (files.length === 0 && !isEditing)}
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isEditing ? "Update Post" : "Create Post"}
+                {isSubmitting 
+                  ? (isEditing ? "Updating..." : "Creating...") 
+                  : (isEditing ? "Update Post" : "Create Post")
+                }
               </Button>
             </div>
           </form>
         </div>
       )}
 
-      {/* Blog Posts List */}
       {!showForm && (
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <h2 className="text-xl font-semibold text-white mb-6">
@@ -320,31 +363,34 @@ export default function Blog() {
                   className="border border-white/10 rounded-lg p-4 bg-white/5 hover:bg-white/10 transition-all duration-200"
                 >
                   <div className="flex items-start gap-4">
-                    {/* Cover Image Thumbnail */}
                     {post.coverImage && (
                       <div className="flex-shrink-0">
-                        <img 
-                          src={post.coverImage} 
+                        <Image
+                          src={post.coverImage}
                           alt={post.title}
+                          width={80}
+                          height={80}
                           className="w-20 h-20 object-cover rounded-lg border border-white/10"
                         />
                       </div>
                     )}
-                    
+
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="text-lg font-semibold text-white mb-2">
                             {post.title}
                           </h3>
-                          
+
                           <div className="flex items-center gap-4 text-sm text-gray-400 mb-2">
                             <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs">
                               {post.category}
                             </span>
-                            <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                            <span>
+                              {new Date(post.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
-                          
+
                           <p className="text-gray-400 text-sm line-clamp-2">
                             {post.content.substring(0, 150)}...
                           </p>

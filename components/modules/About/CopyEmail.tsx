@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
@@ -41,7 +42,7 @@ export default function CopyMail({ email }: { email: string }) {
   return (
     <>
       <div className="absolute top-0 h-full w-full rounded-2xl bg-black/30 z-50"></div>
-      <img src="/grid.svg" className="absolute top-0 -right-0 z-50" alt="" />
+      <Image src="/grid.svg" className="absolute top-0 -right-0 z-50" alt="" />
       <div className="absolute z-50 inset-0 flex items-center -bottom-10 justify-center h-full text-white font-semibold px-4 text-center ">
         <div className="flex flex-col items-center justify-center">
           <h1 className="">

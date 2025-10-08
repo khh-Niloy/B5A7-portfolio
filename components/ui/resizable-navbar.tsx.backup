@@ -9,7 +9,6 @@ import {
 } from "framer-motion";
 
 import React, { useRef, useState } from "react";
-import Image from "next/image";
 
 
 interface NavbarProps {
@@ -191,12 +190,12 @@ export const MobileNavHeader = ({
   );
 };
 
-export const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
+export const MobileNavMenu = ({
   children,
   className,
   isOpen,
-  onClose,
-}) => {
+  onClose: () => void,
+}: MobileNavMenuProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -236,7 +235,13 @@ export const NavbarLogo = () => {
       href="#"
       className="relative z-[50] mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-white"
     >
-      <span className="font-bold text-white">Niloy</span>
+      <img
+        src="https://assets.aceternity.com/logo-dark.png"
+        alt="logo"
+        width={30}
+        height={30}
+      />
+      <span className="font-medium text-white">Niloy</span>
     </a>
   );
 };

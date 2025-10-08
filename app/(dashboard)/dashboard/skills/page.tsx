@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm, useFieldArray, Controller, Control, UseFormRegister } from "react-hook-form";
 import { Plus, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -42,22 +42,23 @@ const PREDEFINED_CATEGORIES = [
 ];
 
 export default function Skills() {
-  const [existingSkills, setExistingSkills] = React.useState<ExistingSkill[]>([]);
+  const [existingSkills, setExistingSkills] = React.useState<ExistingSkill[]>(
+    []
+  );
   const [loading, setLoading] = React.useState(true);
   const [showForm, setShowForm] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
-  const [editingSkill, setEditingSkill] = React.useState<ExistingSkill | null>(null);
-
-  const { control, handleSubmit, register, reset, setValue } = useForm<SkillFormValues>({
-    defaultValues: {
-      categories: [
-        {
-          category: "frontend",
-          skills: "",
-        },
-      ],
-    },
-  });
+  const { control, handleSubmit, register, reset } =
+    useForm<SkillFormValues>({
+      defaultValues: {
+        categories: [
+          {
+            category: "frontend",
+            skills: "",
+          },
+        ],
+      },
+    });
 
   const {
     fields: categoryFields,
@@ -68,7 +69,6 @@ export default function Skills() {
     name: "categories",
   });
 
-  // Fetch existing skills
   const fetchSkills = async () => {
     setLoading(true);
     try {
@@ -83,71 +83,65 @@ export default function Skills() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchSkills();
   }, []);
 
   const handleCreate = () => {
     setIsEditing(false);
-    setEditingSkill(null);
     setShowForm(true);
     reset();
   };
 
   const handleEdit = (skill: ExistingSkill) => {
     setIsEditing(true);
-    setEditingSkill(skill);
     setShowForm(true);
-    // Populate form with existing skill data
     reset({
-      categories: [{
-        category: skill.category,
-        skills: skill.skills.join(", ")
-      }]
+      categories: [
+        {
+          category: skill.category,
+          skills: skill.skills.join(", "),
+        },
+      ],
     });
   };
 
-  const handleDelete = async (skillId: string) => {
-    if (confirm("Are you sure you want to delete this skill category?")) {
-      try {
-        // TODO: Implement delete skills API
-        setExistingSkills(existingSkills.filter(skill => skill._id !== skillId));
-        toast.success("Skill category deleted successfully!");
-      } catch (error) {
-        console.error("Failed to delete skill:", error);
-        toast.error("Failed to delete skill category");
-      }
-    }
-  };
+  // const handleDelete = async (skillId: string) => {
+  //   if (confirm("Are you sure you want to delete this skill category?")) {
+  //     try {
+  //       // TODO: Implement delete skills API
+  //       setExistingSkills(existingSkills.filter(skill => skill._id !== skillId));
+  //       toast.success("Skill category deleted successfully!");
+  //     } catch (error) {
+  //       console.error("Failed to delete skill:", error);
+  //       toast.error("Failed to delete skill category");
+  //     }
+  //   }
+  // };
 
   const handleCancel = () => {
     setShowForm(false);
     setIsEditing(false);
-    setEditingSkill(null);
     reset();
   };
 
   const handleAdd = async (data: SkillFormValues) => {
-    // Transform skills string to array
     const transformedData = data.categories.map((category) => ({
       category: category.category,
       skills: category.skills
         .split(",")
         .map((skill) => skill.trim())
-        .filter((skill) => skill !== ""), // Remove empty strings
+        .filter((skill) => skill !== ""),
     }));
-
-    console.log("Adding Skills:", transformedData);
 
     try {
       const result = await createSkills(transformedData);
-      console.log("Add Result:", result);
-      
+
       if (result?.success) {
         toast.success("Skills added successfully! 💪");
         setShowForm(false);
         reset();
-        fetchSkills(); // Refresh skills list
+        fetchSkills();
       } else {
         toast.error(result?.message || "Failed to add skills");
       }
@@ -158,26 +152,22 @@ export default function Skills() {
   };
 
   const handleUpdate = async (data: SkillFormValues) => {
-    // Transform skills string to array
     const transformedData = data.categories.map((category) => ({
       category: category.category,
       skills: category.skills
         .split(",")
         .map((skill) => skill.trim())
-        .filter((skill) => skill !== ""), // Remove empty strings
+        .filter((skill) => skill !== ""),
     }));
-
-    console.log("Updating Skills:", transformedData);
 
     try {
       const result = await updateSkills(transformedData);
-      console.log("Update Result:", result);
-      
+
       if (result?.success) {
         toast.success("Skills updated successfully! 🔥");
         setShowForm(false);
         reset();
-        fetchSkills(); // Refresh skills list
+        fetchSkills();
       } else {
         toast.error(result?.message || "Failed to update skills");
       }
@@ -210,7 +200,7 @@ export default function Skills() {
             Manage your technical skills organized by categories.
           </p>
         </div>
-        
+
         {!showForm && (
           <Button
             onClick={handleCreate}
@@ -325,12 +315,12 @@ export default function Skills() {
                           {skillCategory.skills.length} skills
                         </span>
                       </div>
-                      
+
                       <div className="text-sm text-gray-400 mb-4">
-                        Created {new Date(skillCategory.createdAt).toLocaleDateString()}
+                        Created{" "}
+                        {new Date(skillCategory.createdAt).toLocaleDateString()}
                       </div>
 
-                      {/* Skills Pills */}
                       <div className="flex flex-wrap gap-2">
                         {skillCategory.skills.map((skill, index) => (
                           <span
@@ -352,14 +342,14 @@ export default function Skills() {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button
+                      {/* <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleDelete(skillCategory._id)}
                         className="border-red-500/30 text-red-400 hover:bg-red-500/10"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                 </div>
@@ -380,8 +370,8 @@ function CategorySection({
   canRemove,
 }: {
   categoryIndex: number;
-  control: any;
-  register: any;
+  control: Control<SkillFormValues>;
+  register: UseFormRegister<SkillFormValues>;
   onRemove: () => void;
   canRemove: boolean;
 }) {

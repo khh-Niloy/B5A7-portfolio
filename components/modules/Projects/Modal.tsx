@@ -3,34 +3,16 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import getEachProject from "@/helper/getEachProject";
+import { toArrayConvert } from "@/lib/ToArrayConvert";
 
 export async function Modal({ id }: { id: string }) {
-
-
   const project = await getEachProject(id);
-  console.log(project);
-
-  // Normalize helper for arrays/strings
-  const toArray = (val: any) => {
-    if (!val) return [] as string[];
-    if (Array.isArray(val)) return val as string[];
-    if (typeof val === "string") {
-      return val
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-    }
-    return [] as string[];
-  };
 
   return (
     <Dialog>
@@ -57,22 +39,28 @@ export async function Modal({ id }: { id: string }) {
             {project?.shortDes && (
               <div>
                 <h4 className="text-white font-semibold mb-1">Summary</h4>
-                <p className="text-gray-300 leading-relaxed">{project.shortDes}</p>
+                <p className="text-gray-300 leading-relaxed">
+                  {project.shortDes}
+                </p>
               </div>
             )}
 
             {project?.problemSolution && (
               <div>
-                <h4 className="text-white font-semibold mb-1">Problem & Solution</h4>
-                <p className="text-gray-300 leading-relaxed">{project.problemSolution}</p>
+                <h4 className="text-white font-semibold mb-1">
+                  Problem & Solution
+                </h4>
+                <p className="text-gray-300 leading-relaxed">
+                  {project.problemSolution}
+                </p>
               </div>
             )}
 
-            {toArray(project?.techStack).length > 0 && (
+            {toArrayConvert(project?.techStack).length > 0 && (
               <div>
                 <h4 className="text-white font-semibold mb-2">Tech Stack</h4>
                 <div className="flex flex-wrap gap-2">
-                  {toArray(project?.techStack).map((t, i) => (
+                  {toArrayConvert(project?.techStack).map((t, i) => (
                     <span
                       key={`tech-${i}`}
                       className="px-3 py-1.5 bg-white/10 text-gray-300 text-sm rounded-lg border border-white/10"
@@ -84,11 +72,11 @@ export async function Modal({ id }: { id: string }) {
               </div>
             )}
 
-            {toArray(project?.features).length > 0 && (
+            {toArrayConvert(project?.features).length > 0 && (
               <div>
                 <h4 className="text-white font-semibold mb-2">Key Features</h4>
                 <ul className="list-disc list-inside text-gray-300 space-y-1">
-                  {toArray(project?.features).map((f, i) => (
+                  {toArrayConvert(project?.features).map((f, i) => (
                     <li key={`feat-${i}`}>{f}</li>
                   ))}
                 </ul>
@@ -98,14 +86,20 @@ export async function Modal({ id }: { id: string }) {
             {project?.dependencies && (
               <div>
                 <h4 className="text-white font-semibold mb-1">Dependencies</h4>
-                <p className="text-gray-300 leading-relaxed">{project.dependencies}</p>
+                <p className="text-gray-300 leading-relaxed">
+                  {project.dependencies}
+                </p>
               </div>
             )}
 
             {project?.responsibilities && (
               <div>
-                <h4 className="text-white font-semibold mb-1">Responsibilities</h4>
-                <p className="text-gray-300 leading-relaxed">{project.responsibilities}</p>
+                <h4 className="text-white font-semibold mb-1">
+                  Responsibilities
+                </h4>
+                <p className="text-gray-300 leading-relaxed">
+                  {project.responsibilities}
+                </p>
               </div>
             )}
 
@@ -135,7 +129,9 @@ export async function Modal({ id }: { id: string }) {
 
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button className="cursor-pointer w-full" variant="outline">Close</Button>
+              <Button className="cursor-pointer w-full" variant="outline">
+                Close
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

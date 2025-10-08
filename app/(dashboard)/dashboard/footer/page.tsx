@@ -44,16 +44,13 @@ export default function Footer() {
     name: "socialLinks",
   });
 
-  // Mock data - replace with actual API calls
   useEffect(() => {
     const fetchSocialLinks = async () => {
       setLoading(true);
       try {
-        // TODO: Replace with actual API call
         // const data = await getSocialLinks();
         // setSocialLinks(data || []);
         
-        // Mock data for now
         setSocialLinks([
           {
             _id: "1",
@@ -108,7 +105,6 @@ export default function Footer() {
         return;
       }
 
-      // TODO: Replace with actual API calls
       if (isEditing) {
         // await updateSocialLinks(filteredLinks);
         setSocialLinks(filteredLinks.map((link, index) => ({ ...link, _id: String(index + 1) })));

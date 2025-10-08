@@ -1,10 +1,14 @@
 "use server";
+import { revalidateTag } from "next/cache";
 
 export async function deleteBlog(blogId: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/blog/${blogId}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/blog/${blogId}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     const result = await response.json();
 
@@ -14,6 +18,7 @@ export async function deleteBlog(blogId: string) {
         message: result.message || "Failed to delete blog post",
       };
     }
+    revalidateTag("blogs");
 
     return {
       success: true,

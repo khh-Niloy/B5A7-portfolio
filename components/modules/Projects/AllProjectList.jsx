@@ -4,7 +4,6 @@ import getProjects from "@/helper/getProjects";
 
 export default async function AllProjectList() {
   const projects = await getProjects();
-  // console.log(projects);
 
   return (
     <div className="text-white pt-32 pb-20">

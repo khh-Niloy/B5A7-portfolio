@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
   IconHome,
-  IconBrandTabler,
   IconCode,
   IconUser,
   IconBulb,

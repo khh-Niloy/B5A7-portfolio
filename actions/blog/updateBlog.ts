@@ -1,12 +1,15 @@
 "use server";
+import { revalidateTag } from "next/cache";
 
 export async function updateBlog(blogId: string, formData: FormData) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/blog/${blogId}`, {
-      method: "PATCH",
-      body: formData, // Send FormData directly for file upload
-    });
-
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/blog/${blogId}`,
+      {
+        method: "PATCH",
+        body: formData,
+      }
+    );
     const result = await response.json();
 
     if (!response.ok) {
@@ -15,6 +18,7 @@ export async function updateBlog(blogId: string, formData: FormData) {
         message: result.message || "Failed to update blog post",
       };
     }
+    revalidateTag("blogs");
 
     return {
       success: true,

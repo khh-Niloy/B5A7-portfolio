@@ -9,9 +9,11 @@ import AllBlogList from "@/components/modules/Blog/AllBlogList";
 import Footer from "@/components/modules/Footer/Footer";
 import Experience from "@/components/modules/Experience/Experience";
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const aboutContent = await getAbout();
-  // console.log(aboutContent);
   const educationContent = {
     education: aboutContent.universityInfo,
     sampleText: aboutContent.aboutInfo.sampleText,

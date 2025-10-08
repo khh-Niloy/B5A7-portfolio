@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-const login = async (data: any) => {
+const login = async (data: { email: string; password: string }) => {
   try {
     console.log(data);
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
@@ -9,7 +9,7 @@ const login = async (data: any) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-      credentials: "include", // This is important for cookies!
+      credentials: "include",
     });
     const result = await res.json();
     console.log(result);
@@ -20,16 +20,13 @@ const login = async (data: any) => {
       };
     }
     
-    // Only redirect on successful login
     if (result.success || result.data) {
       redirect("/dashboard");
     }
     
     return result;
   } catch (error) {
-    // Check if it's a redirect error (which is expected)
     if (error && typeof error === 'object' && 'digest' in error) {
-      // This is a Next.js redirect, let it through
       throw error;
     }
     

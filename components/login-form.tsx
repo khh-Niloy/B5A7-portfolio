@@ -10,16 +10,14 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { loginSchema, type LoginFormData } from "@/lib/validation";
+import { withErrorHandling } from "@/lib/error-handler";
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
 
 export function LoginForm({
   className,
@@ -27,42 +25,60 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>();
+    formState: { errors, isSubmitting },
+    clearErrors,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur",
+  });
 
   const onSubmit = async (data: LoginFormData) => {
-    // console.log(data);
     setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
+    setApiError(null);
+    clearErrors();
+
+    await withErrorHandling(
+      async () => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const result = await res.json();
+        
+        if (!result.success && !result.data) {
+          throw new Error(result.message || "Login failed");
+        }
+
+        return result;
+      },
+      {
+        successMessage: "Login successful! Welcome back! 🎉",
+        errorMessage: "Login failed. Please check your credentials and try again.",
+        onError: (error) => {
+          setApiError(error instanceof Error ? error.message : "Login failed");
         },
-        credentials: "include",
-      });
-      const result = await res.json();
-      // console.log(result);
-      if (result.success || result.data) {
-        toast.success("Login successful");
-        router.push("/");
-      } else {
-        toast.error(result.message || "Login failed");
-        setError(result.message || "Login failed");
+        onSuccess: () => {
+          router.push("/dashboard");
+        },
       }
-    } catch (error) {
-      // console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-    
+    );
+
+    setIsLoading(false);
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -77,9 +93,10 @@ export function LoginForm({
                 </p>
               </div>
               
-              {error && (
-                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
-                  <p className="text-red-400 text-sm text-center">{error}</p>
+              {apiError && (
+                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+                  <p className="text-red-400 text-sm">{apiError}</p>
                 </div>
               )}
               
@@ -91,17 +108,15 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
-                  className={errors.email ? "border-red-500" : ""}
+                  {...register("email")}
+                  className={errors.email ? "border-red-500 focus:border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 {errors.email && (
-                  <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.email.message}
+                  </p>
                 )}
               </Field>
               
@@ -113,15 +128,15 @@ export function LoginForm({
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    className={`pr-10 ${errors.password ? "border-red-500" : ""}`}
-                    {...register("password", {
-                      required: "Password is required",
-                    })}
+                    className={`pr-10 ${errors.password ? "border-red-500 focus:border-red-500" : ""}`}
+                    {...register("password")}
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                    disabled={isLoading}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -131,12 +146,19 @@ export function LoginForm({
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>
+                  <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.password.message}
+                  </p>
                 )}
               </Field>
               
               <Field>
-                <Button type="submit" disabled={isLoading} className="w-full bg-blue-500 hover:bg-blue-600">
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || isSubmitting} 
+                  className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
               </Field>

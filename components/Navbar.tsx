@@ -53,7 +53,7 @@ export function NavbarDemo() {
     setIsMobileMenuOpen(false);
   };
 
-  const [me, setMe] = useState<any>(null);
+  const [me, setMe] = useState<Record<string, unknown> | null>(null);
   const router = useRouter();
   useEffect(() => {
     const fetchMe = async () => {
