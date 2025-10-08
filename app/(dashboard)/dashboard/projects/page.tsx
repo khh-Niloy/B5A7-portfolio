@@ -15,18 +15,16 @@ import getEachProject from "@/helper/getEachProject";
 interface Project {
   _id: string;
   image: string;
-  projectName: string;
   shortDes: string;
   techStack: string[];
   liveSite: string;
-  details: {
-    tagline: string;
-    problemSolution: string;
-    features: string[];
-    dependencies: string[];
-    responsibilities: string;
-    githubRepo: string;
-  };
+  projectName: string;
+  tagline: string;
+  problemSolution: string;
+  features: string[];
+  dependencies: string[];
+  responsibilities: string;
+  githubRepo: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -105,19 +103,39 @@ export default function Projects() {
     setShowForm(true);
     setFiles([]);
 
-    // Populate form with project data
-    setValue("projectName", project.projectName);
-    setValue("shortDes", project.shortDes);
-    setValue("liveSite", project.liveSite);
-    setValue("techStack", project.techStack?.join(", ") || "");
-
-    if (project.details) {
-      setValue("tagline", project.details.tagline || "");
-      setValue("problemSolution", project.details.problemSolution || "");
-      setValue("responsibilities", project.details.responsibilities || "");
-      setValue("githubRepo", project.details.githubRepo || "");
-      setValue("features", project.details.features?.join(", ") || "");
-      setValue("dependencies", project.details.dependencies?.join(", ") || "");
+    try {
+      // Fetch the freshest copy by id (flat schema)
+      const fresh = await getEachProject(project._id);
+      console.log('fresh project:', JSON.stringify(fresh, null, 2));
+      const mapped = {
+        projectName: fresh?.projectName || "",
+        shortDes: fresh?.shortDes || "",
+        liveSite: fresh?.liveSite || "",
+        tagline: fresh?.tagline || "",
+        problemSolution: fresh?.problemSolution || "",
+        responsibilities: fresh?.responsibilities || "",
+        githubRepo: fresh?.githubRepo || "",
+        features: Array.isArray(fresh?.features) ? fresh.features.join(", ") : "",
+        dependencies: fresh.dependencies ?? "",
+        techStack: Array.isArray(fresh?.techStack) ? fresh.techStack.join(", ") : "",
+      };
+      reset(mapped);
+      console.log('mapped form values:', mapped);
+    } catch (e) {
+      // Fallback to the list item if fetch fails (flat schema)
+      const mapped = {
+        projectName: project.projectName || "",
+        shortDes: project.shortDes || "",
+        liveSite: project.liveSite || "",
+        tagline: (project as any).tagline || "",
+        problemSolution: (project as any).problemSolution || "",
+        responsibilities: (project as any).responsibilities || "",
+        githubRepo: (project as any).githubRepo || "",
+        features: Array.isArray((project as any).features) ? (project as any).features.join(", ") : "",
+        dependencies: Array.isArray((project as any).dependencies) ? (project as any).dependencies.join(", ") : "",
+        techStack: Array.isArray(project.techStack) ? project.techStack.join(", ") : "",
+      };
+      reset(mapped);
     }
   };
 
@@ -153,17 +171,17 @@ export default function Projects() {
       // Transform arrays
       const techStackArray = data.techStack
         .split(",")
-        .map((tech) => tech.trim())
+        .map((tech) => tech.trim().replace(/\.$/, ""))
         .filter((tech) => tech !== "");
 
       const featuresArray = data.features
         .split(",")
-        .map((feature) => feature.trim())
+        .map((feature) => feature.trim().replace(/\.$/, ""))
         .filter((feature) => feature !== "");
 
       const dependenciesArray = data.dependencies
         .split(",")
-        .map((dep) => dep.trim())
+        .map((dep) => dep.trim().replace(/\.$/, ""))
         .filter((dep) => dep !== "");
 
       // Append main project fields
@@ -181,7 +199,20 @@ export default function Projects() {
       formData.append("githubRepo", data.githubRepo);
 
       if (isEditing && editingProject) {
-        // TODO: Implement update project API
+        // Send PATCH update with multipart/form-data
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_API}/projects/${editingProject._id}`,
+          {
+            method: "PATCH",
+            body: formData,
+            credentials: "include",
+          }
+        );
+        const result = await res.json();
+        if (!res.ok || !result?.success) {
+          toast.error(result?.message || "Failed to update project");
+          return;
+        }
         toast.success("Project updated successfully! 🚀");
         setShowForm(false);
         setFiles([]);
@@ -475,7 +506,7 @@ export default function Projects() {
 
                           <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
                             <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-sm font-medium">
-                              {project.details?.tagline || "Project"}
+                              {project.tagline}
                             </span>
                             <span className="text-gray-500">
                               {new Date(project.createdAt).toLocaleDateString()}
@@ -537,9 +568,9 @@ export default function Projects() {
                             Live Site
                           </a>
                         )}
-                        {project.details?.githubRepo && (
+                        {project?.githubRepo && (
                           <a
-                            href={project.details.githubRepo}
+                            href={project.githubRepo}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200"

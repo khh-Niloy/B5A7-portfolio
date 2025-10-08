@@ -16,7 +16,7 @@ interface ProjectFormValues {
   shortDes: string;
   techStack: string;
   liveSite: string;
-  
+
   // Details fields
   tagline: string;
   problemSolution: string;
@@ -37,15 +37,15 @@ interface UpdateProjectsProps {
   setLoadingProjects: (loading: boolean) => void;
 }
 
-export default function UpdateProjects({ 
-  files, 
-  setFiles, 
-  projects, 
-  setProjects, 
-  selectedProject, 
-  setSelectedProject, 
-  loadingProjects, 
-  setLoadingProjects 
+export default function UpdateProjects({
+  files,
+  setFiles,
+  projects,
+  setProjects,
+  selectedProject,
+  setSelectedProject,
+  loadingProjects,
+  setLoadingProjects,
 }: UpdateProjectsProps) {
   const {
     register,
@@ -74,6 +74,7 @@ export default function UpdateProjects({
       setLoadingProjects(true);
       try {
         const projectsData = await getProjects();
+        console.log(projectsData);
         setProjects(projectsData || []);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
@@ -97,45 +98,108 @@ export default function UpdateProjects({
     try {
       const projectData = await getEachProject(projectId);
       setSelectedProject(projectData);
-      
-      // Populate form with project data
+      console.log(projectData);
+      console.log(projectData.features);
+      console.log(projectData.dependencies);
+      console.log(projectData.techStack);
+
+      // Populate form with project data (support both flat and legacy nested structures)
       if (projectData) {
         setValue("projectName", projectData.projectName || "");
         setValue("shortDes", projectData.shortDes || "");
         setValue("liveSite", projectData.liveSite || "");
+
+        // Prefer flat fields, fallback to legacy details.* if present
+        setValue("tagline", projectData.tagline);
+        setValue("problemSolution", projectData.problemSolution ?? "");
+        setValue("responsibilities", projectData.responsibilities ?? "");
+        setValue("githubRepo", projectData.githubRepo ?? "");
+
+        // Arrays → comma separated
+        const featuresArr = projectData.features ?? "";
+        setValue(
+          "features",
+          Array.isArray(featuresArr) ? featuresArr.join(", ") : ""
+        );
+
+        setValue("dependencies", projectData.dependencies ?? "");
         
-        // Handle details object
-        if (projectData.details) {
-          setValue("tagline", projectData.details.tagline || "");
-          setValue("problemSolution", projectData.details.problemSolution || "");
-          setValue("responsibilities", projectData.details.responsibilities || "");
-          setValue("githubRepo", projectData.details.githubRepo || "");
-          
-          // Convert arrays back to comma-separated strings
-          setValue("features", projectData.details.features?.join(", ") || "");
-          setValue("dependencies", projectData.details.dependencies?.join(", ") || "");
-        }
-        
-        // Handle techStack array
-        setValue("techStack", projectData.techStack?.join(", ") || "");
+
+        // techStack
+        setValue(
+          "techStack",
+          Array.isArray(projectData.techStack)
+            ? projectData.techStack.join(", ")
+            : ""
+        );
       }
-      } catch (error) {
-        console.error("Failed to fetch project details:", error);
-        toast.error("Failed to load project details");
-      }
+    } catch (error) {
+      console.error("Failed to fetch project details:", error);
+      toast.error("Failed to load project details");
+    }
   };
 
   const onUpdateSubmit = async (data: ProjectFormValues) => {
+    console.log(data);
     if (!selectedProject) {
       toast.error("Please select a project to update");
       return;
     }
 
-    console.log("Update project data:", data);
-    console.log("Selected project ID:", selectedProject._id);
-    
-    // TODO: Implement update project API call
-    toast.success("Update functionality will be implemented with your update API");
+    try {
+      // Build FormData for PATCH (matches multerUpload.array("files"))
+      const formData = new FormData();
+
+      // Include image if user uploaded a new one
+      if (files && files.length > 0) {
+        formData.append("files", files[0]);
+      }
+
+      // Send plain strings; backend will parse
+      const techStackString = data.techStack ?? "";
+      const featuresString = data.features ?? "";
+      const dependenciesString = data.dependencies ?? "";
+
+      // Append flat fields per your updated model
+      formData.append("projectName", data.projectName || "");
+      formData.append("shortDes", data.shortDes || "");
+      formData.append("techStack", techStackString);
+      formData.append("liveSite", data.liveSite || "");
+      formData.append("tagline", data.tagline || "");
+      formData.append("problemSolution", data.problemSolution || "");
+      formData.append("features", featuresString);
+      formData.append("dependencies", dependenciesString);
+      formData.append("responsibilities", data.responsibilities || "");
+      formData.append("githubRepo", data.githubRepo || "");
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/projects/${selectedProject._id}`,
+        {
+          method: "PATCH",
+          body: formData,
+          credentials: "include",
+        }
+      );
+
+      const result = await res.json();
+
+      if (!res.ok || !result?.success) {
+        toast.error(result?.message || "Failed to update project");
+        return;
+      }
+
+      toast.success("Project updated successfully! 🚀");
+      // Refresh list and clear state
+      setFiles([]);
+      setSelectedProject(null);
+      reset();
+      setLoadingProjects(true);
+      const refreshed = await getProjects();
+      setProjects(refreshed || []);
+      setLoadingProjects(false);
+    } catch (err) {
+      toast.error("Failed to update project");
+    }
   };
 
   return (
@@ -148,17 +212,23 @@ export default function UpdateProjects({
         <div className="space-y-4">
           <div>
             <Label htmlFor="projectSelect">Choose Project</Label>
-              <select
-                id="projectSelect"
-                onChange={(e) => handleProjectSelect(e.target.value)}
-                className="mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-3 text-white focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={loadingProjects}
-              >
+            <select
+              id="projectSelect"
+              onChange={(e) => handleProjectSelect(e.target.value)}
+              className="mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-3 text-white focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none hover:border-white/20 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={loadingProjects}
+            >
               <option value="" className="bg-[#0a0f1e] text-gray-400">
-                {loadingProjects ? "Loading projects..." : "Select a project to update..."}
+                {loadingProjects
+                  ? "Loading projects..."
+                  : "Select a project to update..."}
               </option>
               {projects.map((project) => (
-                <option key={project._id} value={project._id} className="bg-[#0a0f1e] text-white">
+                <option
+                  key={project._id}
+                  value={project._id}
+                  className="bg-[#0a0f1e] text-white"
+                >
                   {project.projectName}
                 </option>
               ))}
@@ -177,8 +247,8 @@ export default function UpdateProjects({
             </h2>
             {selectedProject.image && (
               <div className="mb-4">
-                <img 
-                  src={selectedProject.image} 
+                <img
+                  src={selectedProject.image}
                   alt={selectedProject.projectName}
                   className="w-full max-w-md h-48 object-cover rounded-lg border"
                 />
@@ -266,7 +336,9 @@ export default function UpdateProjects({
 
             <div className="space-y-6">
               <div>
-                <Label htmlFor="update-problemSolution">Problem & Solution</Label>
+                <Label htmlFor="update-problemSolution">
+                  Problem & Solution
+                </Label>
                 <Textarea
                   id="update-problemSolution"
                   placeholder="What problem does this project solve and how?"
@@ -285,13 +357,15 @@ export default function UpdateProjects({
                   className="mt-2 min-h-[100px]"
                   required
                 />
-                  <p className="text-sm text-gray-400 mt-1">
-                    Separate features with commas
-                  </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Separate features with commas
+                </p>
               </div>
 
               <div>
-                <Label htmlFor="update-responsibilities">Your Responsibilities</Label>
+                <Label htmlFor="update-responsibilities">
+                  Your Responsibilities
+                </Label>
                 <Textarea
                   id="update-responsibilities"
                   placeholder="What was your role and responsibilities in this project?"
@@ -319,9 +393,9 @@ export default function UpdateProjects({
                   className="mt-2 min-h-[100px]"
                   required
                 />
-                  <p className="text-sm text-gray-400 mt-1">
-                    Separate technologies with commas
-                  </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Separate technologies with commas
+                </p>
               </div>
 
               <div>
@@ -333,9 +407,9 @@ export default function UpdateProjects({
                   className="mt-2 min-h-[100px]"
                   required
                 />
-                  <p className="text-sm text-gray-400 mt-1">
-                    Separate dependencies with commas
-                  </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Separate dependencies with commas
+                </p>
               </div>
             </div>
           </div>

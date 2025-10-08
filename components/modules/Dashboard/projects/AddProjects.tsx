@@ -52,12 +52,12 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
 
   const handleFileUpload = (uploadedFiles: File[]) => {
     setFiles(uploadedFiles);
-    console.log("Uploaded files:", uploadedFiles);
+    // console.log("Uploaded files:", uploadedFiles);
   };
 
   const onSubmit = async (data: ProjectFormValues) => {
-    console.log("Project data:", data);
-    console.log("Uploaded image:", files[0]);
+    // console.log("Project data:", data);
+    // console.log("Uploaded image:", files[0]);
 
     if (files.length === 0) {
       toast.error("Please upload a project image");
@@ -70,39 +70,26 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
     // Append the image file (backend expects "files" field)
     formData.append("files", files[0]);
 
-    // Transform arrays
-    const techStackArray = data.techStack
-      .split(",")
-      .map((tech) => tech.trim())
-      .filter((tech) => tech !== "");
-    
-    const featuresArray = data.features
-      .split(",")
-      .map((feature) => feature.trim())
-      .filter((feature) => feature !== "");
-    
-    const dependenciesArray = data.dependencies
-      .split(",")
-      .map((dep) => dep.trim())
-      .filter((dep) => dep !== "");
+    // Send plain strings; backend will parse
+    const techStackString = data.techStack ?? "";
+    const featuresString = data.features ?? "";
+    const dependenciesString = data.dependencies ?? "";
 
-    // Append main project fields
-    formData.append("projectName", data.projectName);
-    formData.append("shortDes", data.shortDes);
-    formData.append("techStack", JSON.stringify(techStackArray));
-    formData.append("liveSite", data.liveSite);
-    
-    // Append details fields
-    formData.append("tagline", data.tagline);
-    formData.append("problemSolution", data.problemSolution);
-    formData.append("features", JSON.stringify(featuresArray));
-    formData.append("dependencies", JSON.stringify(dependenciesArray));
-    formData.append("responsibilities", data.responsibilities);
-    formData.append("githubRepo", data.githubRepo);
+    // Append flat fields per updated model (no nested details)
+    formData.append("projectName", data.projectName || "");
+    formData.append("shortDes", data.shortDes || "");
+    formData.append("techStack", techStackString);
+    formData.append("liveSite", data.liveSite || "");
+    formData.append("tagline", data.tagline || "");
+    formData.append("problemSolution", data.problemSolution || "");
+    formData.append("features", featuresString);
+    formData.append("dependencies", dependenciesString);
+    formData.append("responsibilities", data.responsibilities || "");
+    formData.append("githubRepo", data.githubRepo || "");
 
     try {
       const result = await createProject(formData);
-      console.log("Result:", result);
+      // console.log("Result:", result);
 
       if (result?.success) {
         toast.success("Project created successfully! 🚀");
@@ -141,7 +128,7 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="e.g., MadChef - Restaurant Management App"
               {...register("projectName")}
               className="mt-2"
-              required
+              
             />
           </div>
 
@@ -152,7 +139,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="A catchy tagline for your project"
               {...register("tagline")}
               className="mt-2"
-              required
             />
           </div>
 
@@ -163,7 +149,7 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="Brief description of your project..."
               {...register("shortDes")}
               className="mt-2 min-h-[80px]"
-              required
+              
             />
           </div>
 
@@ -175,7 +161,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="https://example.com"
               {...register("liveSite")}
               className="mt-2"
-              required
             />
           </div>
 
@@ -187,7 +172,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="https://github.com/username/repo"
               {...register("githubRepo")}
               className="mt-2"
-              required
             />
           </div>
         </div>
@@ -207,7 +191,7 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="What problem does this project solve and how?"
               {...register("problemSolution")}
               className="mt-2 min-h-[120px]"
-              required
+              
             />
           </div>
 
@@ -218,7 +202,7 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="Feature 1, Feature 2, Feature 3"
               {...register("features")}
               className="mt-2 min-h-[100px]"
-              required
+              
             />
             <p className="text-sm text-gray-400 mt-1">
               Separate features with commas
@@ -232,7 +216,7 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="What was your role and responsibilities in this project?"
               {...register("responsibilities")}
               className="mt-2 min-h-[100px]"
-              required
+              
             />
           </div>
         </div>
@@ -252,7 +236,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="React, Next.js, TypeScript, MongoDB"
               {...register("techStack")}
               className="mt-2 min-h-[100px]"
-              required
             />
             <p className="text-sm text-gray-400 mt-1">
               Separate technologies with commas
@@ -266,7 +249,7 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="axios, framer-motion, tailwindcss"
               {...register("dependencies")}
               className="mt-2 min-h-[100px]"
-              required
+              
             />
             <p className="text-sm text-gray-400 mt-1">
               Separate dependencies with commas

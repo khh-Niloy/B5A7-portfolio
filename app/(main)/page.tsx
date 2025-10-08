@@ -7,6 +7,7 @@ import TechStack from "@/components/modules/Tech/TechStack";
 import AllProjectList from "@/components/modules/Projects/AllProjectList";
 import AllBlogList from "@/components/modules/Blog/AllBlogList";
 import Footer from "@/components/modules/Footer/Footer";
+import Experience from "@/components/modules/Experience/Experience";
 
 export default async function Home() {
   const aboutContent = await getAbout();
@@ -33,6 +34,10 @@ export default async function Home() {
             <SocialLinks content={socialLinksContent} />
             <Education content={educationContent} />
           </div>
+        </div>
+
+        <div id="experience" className="mt-20 ">
+          <Experience />
         </div>
 
         <div id="skills" className="mt-20 ">

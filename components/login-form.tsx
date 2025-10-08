@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { redirect } from "next/navigation";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface LoginFormData {
   email: string;
@@ -27,7 +28,7 @@ export function LoginForm({
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -50,8 +51,10 @@ export function LoginForm({
       const result = await res.json();
       // console.log(result);
       if (result.success || result.data) {
-        redirect("/");
+        toast.success("Login successful");
+        router.push("/");
       } else {
+        toast.error(result.message || "Login failed");
         setError(result.message || "Login failed");
       }
     } catch (error) {
