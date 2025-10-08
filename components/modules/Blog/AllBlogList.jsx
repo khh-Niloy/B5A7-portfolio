@@ -4,7 +4,7 @@ import getBlogs from "@/helper/getBlogs";
 
 export default async function AllBlogList() {
   const blogs = await getBlogs();
-  console.log("Blog posts:", blogs);
+  // console.log("Blog posts:", blogs);
 
   return (
     <div className="text-white pt-32 pb-20">

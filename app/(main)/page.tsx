@@ -10,7 +10,7 @@ import Footer from "@/components/modules/Footer/Footer";
 
 export default async function Home() {
   const aboutContent = await getAbout();
-  console.log(aboutContent);
+  // console.log(aboutContent);
   const educationContent = {
     education: aboutContent.universityInfo,
     sampleText: aboutContent.aboutInfo.sampleText,

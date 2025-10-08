@@ -4,7 +4,7 @@ import TechName from "./TechName";
 
 export default async function TechStack() {
   const skills = await getSkills();
-  console.log("All skills:", skills);
+  // console.log("All skills:", skills);
 
   const frontendData = skills?.data?.find((skill) => skill.category === "frontend");
   const backendData = skills?.data?.find((skill) => skill.category === "backend");

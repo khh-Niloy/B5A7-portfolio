@@ -2,7 +2,7 @@ import React from "react";
 import { getSkillIcon } from "@/lib/skillsIconMap";
 
 export default function TechName({ headTitle, techArray, give, forMobile }) {
-  console.log("techArray:", techArray);
+  // console.log("techArray:", techArray);
   
   return (
     <div className="w-full">

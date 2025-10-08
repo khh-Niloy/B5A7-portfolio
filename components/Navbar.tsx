@@ -10,7 +10,9 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState } from "react";
+import getMe from "@/helper/getMe";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function NavbarDemo() {
   const navItems = [
@@ -39,7 +41,7 @@ export function NavbarDemo() {
     link: string
   ) => {
     e.preventDefault();
-    const targetId = link.substring(1); // Remove the # from the link
+    const targetId = link.substring(1);
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {
@@ -48,9 +50,28 @@ export function NavbarDemo() {
         block: "start",
       });
     }
-
-    // Close mobile menu if open
     setIsMobileMenuOpen(false);
+  };
+
+  const [me, setMe] = useState<any>(null);
+  const router = useRouter();
+  useEffect(() => {
+    const fetchMe = async () => {
+      const me = await getMe();
+      setMe(me);
+    };
+    fetchMe();
+  }, []);
+
+  const handleLogout = async() => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/logout`, {
+      credentials: "include",
+      method: "POST",
+    });
+    const result = await res.json();
+    if (result.success) {
+      router.push("/");
+    }
   };
 
   return (
@@ -61,10 +82,21 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} onItemClick={handleNavClick} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary">Login</NavbarButton>
-            <NavbarButton href="/dashboard" variant="secondary">
-              Dashboard
-            </NavbarButton>
+            {me ? (
+              <>
+                <NavbarButton href="/dashboard" variant="secondary">
+                  Dashboard
+                </NavbarButton>
+                <NavbarButton onClick={() => handleLogout()} href="/dashboard" variant="secondary">
+                  Logout
+                </NavbarButton>
+              </>
+            ) : (
+              <NavbarButton href="/login" variant="secondary">
+                Login
+              </NavbarButton>
+            )}
+
             <NavbarButton
               target="_blank"
               href="https://drive.google.com/file/d/1BLx92Yt42G7AEEMrReQ2dp_ZNFCHl5as/view?usp=sharing"

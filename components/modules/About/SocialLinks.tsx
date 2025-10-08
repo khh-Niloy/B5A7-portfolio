@@ -7,7 +7,7 @@ import { FaWhatsapp } from "react-icons/fa";
 
 
 export default function SocialLinks({ content }: { content: any }) {
-  console.log(content);
+  // console.log(content);
   const { socialLinks, email } = content;
 
   const icons = {
