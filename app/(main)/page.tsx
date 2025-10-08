@@ -24,7 +24,7 @@ export default async function Home() {
     <>
       <Banner />
       <div className="w-[85%] mx-auto">
-        <div className="w-full mx-auto gap-3 flex mt-20">
+        <div id="about" className="w-full mx-auto gap-3 flex mt-20">
           <div className="w-1/2">
             <Journey content={aboutContent.journey} />
           </div>
@@ -35,11 +35,11 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="mt-20 ">
+        <div id="skills" className="mt-20 ">
           <TechStack />
         </div>
 
-        <div className="mt-20 ">
+        <div id="projects" className="mt-20 ">
           <AllProjectList />
         </div>
 
@@ -47,7 +47,7 @@ export default async function Home() {
           <AllBlogList />
         </div>
 
-        <div className="mt-20 ">
+        <div id="contact" className="mt-20 ">
           <Footer />
         </div>
       </div>

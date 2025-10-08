@@ -15,12 +15,16 @@ import { useState } from "react";
 export function NavbarDemo() {
   const navItems = [
     {
-      name: "Features",
-      link: "#features",
+      name: "About",
+      link: "#about",
     },
     {
-      name: "Pricing",
-      link: "#pricing",
+      name: "Skills",
+      link: "#skills",
+    },
+    {
+      name: "Projects",
+      link: "#projects",
     },
     {
       name: "Contact",
@@ -30,17 +34,44 @@ export function NavbarDemo() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    link: string
+  ) => {
+    e.preventDefault();
+    const targetId = link.substring(1); // Remove the # from the link
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+
+    // Close mobile menu if open
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <div className="relative w-full">
       <Navbar>
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
-          <NavItems items={navItems} />
+          <NavItems items={navItems} onItemClick={handleNavClick} />
           <div className="flex items-center gap-4">
             <NavbarButton variant="secondary">Login</NavbarButton>
-            <NavbarButton href="/dashboard" variant="secondary">Dashboard</NavbarButton>
-            <NavbarButton variant="primary">Book a call</NavbarButton>
+            <NavbarButton href="/dashboard" variant="secondary">
+              Dashboard
+            </NavbarButton>
+            <NavbarButton
+              target="_blank"
+              href="https://drive.google.com/file/d/1BLx92Yt42G7AEEMrReQ2dp_ZNFCHl5as/view?usp=sharing"
+              variant="primary"
+            >
+              My Resume
+            </NavbarButton>
           </div>
         </NavBody>
 
@@ -62,8 +93,8 @@ export function NavbarDemo() {
               <a
                 key={`mobile-link-${idx}`}
                 href={item.link}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-neutral-600 dark:text-neutral-300"
+                onClick={(e) => handleNavClick(e, item.link)}
+                className="relative text-white"
               >
                 <span className="block">{item.name}</span>
               </a>
@@ -90,5 +121,3 @@ export function NavbarDemo() {
     </div>
   );
 }
-
-
