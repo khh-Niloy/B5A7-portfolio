@@ -10,7 +10,7 @@ import Footer from "@/components/modules/Footer/Footer";
 import Experience from "@/components/modules/Experience/Experience";
 
 // Force dynamic rendering
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const aboutContent = await getAbout();
@@ -22,23 +22,25 @@ export default async function Home() {
     socialLinks: aboutContent.contacts,
     email: aboutContent.aboutInfo.email,
   };
-
   return (
     <>
       <Banner />
-      <div className="w-[85%] mx-auto">
-        <div id="about" className="w-full mx-auto gap-3 flex mt-20">
-          <div className="w-1/2">
+      <div className="w-[85%] lg:w-[90%] mx-auto">
+        <div
+          id="about"
+          className="w-full mx-auto gap-3 flex flex-col lg:flex-row mt-20"
+        >
+          <div className="xl:w-1/2 lg:w-[45%]">
             <Journey content={aboutContent.journey} />
           </div>
 
-          <div className="w-1/2 flex flex-col gap-5">
+          <div className="xl:w-1/2 lg:w-[55%] flex flex-col gap-5">
             <SocialLinks content={socialLinksContent} />
             <Education content={educationContent} />
           </div>
         </div>
 
-        <div id="experience" className="mt-20 ">
+        <div id="experience" className="mt-10 ">
           <Experience />
         </div>
 
@@ -46,15 +48,15 @@ export default async function Home() {
           <TechStack />
         </div>
 
-        <div id="projects" className="mt-20 ">
+        <div id="projects" className=" ">
           <AllProjectList />
         </div>
 
-        <div className="mt-20 ">
+        <div className=" ">
           <AllBlogList />
         </div>
 
-        <div id="contact" className="mt-20 ">
+        <div id="contact" className="">
           <Footer />
         </div>
       </div>

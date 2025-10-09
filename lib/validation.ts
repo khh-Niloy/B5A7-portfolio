@@ -8,7 +8,6 @@ export const emailSchema = z
 export const passwordSchema = z
   .string()
   .min(1, "Password is required")
-  .min(6, "Password must be at least 6 characters");
 
 export const urlSchema = z
   .string()

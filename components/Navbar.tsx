@@ -32,6 +32,10 @@ export function NavbarDemo() {
       name: "Contact",
       link: "#contact",
     },
+    {
+      name: "Experience",
+      link: "#experience",
+    }
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

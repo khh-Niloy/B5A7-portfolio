@@ -22,7 +22,7 @@ export async function Modal({ id }: { id: string }) {
             Project Details
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:w-[90%] max-h-[70vh] overflow-y-auto w-full">
+        <DialogContent className="w-[85%] sm:w-[90%] max-h-[70vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl">
               {project?.projectName || "Project Details"}
