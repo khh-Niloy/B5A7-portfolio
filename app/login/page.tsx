@@ -1,0 +1,14 @@
+import { LoginForm } from "@/components/login-form";
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
+export default function LoginPage() {
+  return (
+    <div className="flex min-h-screen w-full items-center justify-center p-6 md:p-10 bg-[#000319]">
+      <div className="w-full max-w-sm">
+        <LoginForm />
+      </div>
+    </div>
+  );
+}

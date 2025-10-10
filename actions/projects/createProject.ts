@@ -1,57 +1,53 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
-
-interface ProjectData {
-  projectName: string;
-  shortDes: string;
-  techStacks: string[];
-  liveSite: string;
-}
 
 export const createProject = async (formData: FormData) => {
   try {
-    console.log("Creating project with FormData");
-    console.log("FormData", formData);
-
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/projects`, {
       method: "POST",
       body: formData,
     });
 
-    console.log("Response status:", res.status);
-    console.log("Response ok:", res.ok);
-
-    const responseText = await res.text();
-    console.log("Response text:", responseText.substring(0, 500));
-
-    let result;
-    try {
-      result = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error("Failed to parse response as JSON");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
       return {
-        error: "Invalid response from server",
+        success: false,
+        message: errorData.message || `HTTP ${res.status}: ${res.statusText}`,
         status: res.status,
-        responsePreview: responseText.substring(0, 200),
       };
     }
 
-    console.log("Parsed result:", result);
+    const result = await res.json();
 
     if (result?.success) {
-      revalidateTag("PROJECTS");
+      revalidateTag("projects");
       revalidatePath("/");
     }
 
-    return result;
+    return {
+      success: true,
+      data: result.data,
+      message: "Project created successfully",
+    };
   } catch (error) {
     if (error instanceof Error && error.message === "NEXT_REDIRECT") {
       throw error;
     }
-
+    
     console.error("Failed to create project - Error details:", error);
-    return { error: "Failed to create project", details: String(error) };
+    
+    // Network errors
+    if (error instanceof Error && error.message.includes("fetch")) {
+      return {
+        success: false,
+        message: "Network error. Please check your connection and try again.",
+      };
+    }
+    
+    return {
+      success: false,
+      message: "Failed to create project. Please try again later.",
+    };
   }
 };

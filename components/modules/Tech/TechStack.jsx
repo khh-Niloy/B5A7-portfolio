@@ -4,12 +4,19 @@ import TechName from "./TechName";
 
 export default async function TechStack() {
   const skills = await getSkills();
-  console.log("All skills:", skills);
 
-  const frontendData = skills?.data?.find((skill) => skill.category === "frontend");
-  const backendData = skills?.data?.find((skill) => skill.category === "backend");
-  const databaseData = skills?.data?.find((skill) => skill.category === "database");
-  const toolsData = skills?.data?.find((skill) => skill.category === "Tools & Services");
+  const frontendData = skills?.data?.find(
+    (skill) => skill.category === "frontend"
+  );
+  const backendData = skills?.data?.find(
+    (skill) => skill.category === "backend"
+  );
+  const databaseData = skills?.data?.find(
+    (skill) => skill.category === "database"
+  );
+  const toolsData = skills?.data?.find(
+    (skill) => skill.category === "Tools & Services"
+  );
 
   const frontendSkills = frontendData?.skills || [];
   const backendSkills = backendData?.skills || [];
@@ -25,29 +32,17 @@ export default async function TechStack() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {frontendSkills.length > 0 && (
-          <TechName
-            headTitle="Frontend"
-            techArray={frontendSkills}
-            give={2}
-          />
+          <TechName headTitle="Frontend" techArray={frontendSkills} give={2} />
         )}
-        
+
         {backendSkills.length > 0 && (
-          <TechName
-            headTitle="Backend"
-            techArray={backendSkills}
-            give={2}
-          />
+          <TechName headTitle="Backend" techArray={backendSkills} give={2} />
         )}
-        
+
         {databaseSkills.length > 0 && (
-          <TechName
-            headTitle="Database"
-            techArray={databaseSkills}
-            give={2}
-          />
+          <TechName headTitle="Database" techArray={databaseSkills} give={2} />
         )}
-        
+
         {toolsSkills.length > 0 && (
           <TechName
             headTitle="Tools & Services"

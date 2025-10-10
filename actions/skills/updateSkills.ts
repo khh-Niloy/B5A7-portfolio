@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
 
 interface SkillData {
   category: string;
@@ -10,9 +9,6 @@ interface SkillData {
 
 export const updateSkills = async (data: SkillData[]) => {
   try {
-    console.log("Updating skills:", data);
-    console.log("API URL:", `${process.env.NEXT_PUBLIC_BASE_API}/skills/skills/upsert-skills-for-category`);
-
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/skills/skills/upsert-skills-for-category`,
       {
@@ -24,19 +20,12 @@ export const updateSkills = async (data: SkillData[]) => {
       }
     );
 
-    console.log("Response status:", res.status);
-    console.log("Response ok:", res.ok);
-    console.log("Response content-type:", res.headers.get("content-type"));
-
-    // Get the response as text first to check what we're getting
     const responseText = await res.text();
-    console.log("Response text (first 500 chars):", responseText.substring(0, 500));
 
-    // Try to parse as JSON
     let result;
     try {
       result = JSON.parse(responseText);
-    } catch (parseError) {
+    } catch {
       console.error("Failed to parse response as JSON");
       return { 
         error: "Invalid response from server", 
@@ -45,18 +34,15 @@ export const updateSkills = async (data: SkillData[]) => {
       };
     }
 
-    console.log("Parsed result:", result);
-
     if (result?.success) {
-      revalidateTag("SKILLS");
+      revalidateTag("skills");
       revalidatePath("/");
     }
 
     return result;
   } catch (error) {
-    // Check if it's a redirect (expected behavior)
     if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-      throw error; // Re-throw to allow redirect to happen
+      throw error;
     }
     
     console.error("Failed to update skills - Error details:", error);

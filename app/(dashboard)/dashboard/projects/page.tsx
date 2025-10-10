@@ -1,173 +1,587 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/ui/file-upload";
+import { Plus, Edit, ExternalLink } from "lucide-react";
+import toast from "react-hot-toast";
 import { createProject } from "@/actions/projects/createProject";
+import getProjects from "@/helper/getProjects";
+import getEachProject from "@/helper/getEachProject";
+import Image from "next/image";
+
+interface Project {
+  _id: string;
+  image: string;
+  shortDes: string;
+  techStack: string[];
+  liveSite: string;
+  projectName: string;
+  tagline: string;
+  problemSolution: string;
+  features: string[];
+  dependencies: string[];
+  responsibilities: string;
+  githubRepo: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface ProjectFormValues {
   projectName: string;
   shortDes: string;
-  techStacks: string;
+  techStack: string;
   liveSite: string;
+  tagline: string;
+  problemSolution: string;
+  features: string;
+  dependencies: string;
+  responsibilities: string;
+  githubRepo: string;
 }
 
 export default function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [showForm, setShowForm] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
 
   const {
     register,
     handleSubmit,
-    formState: { isDirty },
+    reset,
+    formState: {},
   } = useForm<ProjectFormValues>({
     defaultValues: {
       projectName: "",
       shortDes: "",
-      techStacks: "",
+      techStack: "",
       liveSite: "",
+      tagline: "",
+      problemSolution: "",
+      features: "",
+      dependencies: "",
+      responsibilities: "",
+      githubRepo: "",
     },
   });
 
-  const handleFileUpload = (uploadedFiles: File[]) => {
-    setFiles(uploadedFiles);
-    console.log("Uploaded files:", uploadedFiles);
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const data = await getProjects();
+      setProjects(data || []);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onSubmit = async (data: ProjectFormValues) => {
-    console.log("Project data:", data);
-    console.log("Uploaded image:", files[0]);
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
-    if (files.length === 0) {
-      alert("Please upload a project image");
-      return;
-    }
+  const handleCreate = () => {
+    setIsEditing(false);
+    setEditingProject(null);
+    setShowForm(true);
+    setFiles([]);
+    reset();
+  };
 
-    // Create FormData for file upload
-    const formData = new FormData();
-
-    // Append the image file (backend expects "files" field)
-    formData.append("files", files[0]);
-
-    // Transform and append techStacks as array
-    const techStacksArray = data.techStacks
-      .split(",")
-      .map((tech) => tech.trim())
-      .filter((tech) => tech !== "");
-
-    // Append other fields
-    formData.append("projectName", data.projectName);
-    formData.append("shortDes", data.shortDes);
-    formData.append("liveSite", data.liveSite);
-    formData.append("techStacks", JSON.stringify(techStacksArray));
+  const handleEdit = async (project: Project) => {
+    setIsEditing(true);
+    setEditingProject(project);
+    setShowForm(true);
+    setFiles([]);
 
     try {
-      const result = await createProject(formData);
-      console.log("Result:", result);
-
-      if (result?.success) {
-        alert("Project created successfully!");
-      } else {
-        alert(result?.message || "Failed to create project");
-      }
-    } catch (error) {
-      console.error("Failed to create project:", error);
-      alert("Failed to create project");
+      const fresh = await getEachProject(project._id);
+      const resetValues = {
+        projectName: fresh?.projectName || "",
+        shortDes: fresh?.shortDes || "",
+        liveSite: fresh?.liveSite || "",
+        tagline: fresh?.tagline || "",
+        problemSolution: fresh?.problemSolution || "",
+        responsibilities: fresh?.responsibilities || "",
+        githubRepo: fresh?.githubRepo || "",
+        features: Array.isArray(fresh?.features)
+          ? fresh.features.join(", ")
+          : "",
+        dependencies: fresh.dependencies ?? "",
+        techStack: Array.isArray(fresh?.techStack)
+          ? fresh.techStack.join(", ")
+          : "",
+      };
+      reset(resetValues);
+    } catch {
+      const resetValues = {
+        projectName: project.projectName || "",
+        shortDes: project.shortDes || "",
+        liveSite: project.liveSite || "",
+        tagline:
+          ((project as unknown as Record<string, unknown>).tagline as string) ||
+          "",
+        problemSolution:
+          ((project as unknown as Record<string, unknown>)
+            .problemSolution as string) || "",
+        responsibilities:
+          ((project as unknown as Record<string, unknown>)
+            .responsibilities as string) || "",
+        githubRepo:
+          ((project as unknown as Record<string, unknown>)
+            .githubRepo as string) || "",
+        features: Array.isArray(
+          (project as unknown as Record<string, unknown>).features
+        )
+          ? (
+              (project as unknown as Record<string, unknown>)
+                .features as string[]
+            ).join(", ")
+          : "",
+        dependencies: Array.isArray(
+          (project as unknown as Record<string, unknown>).dependencies
+        )
+          ? (
+              (project as unknown as Record<string, unknown>)
+                .dependencies as string[]
+            ).join(", ")
+          : "",
+        techStack: Array.isArray(project.techStack)
+          ? project.techStack.join(", ")
+          : "",
+      };
+      reset(resetValues);
     }
   };
 
-  return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Add Project
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Showcase your projects with images and details.
-        </p>
-      </div>
+  // const handleDelete = async (projectId: string) => {
+  //   if (confirm("Are you sure you want to delete this project?")) {
+  //     try {
+  //       setProjects(projects.filter((project) => project._id !== projectId));
+  //       toast.success("Project deleted successfully!");
+  //     } catch (error) {
+  //       console.error("Failed to delete project:", error);
+  //       toast.error("Failed to delete project");
+  //     }
+  //   }
+  // };
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Image Upload Section */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-            Project Image
-          </h2>
-          <div className="w-full max-w-4xl mx-auto">
-            <FileUpload onChange={handleFileUpload} />
-          </div>
+  const onSubmit = async (data: ProjectFormValues) => {
+    try {
+      if (files.length === 0 && !isEditing) {
+        toast.error("Please upload a project image");
+        return;
+      }
+
+      const formData = new FormData();
+
+      if (files.length > 0) {
+        formData.append("files", files[0]);
+      }
+
+      const techStackArray = data.techStack
+        .split(",")
+        .map((tech) => tech.trim().replace(/\.$/, ""))
+        .filter((tech) => tech !== "");
+
+      const featuresArray = data.features
+        .split(",")
+        .map((feature) => feature.trim().replace(/\.$/, ""))
+        .filter((feature) => feature !== "");
+
+      formData.append("projectName", data.projectName);
+      formData.append("shortDes", data.shortDes);
+      formData.append("techStack", JSON.stringify(techStackArray));
+      formData.append("liveSite", data.liveSite);
+
+      formData.append("tagline", data.tagline);
+      formData.append("problemSolution", data.problemSolution);
+      formData.append("features", JSON.stringify(featuresArray));
+      formData.append("dependencies", data.dependencies);
+      formData.append("responsibilities", data.responsibilities);
+      formData.append("githubRepo", data.githubRepo);
+
+      if (isEditing && editingProject) {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_API}/projects/${editingProject._id}`,
+          {
+            method: "PATCH",
+            body: formData,
+            credentials: "include",
+          }
+        );
+        const result = await res.json();
+        if (!res.ok || !result?.success) {
+          toast.error(result?.message || "Failed to update project");
+          return;
+        }
+        toast.success("Project updated successfully! 🚀");
+        setShowForm(false);
+        setFiles([]);
+        reset();
+        fetchProjects();
+      } else {
+        const result = await createProject(formData);
+        if (result?.success) {
+          toast.success("Project created successfully! 🚀");
+          setShowForm(false);
+          setFiles([]);
+          reset();
+          fetchProjects();
+        } else {
+          toast.error(result?.message || "Failed to create project");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to save project:", error);
+      toast.error("Failed to save project");
+    }
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setIsEditing(false);
+    setEditingProject(null);
+    setFiles([]);
+    reset();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto"></div>
+          <p className="mt-4 text-gray-400">Loading projects...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 md:space-y-10 px-4 md:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Project Management</h1>
+          <p className="mt-2 text-sm md:text-base text-gray-400">
+            Create, edit, and manage your portfolio projects.
+          </p>
         </div>
 
-        {/* Project Information Section */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-            Project Information
-          </h2>
+        {!showForm && (
+          <Button
+            onClick={handleCreate}
+            className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Project
+          </Button>
+        )}
+      </div>
 
-          <div className="space-y-6">
+      {showForm && (
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-lg md:text-xl font-semibold text-white">
+              {isEditing ? "Edit Project" : "Create New Project"}
+            </h2>
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-              <Label htmlFor="projectName">Project Name</Label>
-              <Input
-                id="projectName"
-                placeholder="e.g., MadChef - Restaurant Management App"
-                {...register("projectName")}
-                className="mt-2"
-                required
-              />
+              <Label>Project Image</Label>
+              {isEditing && editingProject?.image && (
+                <div className="mt-2 mb-4">
+                  <Image
+                    src={editingProject.image}
+                    alt="Current project"
+                    className="w-full max-w-md h-48 object-cover rounded-lg border border-white/10"
+                  />
+                  <p className="text-sm text-gray-400 mt-2">
+                    Current project image
+                  </p>
+                </div>
+              )}
+              <div className="mt-2">
+                <FileUpload onChange={setFiles} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+              <div>
+                <Label htmlFor="projectName">Project Name</Label>
+                <Input
+                  id="projectName"
+                  placeholder="e.g., MadChef - Restaurant Management App"
+                  {...register("projectName")}
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="tagline">Tagline</Label>
+                <Input
+                  id="tagline"
+                  placeholder="A catchy tagline for your project"
+                  {...register("tagline")}
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="liveSite">Live Site URL</Label>
+                <Input
+                  id="liveSite"
+                  type="url"
+                  placeholder="https://example.com"
+                  {...register("liveSite")}
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="githubRepo">GitHub Repository</Label>
+                <Input
+                  id="githubRepo"
+                  type="url"
+                  placeholder="https://github.com/username/repo"
+                  {...register("githubRepo")}
+                  className="mt-2"
+                  required
+                />
+              </div>
             </div>
 
             <div>
               <Label htmlFor="shortDes">Short Description</Label>
               <Textarea
                 id="shortDes"
-                placeholder="Describe your project in a few sentences..."
+                placeholder="Brief description of your project..."
                 {...register("shortDes")}
+                className="mt-2 min-h-[80px]"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="problemSolution">Problem & Solution</Label>
+              <Textarea
+                id="problemSolution"
+                placeholder="What problem does this project solve and how?"
+                {...register("problemSolution")}
+                className="mt-2 min-h-[120px]"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+              <div>
+                <Label htmlFor="techStack">Tech Stack</Label>
+                <Textarea
+                  id="techStack"
+                  placeholder="React, Next.js, TypeScript, MongoDB"
+                  {...register("techStack")}
+                  className="mt-2 min-h-[100px]"
+                  required
+                />
+                <p className="text-sm text-gray-400 mt-1">
+                  Separate technologies with commas
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="features">Key Features</Label>
+                <Textarea
+                  id="features"
+                  placeholder="Feature 1, Feature 2, Feature 3"
+                  {...register("features")}
+                  className="mt-2 min-h-[100px]"
+                  required
+                />
+                <p className="text-sm text-gray-400 mt-1">
+                  Separate features with commas
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="responsibilities">Your Responsibilities</Label>
+              <Textarea
+                id="responsibilities"
+                placeholder="What was your role and responsibilities in this project?"
+                {...register("responsibilities")}
                 className="mt-2 min-h-[100px]"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="techStacks">Tech Stacks</Label>
+              <Label htmlFor="dependencies">Key Dependencies</Label>
               <Textarea
-                id="techStacks"
-                placeholder="React, Next.js, TypeScript, MongoDB"
-                {...register("techStacks")}
-                className="mt-2"
+                id="dependencies"
+                placeholder="axios, framer-motion, tailwindcss"
+                {...register("dependencies")}
+                className="mt-2 min-h-[80px]"
                 required
               />
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Separate technologies with commas
+              <p className="text-sm text-gray-400 mt-1">
+                Separate dependencies with commas
               </p>
             </div>
 
-            <div>
-              <Label htmlFor="liveSite">Live Site URL</Label>
-              <Input
-                id="liveSite"
-                type="url"
-                placeholder="https://example.com"
-                {...register("liveSite")}
-                className="mt-2"
-                required
-              />
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-white/10">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
+              >
+                {isEditing ? "Update Project" : "Create Project"}
+              </Button>
             </div>
-          </div>
+          </form>
         </div>
+      )}
 
-        {/* Submit Button */}
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button
-            type="submit"
-            size="lg"
-            className="disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Create Project
-          </Button>
+      {!showForm && (
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <h2 className="text-lg md:text-xl font-semibold text-white mb-6">
+            All Projects ({projects.length})
+          </h2>
+
+          {projects.length === 0 ? (
+            <div className="text-center py-8 md:py-12">
+              <p className="text-gray-400 mb-4">No projects yet.</p>
+              <Button
+                onClick={handleCreate}
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Project
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4 md:space-y-6">
+              {projects.map((project) => (
+                <div
+                  key={project._id}
+                  className="border border-white/10 rounded-xl p-4 md:p-6 bg-white/5 hover:bg-white/10 transition-all duration-200"
+                >
+                  <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-6">
+                    {project.image && (
+                      <div className="flex-shrink-0 w-full sm:w-32 h-32">
+                        <Image
+                          src={project.image}
+                          alt={project.projectName}
+                          className="w-full h-full object-cover rounded-xl border border-white/10"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex-1 min-w-0 w-full">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg md:text-xl font-semibold text-white mb-3">
+                            {project.projectName}
+                          </h3>
+
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-400 mb-4">
+                            <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs sm:text-sm font-medium w-fit">
+                              {project.tagline}
+                            </span>
+                            <span className="text-gray-500 text-xs sm:text-sm">
+                              {new Date(project.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(project)}
+                            className="border-white/10 text-gray-300 hover:bg-white/5 hover:text-white transition-all duration-200"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <p className="text-gray-400 text-sm md:text-base mb-4 leading-relaxed">
+                        {project.shortDes}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {project.techStack?.slice(0, 6).map((tech, index) => (
+                          <span
+                            key={index}
+                            className="px-2 md:px-3 py-1 md:py-1.5 bg-white/10 text-gray-300 text-xs md:text-sm rounded-lg border border-white/10 hover:bg-white/20 transition-all duration-200"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                        {project.techStack?.length > 6 && (
+                          <span className="px-2 md:px-3 py-1 md:py-1.5 bg-white/10 text-gray-400 text-xs md:text-sm rounded-lg border border-white/10">
+                            +{project.techStack.length - 6} more
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                        {project.liveSite && (
+                          <a
+                            href={project.liveSite}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg transition-all duration-200 w-full sm:w-auto justify-center sm:justify-start"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Live Site
+                          </a>
+                        )}
+                        {project?.githubRepo && (
+                          <a
+                            href={project.githubRepo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm text-gray-400 hover:text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200 w-full sm:w-auto justify-center sm:justify-start"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            GitHub
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </form>
+      )}
     </div>
   );
 }

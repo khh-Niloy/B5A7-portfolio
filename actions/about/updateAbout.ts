@@ -18,9 +18,6 @@ interface AboutData {
 
 export const updateAbout = async (data: AboutData, id: string) => {
   try {
-    console.log("Updating about with ID:", id);
-    console.log("Changed data:", data);
-    
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/about/about-content/${id}`,
       {
@@ -31,16 +28,14 @@ export const updateAbout = async (data: AboutData, id: string) => {
         body: JSON.stringify(data),
       }
     );
-    // console.log(res)
 
     const result = await res.json();
 
     if (result?.id) {
-      revalidateTag("ABOUT");
+      revalidateTag("about");
       revalidatePath("/");
       redirect("/");
     }
-    console.log(result);
     return result;
   } catch (error) {
     console.error("Failed to submit:", error);

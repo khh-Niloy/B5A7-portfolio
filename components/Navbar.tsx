@@ -10,25 +10,84 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState } from "react";
+import getMe from "@/helper/getMe";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function NavbarDemo() {
   const navItems = [
     {
-      name: "Features",
-      link: "#features",
+      name: "About",
+      link: "#about",
     },
     {
-      name: "Pricing",
-      link: "#pricing",
+      name: "Skills",
+      link: "#skills",
     },
     {
-      name: "Contact",
-      link: "#contact",
+      name: "Projects",
+      link: "#projects",
+    },
+    {
+      name: "Blogs",
+      link: "#blog",
+    },
+    {
+      name: "Experience",
+      link: "#experience",
     },
   ];
 
+  const resumeLink =
+    "https://drive.google.com/file/d/1wSpMEweF1MnsjjTZrmby_g4qCBb3fWn9/view?usp=sharing";
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    link: string
+  ) => {
+    e.preventDefault();
+
+    if (window.location.pathname.startsWith("/blogs")) {
+      router.push(`/${link}`);
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
+    const targetId = link.substring(1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  const [me, setMe] = useState<Record<string, unknown> | null>(null);
+  const router = useRouter();
+  useEffect(() => {
+    const fetchMe = async () => {
+      const me = await getMe();
+      setMe(me);
+    };
+    fetchMe();
+  }, []);
+
+  const handleLogout = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/logout`, {
+      credentials: "include",
+      method: "POST",
+    });
+    const result = await res.json();
+    if (result.success) {
+      setMe(null);
+      router.push("/");
+    }
+  };
 
   return (
     <div className="relative w-full">
@@ -36,11 +95,29 @@ export function NavbarDemo() {
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
-          <NavItems items={navItems} />
+          <NavItems items={navItems} onItemClick={handleNavClick} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary">Login</NavbarButton>
-            <NavbarButton href="/dashboard" variant="secondary">Dashboard</NavbarButton>
-            <NavbarButton variant="primary">Book a call</NavbarButton>
+            {me ? (
+              <>
+                <NavbarButton href="/dashboard" variant="secondary">
+                  Dashboard
+                </NavbarButton>
+                <NavbarButton
+                  onClick={() => handleLogout()}
+                  variant="secondary"
+                >
+                  Logout
+                </NavbarButton>
+              </>
+            ) : (
+              <NavbarButton href="/login" variant="secondary">
+                Login
+              </NavbarButton>
+            )}
+
+            <NavbarButton target="_blank" href={resumeLink} variant="primary">
+              My Resume
+            </NavbarButton>
           </div>
         </NavBody>
 
@@ -62,26 +139,32 @@ export function NavbarDemo() {
               <a
                 key={`mobile-link-${idx}`}
                 href={item.link}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-neutral-600 dark:text-neutral-300"
+                onClick={(e) => handleNavClick(e, item.link)}
+                className="relative text-white"
               >
                 <span className="block">{item.name}</span>
               </a>
             ))}
             <div className="flex w-full flex-col gap-4">
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Login
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Book a call
+              {me ? (
+                <>
+                  <NavbarButton href="/dashboard" variant="secondary">
+                    Dashboard
+                  </NavbarButton>
+                  <NavbarButton
+                    onClick={() => handleLogout()}
+                    variant="secondary"
+                  >
+                    Logout
+                  </NavbarButton>
+                </>
+              ) : (
+                <NavbarButton href="/login" variant="secondary">
+                  Login
+                </NavbarButton>
+              )}
+              <NavbarButton target="_blank" href={resumeLink} variant="primary">
+                My Resume
               </NavbarButton>
             </div>
           </MobileNavMenu>
@@ -90,5 +173,3 @@ export function NavbarDemo() {
     </div>
   );
 }
-
-
