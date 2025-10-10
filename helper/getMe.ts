@@ -1,5 +1,6 @@
 const getMe = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/get-me`, {
+        cache: "no-store",
         credentials: "include",
     });
     const data = await res.json();

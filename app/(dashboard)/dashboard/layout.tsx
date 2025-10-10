@@ -1,4 +1,5 @@
 import { SidebarDemo } from "@/components/modules/Dashboard/Sidebar";
+import Protect from "@/components/Protect";
 
 export default function DashboardLayout({
   children,
@@ -7,7 +8,9 @@ export default function DashboardLayout({
 }>) {
   return (
     <main className="h-screen">
+      <Protect>
       <SidebarDemo>{children}</SidebarDemo>
+      </Protect>
     </main>
   );
 }

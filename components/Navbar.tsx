@@ -74,6 +74,7 @@ export function NavbarDemo() {
     });
     const result = await res.json();
     if (result.success) {
+      setMe(null);
       router.push("/");
     }
   };
@@ -91,7 +92,7 @@ export function NavbarDemo() {
                 <NavbarButton href="/dashboard" variant="secondary">
                   Dashboard
                 </NavbarButton>
-                <NavbarButton onClick={() => handleLogout()} href="/dashboard" variant="secondary">
+                <NavbarButton onClick={() => handleLogout()} variant="secondary">
                   Logout
                 </NavbarButton>
               </>

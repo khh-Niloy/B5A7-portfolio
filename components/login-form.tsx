@@ -73,7 +73,7 @@ export function LoginForm({
           setApiError(error instanceof Error ? error.message : "Login failed");
         },
         onSuccess: () => {
-          router.push("/dashboard");
+          router.push("/");
         },
       }
     );
