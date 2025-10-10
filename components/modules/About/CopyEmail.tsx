@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 

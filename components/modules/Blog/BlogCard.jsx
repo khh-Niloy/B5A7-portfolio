@@ -10,6 +10,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import Link from "next/link";
 
 export default function BlogCard({
   title,
@@ -17,13 +18,13 @@ export default function BlogCard({
   coverImage,
   category,
   createdAt,
+  id,
 }) {
-  const truncatedContent = content.length > 150 
-    ? content.substring(0, 150) + "..." 
-    : content;
+  const truncatedContent =
+    content.length > 150 ? content.substring(0, 150) + "..." : content;
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -63,10 +64,11 @@ export default function BlogCard({
         </p>
 
         <div className="flex items-center justify-between">
+          <Link className="cursor-pointer hover:underline" href={`/blogs/${id}`}>Read More →</Link>
           <DialogTrigger asChild>
-            <button className="text-gray-300 text-sm sm:text-base font-medium hover:text-white transition-colors duration-200 cursor-pointer">
-              Read More →
-            </button>
+            <Button size="sm" className="cursor-pointer" variant="outline">
+              Quick View
+            </Button>
           </DialogTrigger>
         </div>
       </div>
@@ -76,7 +78,7 @@ export default function BlogCard({
           <DialogTitle className="text-lg sm:text-2xl leading-tight break-words hyphens-auto font-bold text-white mb-2 sm:mb-3">
             {title}
           </DialogTitle>
-          
+
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
             <span className="px-3 py-1.5 bg-white/10 text-white border border-white/10 rounded-full text-xs font-medium capitalize">
               <Tag className="w-3 h-3 inline mr-1" />
@@ -106,7 +108,6 @@ export default function BlogCard({
             </div>
           </div>
         </div>
-        {/* Close button at the end */}
         <div className="mt-6">
           <DialogClose asChild>
             <Button variant="outline" className="w-full cursor-pointer">

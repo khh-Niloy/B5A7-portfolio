@@ -52,7 +52,6 @@ export const LinkPreview = ({
   } else {
     src = imageSrc;
   }
-
   const [isOpen, setOpen] = React.useState(false);
 
   const [isMounted, setIsMounted] = React.useState(false);
@@ -69,7 +68,7 @@ export const LinkPreview = ({
   const handleMouseMove = (event: React.MouseEvent<HTMLAnchorElement>) => {
     const targetRect = (event.target as HTMLAnchorElement).getBoundingClientRect();
     const eventOffsetX = event.clientX - targetRect.left;
-    const offsetFromCenter = (eventOffsetX - targetRect.width / 2) / 2; // Reduce the effect to make it subtle
+    const offsetFromCenter = (eventOffsetX - targetRect.width / 2) / 2;
     x.set(offsetFromCenter);
   };
 
@@ -97,6 +96,8 @@ export const LinkPreview = ({
           onMouseMove={handleMouseMove}
           className={cn("text-white", className)}
           href={url}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {children}
         </HoverCardPrimitive.Trigger>
@@ -129,6 +130,8 @@ export const LinkPreview = ({
               >
                 <a
                   href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="block p-1 bg-white border-2 border-transparent shadow rounded-xl hover:border-neutral-800"
                   style={{ fontSize: 0 }}
                 >

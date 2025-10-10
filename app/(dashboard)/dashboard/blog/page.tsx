@@ -174,11 +174,11 @@ export default function Blog() {
   }
 
   return (
-    <div className="space-y-10">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 md:space-y-10 px-4 md:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Blog Management</h1>
-          <p className="mt-2 text-gray-400">
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Blog Management</h1>
+          <p className="mt-2 text-sm md:text-base text-gray-400">
             Create, edit, and manage your blog posts.
           </p>
         </div>
@@ -186,7 +186,7 @@ export default function Blog() {
         {!showForm && (
           <Button
             onClick={handleCreate}
-            className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
+            className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Post
@@ -195,15 +195,15 @@ export default function Blog() {
       </div>
 
       {showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-lg md:text-xl font-semibold text-white">
               {isEditing ? "Edit Blog Post" : "Create New Blog Post"}
             </h2>
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="border-white/10 text-gray-300 hover:bg-white/5"
+              className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -231,7 +231,7 @@ export default function Blog() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <Label htmlFor="title">Title</Label>
                 <Input
@@ -314,19 +314,19 @@ export default function Blog() {
               )}
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-white/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                className="border-white/10 text-gray-300 hover:bg-white/5"
+                className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || (files.length === 0 && !isEditing)}
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
               >
                 {isSubmitting 
                   ? (isEditing ? "Updating..." : "Creating...") 
@@ -339,54 +339,54 @@ export default function Blog() {
       )}
 
       {!showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <h2 className="text-xl font-semibold text-white mb-6">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <h2 className="text-lg md:text-xl font-semibold text-white mb-6">
             All Blog Posts ({posts.length})
           </h2>
 
           {posts.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8 md:py-12">
               <p className="text-gray-400 mb-4">No blog posts yet.</p>
               <Button
                 onClick={handleCreate}
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Post
               </Button>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {posts.map((post) => (
                 <div
                   key={post._id}
                   className="border border-white/10 rounded-lg p-4 bg-white/5 hover:bg-white/10 transition-all duration-200"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
                     {post.coverImage && (
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 w-full sm:w-20 h-20">
                         <Image
                           src={post.coverImage}
                           alt={post.title}
                           width={80}
                           height={80}
-                          className="w-20 h-20 object-cover rounded-lg border border-white/10"
+                          className="w-full h-full object-cover rounded-lg border border-white/10"
                         />
                       </div>
                     )}
 
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-white mb-2">
+                    <div className="flex-1 w-full">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-base md:text-lg font-semibold text-white mb-2">
                             {post.title}
                           </h3>
 
-                          <div className="flex items-center gap-4 text-sm text-gray-400 mb-2">
-                            <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-400 mb-2">
+                            <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs w-fit">
                               {post.category}
                             </span>
-                            <span>
+                            <span className="text-xs sm:text-sm">
                               {new Date(post.createdAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -396,7 +396,7 @@ export default function Blog() {
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2">
                           <Button
                             size="sm"
                             variant="outline"

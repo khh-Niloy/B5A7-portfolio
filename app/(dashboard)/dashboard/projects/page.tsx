@@ -126,15 +126,33 @@ export default function Projects() {
         projectName: project.projectName || "",
         shortDes: project.shortDes || "",
         liveSite: project.liveSite || "",
-        tagline: (project as unknown as Record<string, unknown>).tagline as string || "",
-        problemSolution: (project as unknown as Record<string, unknown>).problemSolution as string || "",
-        responsibilities: (project as unknown as Record<string, unknown>).responsibilities as string || "",
-        githubRepo: (project as unknown as Record<string, unknown>).githubRepo as string || "",
-        features: Array.isArray((project as unknown as Record<string, unknown>).features)
-          ? ((project as unknown as Record<string, unknown>).features as string[]).join(", ")
+        tagline:
+          ((project as unknown as Record<string, unknown>).tagline as string) ||
+          "",
+        problemSolution:
+          ((project as unknown as Record<string, unknown>)
+            .problemSolution as string) || "",
+        responsibilities:
+          ((project as unknown as Record<string, unknown>)
+            .responsibilities as string) || "",
+        githubRepo:
+          ((project as unknown as Record<string, unknown>)
+            .githubRepo as string) || "",
+        features: Array.isArray(
+          (project as unknown as Record<string, unknown>).features
+        )
+          ? (
+              (project as unknown as Record<string, unknown>)
+                .features as string[]
+            ).join(", ")
           : "",
-        dependencies: Array.isArray((project as unknown as Record<string, unknown>).dependencies)
-          ? ((project as unknown as Record<string, unknown>).dependencies as string[]).join(", ")
+        dependencies: Array.isArray(
+          (project as unknown as Record<string, unknown>).dependencies
+        )
+          ? (
+              (project as unknown as Record<string, unknown>)
+                .dependencies as string[]
+            ).join(", ")
           : "",
         techStack: Array.isArray(project.techStack)
           ? project.techStack.join(", ")
@@ -248,11 +266,11 @@ export default function Projects() {
   }
 
   return (
-    <div className="space-y-10">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 md:space-y-10 px-4 md:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Project Management</h1>
-          <p className="mt-2 text-gray-400">
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Project Management</h1>
+          <p className="mt-2 text-sm md:text-base text-gray-400">
             Create, edit, and manage your portfolio projects.
           </p>
         </div>
@@ -260,7 +278,7 @@ export default function Projects() {
         {!showForm && (
           <Button
             onClick={handleCreate}
-            className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
+            className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Project
@@ -269,15 +287,15 @@ export default function Projects() {
       </div>
 
       {showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-lg md:text-xl font-semibold text-white">
               {isEditing ? "Edit Project" : "Create New Project"}
             </h2>
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="border-white/10 text-gray-300 hover:bg-white/5"
+              className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -303,7 +321,7 @@ export default function Projects() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <Label htmlFor="projectName">Project Name</Label>
                 <Input
@@ -373,7 +391,7 @@ export default function Projects() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <Label htmlFor="techStack">Tech Stack</Label>
                 <Textarea
@@ -428,18 +446,18 @@ export default function Projects() {
               </p>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-white/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                className="border-white/10 text-gray-300 hover:bg-white/5"
+                className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
               >
                 {isEditing ? "Update Project" : "Create Project"}
               </Button>
@@ -449,52 +467,52 @@ export default function Projects() {
       )}
 
       {!showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <h2 className="text-xl font-semibold text-white mb-6">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <h2 className="text-lg md:text-xl font-semibold text-white mb-6">
             All Projects ({projects.length})
           </h2>
 
           {projects.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8 md:py-12">
               <p className="text-gray-400 mb-4">No projects yet.</p>
               <Button
                 onClick={handleCreate}
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Project
               </Button>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {projects.map((project) => (
                 <div
                   key={project._id}
-                  className="border border-white/10 rounded-xl p-6 bg-white/5 hover:bg-white/10 transition-all duration-200"
+                  className="border border-white/10 rounded-xl p-4 md:p-6 bg-white/5 hover:bg-white/10 transition-all duration-200"
                 >
-                  <div className="flex items-start gap-6">
+                  <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-6">
                     {project.image && (
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 w-full sm:w-32 h-32">
                         <Image
                           src={project.image}
                           alt={project.projectName}
-                          className="w-32 h-32 object-cover rounded-xl border border-white/10"
+                          className="w-full h-full object-cover rounded-xl border border-white/10"
                         />
                       </div>
                     )}
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1 min-w-0 w-full">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                         <div className="flex-1">
-                          <h3 className="text-xl font-semibold text-white mb-3">
+                          <h3 className="text-lg md:text-xl font-semibold text-white mb-3">
                             {project.projectName}
                           </h3>
 
-                          <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
-                            <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-sm font-medium">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-400 mb-4">
+                            <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs sm:text-sm font-medium w-fit">
                               {project.tagline}
                             </span>
-                            <span className="text-gray-500">
+                            <span className="text-gray-500 text-xs sm:text-sm">
                               {new Date(project.createdAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -509,18 +527,10 @@ export default function Projects() {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          {/* <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDelete(project._id)}
-                            className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button> */}
                         </div>
                       </div>
 
-                      <p className="text-gray-400 text-base mb-4 leading-relaxed">
+                      <p className="text-gray-400 text-sm md:text-base mb-4 leading-relaxed">
                         {project.shortDes}
                       </p>
 
@@ -528,25 +538,25 @@ export default function Projects() {
                         {project.techStack?.slice(0, 6).map((tech, index) => (
                           <span
                             key={index}
-                            className="px-3 py-1.5 bg-white/10 text-gray-300 text-sm rounded-lg border border-white/10 hover:bg-white/20 transition-all duration-200"
+                            className="px-2 md:px-3 py-1 md:py-1.5 bg-white/10 text-gray-300 text-xs md:text-sm rounded-lg border border-white/10 hover:bg-white/20 transition-all duration-200"
                           >
                             {tech}
                           </span>
                         ))}
                         {project.techStack?.length > 6 && (
-                          <span className="px-3 py-1.5 bg-white/10 text-gray-400 text-sm rounded-lg border border-white/10">
+                          <span className="px-2 md:px-3 py-1 md:py-1.5 bg-white/10 text-gray-400 text-xs md:text-sm rounded-lg border border-white/10">
                             +{project.techStack.length - 6} more
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                         {project.liveSite && (
                           <a
                             href={project.liveSite}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-3 py-1.5 text-sm text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg transition-all duration-200"
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg transition-all duration-200 w-full sm:w-auto justify-center sm:justify-start"
                           >
                             <ExternalLink className="w-4 h-4" />
                             Live Site
@@ -557,7 +567,7 @@ export default function Projects() {
                             href={project.githubRepo}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200"
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm text-gray-400 hover:text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200 w-full sm:w-auto justify-center sm:justify-start"
                           >
                             <ExternalLink className="w-4 h-4" />
                             GitHub

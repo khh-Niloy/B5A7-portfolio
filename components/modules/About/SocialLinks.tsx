@@ -24,15 +24,15 @@ export default function SocialLinks({
     <div className="flex flex-col md:flex-row gap-2">
       <div className="md:w-[50%] my-auto border border-white/10 rounded-xl p-4">
         <div className="py-3 px-5">
-          <h1 className="text-2xl font-semibold">Let's Link Up 🔗</h1>
+          <h1 className="text-2xl font-semibold">Let&apos;s Link Up 🔗</h1>
           <span className="text-xs text-white/90 font-light">
-            Drop a message — I'll get back soon.
+            Drop a message — I&apos;ll get back soon.
           </span>
         </div>
 
         <div className="flex gap-5 mt-2 px-3">
           {(socialLinks as Record<string, unknown>[]).map((e, index) => (
-            <div className="flex items-center justify-center flex-col gap-1.5">
+            <div key={index} className="flex items-center justify-center flex-col gap-1.5">
               <a href={e.link as string} target="_blank" className="z-50">
                 <div
                   className="p-3 bg-gradient-to-r from-[#06091f] to-[#06091F]

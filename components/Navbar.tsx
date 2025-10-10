@@ -29,14 +29,16 @@ export function NavbarDemo() {
       link: "#projects",
     },
     {
-      name: "Contact",
-      link: "#contact",
+      name: "Blogs",
+      link: "#blog",
     },
     {
       name: "Experience",
       link: "#experience",
-    }
+    },
   ];
+
+  const resumeLink = "https://drive.google.com/file/d/1BLx92Yt42G7AEEMrReQ2dp_ZNFCHl5as/view?usp=sharing";
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -45,6 +47,13 @@ export function NavbarDemo() {
     link: string
   ) => {
     e.preventDefault();
+
+    if (window.location.pathname.startsWith("/blogs")) {
+      router.push(`/${link}`);
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
     const targetId = link.substring(1);
     const targetElement = document.getElementById(targetId);
 
@@ -67,7 +76,7 @@ export function NavbarDemo() {
     fetchMe();
   }, []);
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/logout`, {
       credentials: "include",
       method: "POST",
@@ -92,7 +101,10 @@ export function NavbarDemo() {
                 <NavbarButton href="/dashboard" variant="secondary">
                   Dashboard
                 </NavbarButton>
-                <NavbarButton onClick={() => handleLogout()} variant="secondary">
+                <NavbarButton
+                  onClick={() => handleLogout()}
+                  variant="secondary"
+                >
                   Logout
                 </NavbarButton>
               </>
@@ -104,7 +116,7 @@ export function NavbarDemo() {
 
             <NavbarButton
               target="_blank"
-              href="https://drive.google.com/file/d/1BLx92Yt42G7AEEMrReQ2dp_ZNFCHl5as/view?usp=sharing"
+              href={resumeLink}
               variant="primary"
             >
               My Resume
@@ -137,20 +149,30 @@ export function NavbarDemo() {
               </a>
             ))}
             <div className="flex w-full flex-col gap-4">
+              {me ? (
+                <>
+                  <NavbarButton href="/dashboard" variant="secondary">
+                    Dashboard
+                  </NavbarButton>
+                  <NavbarButton
+                    onClick={() => handleLogout()}
+                    variant="secondary"
+                  >
+                    Logout
+                  </NavbarButton>
+                </>
+              ) : (
+                <NavbarButton href="/login" variant="secondary">
+                  Login
+                </NavbarButton>
+              )}
               <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Login
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Book a call
-              </NavbarButton>
+              target="_blank"
+              href={resumeLink}
+              variant="primary"
+            >
+              My Resume
+            </NavbarButton>
             </div>
           </MobileNavMenu>
         </MobileNav>

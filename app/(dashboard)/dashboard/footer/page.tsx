@@ -141,31 +141,31 @@ export default function Footer() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 md:space-y-10 px-4 md:px-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-2xl md:text-3xl font-bold text-white">
             Footer & Social Links
           </h1>
-          <p className="mt-2 text-gray-400">
+          <p className="mt-2 text-sm md:text-base text-gray-400">
             Manage your social media links and footer content.
           </p>
         </div>
         
         {!showForm && (
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               onClick={handleEdit}
               variant="outline"
-              className="border-white/10 text-gray-300 hover:bg-white/5"
+              className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit All
             </Button>
             <Button
               onClick={handleCreate}
-              className="bg-white/10 hover:bg-white/15 border border-white/10 text-white transition-all duration-200"
+              className="bg-white/10 hover:bg-white/15 border border-white/10 text-white transition-all duration-200 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Links
@@ -176,15 +176,15 @@ export default function Footer() {
 
       {/* Social Links Form */}
       {showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-lg md:text-xl font-semibold text-white">
               {isEditing ? "Edit Social Links" : "Add Social Links"}
             </h2>
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="border-white/10 text-gray-300 hover:bg-white/5"
+              className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -197,7 +197,7 @@ export default function Footer() {
                   key={field.id}
                   className="flex items-end gap-4 p-4 border border-white/10 rounded-lg bg-white/5"
                 >
-                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor={`name-${index}`}>Platform Name</Label>
                       <Input
@@ -248,18 +248,18 @@ export default function Footer() {
               </Button>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-white/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                className="border-white/10 text-gray-300 hover:bg-white/5"
+                className="border-white/10 text-gray-300 hover:bg-white/5 w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-white/10 hover:bg-white/15 border border-white/10 text-white transition-all duration-200"
+                className="bg-white/10 hover:bg-white/15 border border-white/10 text-white transition-all duration-200 w-full sm:w-auto"
               >
                 {isEditing ? "Update Links" : "Save Links"}
               </Button>
@@ -270,17 +270,17 @@ export default function Footer() {
 
       {/* Social Links List */}
       {!showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <h2 className="text-xl font-semibold text-white mb-6">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 backdrop-blur-sm">
+          <h2 className="text-lg md:text-xl font-semibold text-white mb-6">
             Current Social Links ({socialLinks.length})
           </h2>
 
           {socialLinks.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8 md:py-12">
               <p className="text-gray-400 mb-4">No social links configured yet.</p>
               <Button
                 onClick={handleCreate}
-                className="bg-white/10 hover:bg-white/15 border border-white/10 text-white transition-all duration-200"
+                className="bg-white/10 hover:bg-white/15 border border-white/10 text-white transition-all duration-200 w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Your First Link
@@ -293,19 +293,19 @@ export default function Footer() {
                   key={social._id}
                   className="border border-white/10 rounded-lg p-4 bg-white/5 hover:bg-white/10 transition-all duration-200"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center border border-white/10">
+                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
                         <span className="text-white font-medium text-sm">
                           {social.name.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       
-                      <div>
-                        <h3 className="text-white font-semibold">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-white font-semibold text-sm md:text-base">
                           {social.name}
                         </h3>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-400 text-xs md:text-sm truncate">
                           {social.link}
                         </p>
                       </div>
