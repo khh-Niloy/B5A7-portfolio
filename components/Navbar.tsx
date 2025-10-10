@@ -38,7 +38,8 @@ export function NavbarDemo() {
     },
   ];
 
-  const resumeLink = "https://drive.google.com/file/d/1BLx92Yt42G7AEEMrReQ2dp_ZNFCHl5as/view?usp=sharing";
+  const resumeLink =
+    "https://drive.google.com/file/d/1wSpMEweF1MnsjjTZrmby_g4qCBb3fWn9/view?usp=sharing";
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -114,11 +115,7 @@ export function NavbarDemo() {
               </NavbarButton>
             )}
 
-            <NavbarButton
-              target="_blank"
-              href={resumeLink}
-              variant="primary"
-            >
+            <NavbarButton target="_blank" href={resumeLink} variant="primary">
               My Resume
             </NavbarButton>
           </div>
@@ -166,13 +163,9 @@ export function NavbarDemo() {
                   Login
                 </NavbarButton>
               )}
-              <NavbarButton
-              target="_blank"
-              href={resumeLink}
-              variant="primary"
-            >
-              My Resume
-            </NavbarButton>
+              <NavbarButton target="_blank" href={resumeLink} variant="primary">
+                My Resume
+              </NavbarButton>
             </div>
           </MobileNavMenu>
         </MobileNav>
