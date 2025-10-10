@@ -4,7 +4,7 @@ A stunning, fully-featured portfolio website built with Next.js 15, featuring a 
 
 ## 🌐 Live Demo
 
-**[View Live Portfolio](https://your-portfolio-domain.com)** *(Replace with your actual deployment URL)*
+**[View Live Portfolio](https://b5a7-portfolio.vercel.app/)** *(Replace with your actual deployment URL)*
 
 ## ✨ Features
 
@@ -189,40 +189,6 @@ npm run lint         # Run ESLint
 - **Secure Headers**: Configured security headers
 - **Environment Variables**: Sensitive data in environment variables
 
-## 📱 Browser Support
-
-- **Modern Browsers**: Chrome, Firefox, Safari, Edge (latest versions)
-- **Mobile Browsers**: iOS Safari, Chrome Mobile
-- **Progressive Enhancement**: Graceful degradation for older browsers
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Next.js Team** for the amazing framework
-- **Vercel** for the deployment platform
-- **Tailwind CSS** for the utility-first CSS framework
-- **Radix UI** for accessible component primitives
-- **Framer Motion** for smooth animations
-
-## 📞 Support
-
-If you have any questions or need help:
-
-- **Email**: your-email@example.com
-- **GitHub Issues**: [Create an issue](https://github.com/your-username/portfolio/issues)
-- **Documentation**: Check the inline code comments
-
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
@@ -230,14 +196,3 @@ If you have any questions or need help:
 2. Connect your repository to Vercel
 3. Configure environment variables
 4. Deploy automatically
-
-### Other Platforms
-- **Netlify**: Compatible with Next.js
-- **Railway**: Easy deployment with database
-- **DigitalOcean**: VPS deployment option
-
----
-
-**Built with ❤️ using Next.js 15 and modern web technologies**
-
-*Last updated: December 2024*
