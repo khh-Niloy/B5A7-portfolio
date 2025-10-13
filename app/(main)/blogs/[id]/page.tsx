@@ -3,8 +3,8 @@ import getBlogs from "@/helper/getBlogs";
 import getEachBlog from "@/helper/getEachBlog";
 
 export async function generateStaticParams() {
-  const blogs = await getBlogs();
-  return blogs.map((blog: { _id: string }) => ({
+  const {fullData} = await getBlogs();
+  return fullData.map((blog: { _id: string }) => ({
     id: blog._id,
   }));
 }

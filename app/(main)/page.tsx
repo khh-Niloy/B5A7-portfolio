@@ -10,7 +10,7 @@ import Footer from "@/components/modules/Footer/Footer";
 import Experience from "@/components/modules/Experience/Experience";
 
 // Force dynamic rendering
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const aboutContent = await getAbout();

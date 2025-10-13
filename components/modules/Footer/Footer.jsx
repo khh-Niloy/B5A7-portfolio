@@ -42,7 +42,7 @@ export default function Footer() {
     <div className="text-white relative flex items-center justify-center flex-col overflow-hidden py-24">
       <img
         src="/pattern.png"
-        className="w-[50%] absolute top-32 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40"
+        className="sm:w-[50%] w-[100%] absolute top-32 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40"
         alt=""
       />
       <h1 className="text-4xl font-bold text-center">
