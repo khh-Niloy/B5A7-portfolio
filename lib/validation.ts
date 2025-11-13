@@ -40,6 +40,7 @@ export const projectSchema = z.object({
   dependencies: optionalStringSchema,
   responsibilities: requiredStringSchema("Responsibilities"),
   githubRepo: urlSchema,
+  projectType: z.enum(["client project", "personal project"]).optional(),
 });
 
 export type ProjectFormValues = z.infer<typeof projectSchema>;

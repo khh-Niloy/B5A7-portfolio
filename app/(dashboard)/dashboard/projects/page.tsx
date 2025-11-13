@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/ui/file-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Plus, Edit, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
 import { createProject } from "@/actions/projects/createProject";
@@ -26,6 +33,7 @@ interface Project {
   dependencies: string[];
   responsibilities: string;
   githubRepo: string;
+  projectType: "client project" | "personal project";
   createdAt: string;
   updatedAt: string;
 }
@@ -41,6 +49,7 @@ interface ProjectFormValues {
   dependencies: string;
   responsibilities: string;
   githubRepo: string;
+  projectType: "client project" | "personal project";
 }
 
 export default function Projects() {
@@ -55,7 +64,9 @@ export default function Projects() {
     register,
     handleSubmit,
     reset,
-    formState: {},
+    setValue,
+    watch,
+    formState: { dirtyFields, isDirty },
   } = useForm<ProjectFormValues>({
     defaultValues: {
       projectName: "",
@@ -68,8 +79,12 @@ export default function Projects() {
       dependencies: "",
       responsibilities: "",
       githubRepo: "",
+      projectType: "personal project",
     },
   });
+
+  const projectType = watch("projectType");
+  const hasChanges = isDirty || (files && files.length > 0);
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -119,6 +134,9 @@ export default function Projects() {
         techStack: Array.isArray(fresh?.techStack)
           ? fresh.techStack.join(", ")
           : "",
+        projectType:
+          (fresh?.projectType as "client project" | "personal project") ||
+          "personal project",
       };
       reset(resetValues);
     } catch {
@@ -157,6 +175,9 @@ export default function Projects() {
         techStack: Array.isArray(project.techStack)
           ? project.techStack.join(", ")
           : "",
+        projectType:
+          (project.projectType as "client project" | "personal project") ||
+          "personal project",
       };
       reset(resetValues);
     }
@@ -181,33 +202,88 @@ export default function Projects() {
         return;
       }
 
+      // Check if there are changes when editing
+      if (isEditing && !isDirty && (!files || files.length === 0)) {
+        toast.error("No changes detected. Please modify at least one field.");
+        return;
+      }
+
       const formData = new FormData();
 
+      // Only append file if a new one is uploaded
       if (files.length > 0) {
         formData.append("files", files[0]);
       }
 
-      const techStackArray = data.techStack
-        .split(",")
-        .map((tech) => tech.trim().replace(/\.$/, ""))
-        .filter((tech) => tech !== "");
+      if (isEditing && editingProject) {
+        // For updates, only send changed fields
+        if (dirtyFields.projectName) {
+          formData.append("projectName", data.projectName);
+        }
+        if (dirtyFields.shortDes) {
+          formData.append("shortDes", data.shortDes);
+        }
+        if (dirtyFields.tagline) {
+          formData.append("tagline", data.tagline);
+        }
+        if (dirtyFields.liveSite) {
+          formData.append("liveSite", data.liveSite);
+        }
+        if (dirtyFields.githubRepo) {
+          formData.append("githubRepo", data.githubRepo);
+        }
+        if (dirtyFields.problemSolution) {
+          formData.append("problemSolution", data.problemSolution);
+        }
+        if (dirtyFields.responsibilities) {
+          formData.append("responsibilities", data.responsibilities);
+        }
+        if (dirtyFields.techStack) {
+          const techStackArray = data.techStack
+            .split(",")
+            .map((tech) => tech.trim().replace(/\.$/, ""))
+            .filter((tech) => tech !== "");
+          formData.append("techStack", JSON.stringify(techStackArray));
+        }
+        if (dirtyFields.features) {
+          const featuresArray = data.features
+            .split(",")
+            .map((feature) => feature.trim().replace(/\.$/, ""))
+            .filter((feature) => feature !== "");
+          formData.append("features", JSON.stringify(featuresArray));
+        }
+        if (dirtyFields.dependencies) {
+          formData.append("dependencies", data.dependencies);
+        }
+        if (dirtyFields.projectType) {
+          formData.append("projectType", data.projectType);
+        }
+      } else {
+        // For create, send all fields
+        const techStackArray = data.techStack
+          .split(",")
+          .map((tech) => tech.trim().replace(/\.$/, ""))
+          .filter((tech) => tech !== "");
 
-      const featuresArray = data.features
-        .split(",")
-        .map((feature) => feature.trim().replace(/\.$/, ""))
-        .filter((feature) => feature !== "");
+        const featuresArray = data.features
+          .split(",")
+          .map((feature) => feature.trim().replace(/\.$/, ""))
+          .filter((feature) => feature !== "");
 
-      formData.append("projectName", data.projectName);
-      formData.append("shortDes", data.shortDes);
-      formData.append("techStack", JSON.stringify(techStackArray));
-      formData.append("liveSite", data.liveSite);
-
-      formData.append("tagline", data.tagline);
-      formData.append("problemSolution", data.problemSolution);
-      formData.append("features", JSON.stringify(featuresArray));
-      formData.append("dependencies", data.dependencies);
-      formData.append("responsibilities", data.responsibilities);
-      formData.append("githubRepo", data.githubRepo);
+        formData.append("projectName", data.projectName);
+        formData.append("shortDes", data.shortDes);
+        formData.append("techStack", JSON.stringify(techStackArray));
+        formData.append("liveSite", data.liveSite);
+        formData.append("tagline", data.tagline);
+        formData.append("problemSolution", data.problemSolution);
+        formData.append("features", JSON.stringify(featuresArray));
+        formData.append("dependencies", data.dependencies);
+        formData.append("responsibilities", data.responsibilities);
+        formData.append("githubRepo", data.githubRepo);
+        // Ensure projectType is always a valid value
+        const projectTypeValue = data.projectType || "personal project";
+        formData.append("projectType", projectTypeValue);
+      }
 
       if (isEditing && editingProject) {
         const res = await fetch(
@@ -269,7 +345,9 @@ export default function Projects() {
     <div className="space-y-6 md:space-y-10 px-4 md:px-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Project Management</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">
+            Project Management
+          </h1>
           <p className="mt-2 text-sm md:text-base text-gray-400">
             Create, edit, and manage your portfolio projects.
           </p>
@@ -306,11 +384,14 @@ export default function Projects() {
               <Label>Project Image</Label>
               {isEditing && editingProject?.image && (
                 <div className="mt-2 mb-4">
-                  <Image
-                    src={editingProject.image}
-                    alt="Current project"
-                    className="w-full max-w-md h-48 object-cover rounded-lg border border-white/10"
-                  />
+                  <div className="relative w-full max-w-md h-48">
+                    <Image
+                      src={editingProject.image}
+                      alt="Current project"
+                      fill
+                      className="object-cover rounded-lg border border-white/10"
+                    />
+                  </div>
                   <p className="text-sm text-gray-400 mt-2">
                     Current project image
                   </p>
@@ -366,6 +447,32 @@ export default function Projects() {
                   className="mt-2"
                   required
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="projectType">Project Type</Label>
+                <Select
+                  value={projectType}
+                  onValueChange={(value) =>
+                    setValue(
+                      "projectType",
+                      value as "client project" | "personal project",
+                      { shouldDirty: true }
+                    )
+                  }
+                >
+                  <SelectTrigger id="projectType" className="mt-2 w-full">
+                    <SelectValue placeholder="Select project type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="client project">
+                      Client Project
+                    </SelectItem>
+                    <SelectItem value="personal project">
+                      Personal Project
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -457,7 +564,8 @@ export default function Projects() {
               </Button>
               <Button
                 type="submit"
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto"
+                disabled={isEditing && !hasChanges}
+                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isEditing ? "Update Project" : "Create Project"}
               </Button>
@@ -492,11 +600,12 @@ export default function Projects() {
                 >
                   <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-6">
                     {project.image && (
-                      <div className="flex-shrink-0 w-full sm:w-32 h-32">
+                      <div className="flex-shrink-0 w-full sm:w-32 h-32 relative">
                         <Image
                           src={project.image}
                           alt={project.projectName}
-                          className="w-full h-full object-cover rounded-xl border border-white/10"
+                          fill
+                          className="object-cover rounded-xl border border-white/10"
                         />
                       </div>
                     )}

@@ -73,7 +73,7 @@ export default function BlogCard({
         </div>
       </div>
 
-      <DialogContent className="w-[94%] sm:w-auto sm:max-w-2xl lg:max-w-3xl max-h-[70vh] overflow-y-auto rounded-3xl border border-white/10 bg-[#050814]/95 p-0 backdrop-blur-xl">
+      <DialogContent className="w-[94%] sm:w-auto sm:max-w-2xl lg:max-w-3xl max-h-[70vh] overflow-y-auto rounded-3xl border border-white/10 bg-[#090D22]/95 p-0 backdrop-blur-xl">
         {coverImage && (
           <div className="relative h-48 sm:h-60 md:h-72 overflow-hidden">
             <img
