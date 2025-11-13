@@ -5,10 +5,15 @@ import getBlogs from "@/helper/getBlogs";
 import getEachBlog from "@/helper/getEachBlog";
 
 export async function generateStaticParams() {
-  const {fullData} = await getBlogs();
-  return fullData.map((blog: { _id: string }) => ({
-    id: blog._id,
-  }));
+  try {
+    const {fullData} = await getBlogs();
+    return fullData.map((blog: { _id: string }) => ({
+      id: blog._id,
+    }));
+  } catch (error) {
+    console.error("Failed to generate static params for blogs:", error);
+    return [];
+  }
 }
 
 export default async function SingleBlog({

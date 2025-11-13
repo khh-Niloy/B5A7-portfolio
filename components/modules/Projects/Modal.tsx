@@ -10,25 +10,43 @@ import {
 import { toArrayConvert } from "@/lib/ToArrayConvert";
 import { ExternalLink, Github } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Project } from "@/interfaces/interface";
 
 export function Modal({ id }: { id: string }) {
-  const [project, setProject] = useState<any>(null);
+  const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open && id) {
+    if (open && id && id.trim() !== "") {
       setLoading(true);
+      setError(null);
+      setProject(null);
       fetch(`${process.env.NEXT_PUBLIC_BASE_API}/projects/${id}`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch project: ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then((data) => {
-          setProject(data.data);
+          if (data.data) {
+            setProject(data.data);
+          } else {
+            setError("Project data not found");
+          }
           setLoading(false);
         })
         .catch((error) => {
           console.error("Failed to fetch project:", error);
+          setError(error.message || "Failed to load project details");
           setLoading(false);
         });
+    } else if (!open) {
+      // Reset state when dialog closes
+      setProject(null);
+      setError(null);
     }
   }, [open, id]);
 
@@ -43,6 +61,15 @@ export function Modal({ id }: { id: string }) {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <p className="text-red-400 text-sm mb-2">{error}</p>
+            <p className="text-[#BEC1DD] text-xs">Please try again later</p>
+          </div>
+        ) : !project ? (
+          <div className="flex items-center justify-center py-12">
+            <p className="text-[#BEC1DD] text-sm">No project data available</p>
           </div>
         ) : (
           <>

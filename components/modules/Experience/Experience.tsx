@@ -27,7 +27,6 @@ export default function Experience() {
       setExperience(list);
     };
     fetchAbout();
-    console.log(experience);
   }, []);
 
   const items = useMemo(() => experience, [experience]);
