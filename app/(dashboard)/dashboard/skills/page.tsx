@@ -73,7 +73,7 @@ export default function Skills() {
     setLoading(true);
     try {
       const data = await getSkills();
-      console.log("Fetched skills:", data);
+      // console.log("Fetched skills:", data);
       setExistingSkills(data?.data || []);
     } catch (error) {
       console.error("Failed to fetch skills:", error);

@@ -27,7 +27,9 @@ export default function Experience() {
       setExperience(list);
     };
     fetchAbout();
+    console.log(experience);
   }, []);
+
 
   const items = useMemo(() => experience, [experience]);
 
@@ -80,20 +82,35 @@ export default function Experience() {
                     </div>
                   )}
 
+                  {Array.isArray(exp.worked) && exp.worked.length > 0 && (
+                    <div className="py-2 text-gray-200 text-sm">
+                      {exp.worked.map((work, wIdx) => (
+                        <ul
+                          key={`${work}-${wIdx}`}
+                          className="list-disc list-inside"
+                        >
+                          <li className="mt-2 mb-1"> {work} </li>
+                        </ul>
+                      ))}
+                    </div>
+                  )}
+
                   {Array.isArray(exp.jobTechStack) &&
                     exp.jobTechStack.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3 items-center">
-                        <h4 className="text-white font-light">
+                      <div className="flex flex-wrap flex-col gap-2 mt-3 items-start">
+                        <h4 className="text-emerald-400 font-light text-sm">
                           Tech i am working with
                         </h4>
-                        {exp.jobTechStack.map((tech, tIdx) => (
-                          <span
-                            key={`${tech}-${tIdx}`}
-                            className="flex items-center gap-2 rounded-lg px-3.5 py-2 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/50 transition-all duration-200 whitespace-nowrap text-xs"
-                          >
-                            {tech}
-                          </span>
-                        ))}
+                        <div className="flex flex-wrap gap-2">
+                          {exp.jobTechStack.map((tech, tIdx) => (
+                            <span
+                              key={`${tech}-${tIdx}`}
+                              className="flex items-center gap-2 rounded-lg px-3.5 py-2 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/50 transition-all duration-200 whitespace-nowrap text-xs"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                 </div>

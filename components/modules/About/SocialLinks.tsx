@@ -11,7 +11,7 @@ export default function SocialLinks({
   content: Record<string, unknown>;
 }) {
   const { socialLinks, email } = content;
-  console.log(socialLinks);
+  // console.log(socialLinks);
 
   const icons = {
     github: <FaGithub className="text-2xl" />,

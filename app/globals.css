@@ -82,12 +82,121 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(56, 189, 248, 0.65),
+      rgba(168, 85, 247, 0.7)
+    );
+    border-radius: 9999px;
+    border: 3px solid rgba(12, 10, 30, 0.65);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(56, 189, 248, 0.85),
+      rgba(168, 85, 247, 0.85)
+    );
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: radial-gradient(
+        72% 68% at 10% 18%,
+        rgba(0, 0, 0, 0.98) 0%,
+        rgba(6, 6, 24, 0.9) 36%,
+        rgba(14, 12, 36, 0.58) 58%,
+        transparent 100%
+      ),
+      radial-gradient(
+        64% 76% at 26% 82%,
+        rgba(0, 125, 255, 0.42) 0%,
+        rgba(0, 90, 214, 0.36) 34%,
+        rgba(8, 58, 176, 0.24) 58%,
+        rgba(14, 38, 128, 0.14) 76%,
+        transparent 92%
+      ),
+      radial-gradient(
+        62% 64% at 65% 68%,
+        rgba(168, 72, 255, 0.6) 0%,
+        rgba(134, 58, 226, 0.48) 36%,
+        rgba(102, 44, 190, 0.3) 60%,
+        rgba(74, 32, 148, 0.12) 80%,
+        transparent 92%
+      ),
+      radial-gradient(
+        56% 60% at 88% 38%,
+        rgba(244, 96, 104, 0.66) 0%,
+        rgba(216, 64, 136, 0.48) 34%,
+        rgba(178, 40, 150, 0.28) 58%,
+        rgba(132, 26, 130, 0.12) 82%,
+        transparent 96%
+      ),
+      radial-gradient(
+        68% 62% at 52% 62%,
+        rgba(255, 255, 255, 0.06) 0%,
+        rgba(255, 255, 255, 0.03) 34%,
+        transparent 75%
+      ),
+      radial-gradient(
+        140% 120% at 50% 120%,
+        rgba(0, 0, 0, 0.82) 0%,
+        rgba(0, 0, 0, 0.72) 28%,
+        rgba(0, 0, 0, 0.56) 50%,
+        rgba(0, 0, 0, 0.36) 70%,
+        transparent 100%
+      );
+    background-color: #04020f;
+    background-attachment: fixed;
+    min-height: 100dvh;
+    position: relative;
+    isolation: isolate;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      140% 120% at 15% -10%,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 16%,
+      rgba(255, 255, 255, 0.02) 32%,
+      transparent 60%
+    );
+    opacity: 0.2;
+    mix-blend-mode: screen;
+    z-index: -1;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(130% 90% at 50% 98%, rgba(0, 0, 0, 0.72) 0%, transparent 55%);
+    mix-blend-mode: multiply;
+    opacity: 0.9;
+    z-index: -1;
+  }
+
+  .custom-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(56, 189, 248, 0.7) rgba(12, 10, 30, 0.65);
   }
 }

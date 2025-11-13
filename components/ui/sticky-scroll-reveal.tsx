@@ -4,49 +4,53 @@ import { useMotionValueEvent, useScroll } from "motion/react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
+type StickyScrollItem = {
+  year: string;
+  description: string;
+  title?: string;
+  headTitle?: string;
+};
+
 export const StickyScroll = ({
   content,
   contentClassName,
 }: {
-  content: {
-    year: string;
-    description: string;
-    headTitle: string;
-  }[];
+  content: StickyScrollItem[];
   contentClassName?: string;
 }) => {
   const [activeCard, setActiveCard] = React.useState(0);
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    container: ref,
-    offset: ["start start", "end start"],
-  });
   const cardLength = content.length;
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const cardsBreakpoints = content.map((_, index) => index / cardLength);
-    const closestBreakpointIndex = cardsBreakpoints.reduce(
-      (acc, breakpoint, index) => {
-        const distance = Math.abs(latest - breakpoint);
-        if (distance < Math.abs(latest - cardsBreakpoints[acc])) {
-          return index;
-        }
-        return acc;
-      },
-      0
-    );
-    setActiveCard(closestBreakpointIndex);
-  });
+  React.useEffect(() => {
+    const node = ref.current;
+    if (!node || cardLength === 0) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = node;
+      const maxScrollable = Math.max(scrollHeight - clientHeight, 1);
+      const progress = scrollTop / maxScrollable;
+      const nextIndex = Math.round(progress * (cardLength - 1));
+      setActiveCard(Math.min(cardLength - 1, Math.max(0, nextIndex)));
+    };
+
+    handleScroll();
+    node.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      node.removeEventListener("scroll", handleScroll);
+    };
+  }, [cardLength]);
 
   return (
     <div
-      className="relative flex h-92 justify-center space-x-10 overflow-y-auto rounded-md"
+      className="relative flex h-92 justify-center space-x-10 overflow-y-auto rounded-md scroll-smooth custom-scroll"
       ref={ref}
     >
-      <div className="div relative flex items-start px-4">
+      <div className="relative flex items-start px-4">
         <div className="max-w-2xl">
           {content.map((item, index) => (
-            <div key={item.year + index} className="my-20">
+            <div key={item.year + index} className="my-16">
               <motion.h2
                 initial={{
                   opacity: 0,
@@ -54,9 +58,10 @@ export const StickyScroll = ({
                 animate={{
                   opacity: activeCard === index ? 1 : 0.3,
                 }}
-                className="text-2xl font-bold text-slate-100"
+                transition={{ duration: 0.3 }}
+                className="text-2xl font-semibold text-slate-100"
               >
-                {item.headTitle}
+                {item.title ?? item.headTitle}
               </motion.h2>
               <motion.p
                 initial={{
@@ -65,7 +70,8 @@ export const StickyScroll = ({
                 animate={{
                   opacity: activeCard === index ? 1 : 0.3,
                 }}
-                className="text-kg mt-10 max-w-sm text-slate-300"
+                transition={{ duration: 0.3 }}
+                className="mt-6 max-w-sm text-base leading-relaxed text-slate-300"
               >
                 {item.description}
               </motion.p>
@@ -76,17 +82,14 @@ export const StickyScroll = ({
       </div>
       <div
         className={cn(
-          "sticky top-10 hidden h-60 w-80 overflow-hidden rounded-md bg-transparent lg:block",
+          "sticky top-12 hidden h-56 w-72 overflow-hidden lg:block",
           contentClassName
         )}
       >
-        <div className="flex  h-full w-full items-center justify-center text-white">
-          <div className="text-center">
-            <div className="text-4xl font-bold mb-2">
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-white">
+            <div className="text-5xl font-black leading-tight drop-shadow-[0_12px_45px_rgba(59,130,246,0.45)]">
               {content[activeCard]?.year}
             </div>
-            <div className="text-lg opacity-80"></div>
-          </div>
         </div>
       </div>
     </div>
