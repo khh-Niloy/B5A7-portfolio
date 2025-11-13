@@ -194,9 +194,4 @@ body {
     opacity: 0.9;
     z-index: -1;
   }
-
-  .custom-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(56, 189, 248, 0.7) rgba(12, 10, 30, 0.65);
-  }
 }

@@ -22,7 +22,7 @@ export default function SocialLinks({
 
   return (
     <div className="flex flex-col md:flex-row gap-2">
-      <div className="md:w-[50%] my-auto border border-white/10 rounded-xl p-4">
+      <div className="md:w-[50%] my-auto border border-white/10 rounded-xl p-4 bg-[#241446]/20 shadow-[0_18px_45px_-25px_rgba(12,16,32,0.45)] backdrop-blur-sm">
         <div className="py-3 px-5">
           <h1 className="text-2xl font-semibold">Let&apos;s Link Up 🔗</h1>
           <span className="text-xs text-white/90 font-light">
@@ -30,12 +30,12 @@ export default function SocialLinks({
           </span>
         </div>
 
-        <div className="flex gap-5 mt-2 px-3">
+        <div className="flex gap-5 mt-2 px-3 ">
           {(socialLinks as Record<string, unknown>[]).map((e, index) => (
             <div key={index} className="flex items-center justify-center flex-col gap-1.5">
               <a href={e.link as string} target="_blank" className="z-50">
                 <div
-                  className="p-3 bg-gradient-to-r from-[#06091f] to-[#06091F]
+                  className="p-3 bg-[#241446]/50
                       hover:border hover:border-white/20 hover:duration-300 cursor-pointer rounded-xl
                          hover:to-[#06091F] hover:scale-[1.1] duration-300"
                 >
@@ -55,8 +55,8 @@ export default function SocialLinks({
       </div>
 
       <div
-        className="md:w-[50%] my-auto relative bg-[url(/bg.png)]
-      relative text-white overflow-hidden rounded-2xl border border-[#3637499d] lg:h-full
+        className="md:w-[50%] my-auto relative
+      relative text-white overflow-hidden rounded-2xl lg:h-full border border-white/10 bg-black/[0.02] px-6 py-7 shadow-[0_18px_45px_-25px_rgba(12,16,32,0.45)] backdrop-blur-sm
       h-36"
       >
         <CopyMail email={email as string} />

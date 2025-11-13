@@ -13,7 +13,7 @@ export default function ProjectCard({
   id,
 }) {
   return (
-    <div className="w-full bg-gradient-to-br from-[#04071D] to-[#0C0E23] border border-[#3637497D] rounded-xl p-5 relative hover:scale-[1.02] duration-500 transition-all">
+    <div className="w-full bg-[#090D22]/40 border border-[#3637497D] rounded-xl p-5 relative hover:scale-[1.02] duration-500 transition-all">
       <div className="bg-[#13162d] rounded-xl relative overflow-hidden sm:h-52 h-40 mb-6">
         {/* <img src="/projectDivImage.png" alt="" className="w-full" /> */}
         <img

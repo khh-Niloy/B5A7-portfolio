@@ -17,6 +17,10 @@ import { useRouter } from "next/navigation";
 export function NavbarDemo() {
   const navItems = [
     {
+      name: "Home",
+      link: "#home",
+    },
+    {
       name: "About",
       link: "#about",
     },

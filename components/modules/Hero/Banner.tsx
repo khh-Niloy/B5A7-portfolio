@@ -4,7 +4,7 @@ import React from "react";
 export default function Banner() {
   return (
     <>
-      <div className="w-full text-center mx-auto relative">
+      <div id="home" className="w-full text-center mx-auto relative">
         <picture>
           <source media="(min-width: 426px)" srcSet="/hero.svg" />
           <source media="(max-width: 425px)" srcSet="/mob.svg" />
