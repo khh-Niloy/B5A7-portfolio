@@ -43,7 +43,7 @@ export function NavbarDemo() {
   ];
 
   const resumeLink =
-    "https://drive.google.com/file/d/1wSpMEweF1MnsjjTZrmby_g4qCBb3fWn9/view?usp=sharing";
+    "https://drive.google.com/file/d/1lBFZMJNUV-LiDfDIhm9ghs3sffHSakgz/view?usp=sharing";
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
