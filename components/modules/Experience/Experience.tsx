@@ -86,7 +86,7 @@ export default function Experience() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center">
+                    <div className="flex md:flex-row flex-col justify-between items-center">
                       <div>
                         {Array.isArray(exp.worked) && exp.worked.length > 0 && (
                           <ul className="space-y-2 mb-4">
