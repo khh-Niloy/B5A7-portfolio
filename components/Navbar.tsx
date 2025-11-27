@@ -101,7 +101,7 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} onItemClick={handleNavClick} />
           <div className="flex items-center gap-4">
-            {me ? (
+            {/* {me ? (
               <>
                 <NavbarButton href="/dashboard" variant="secondary">
                   Dashboard
@@ -117,7 +117,7 @@ export function NavbarDemo() {
               <NavbarButton href="/login" variant="secondary">
                 Login
               </NavbarButton>
-            )}
+            )} */}
 
             <NavbarButton target="_blank" href={resumeLink} variant="primary">
               My Resume
@@ -150,7 +150,7 @@ export function NavbarDemo() {
               </a>
             ))}
             <div className="flex w-full flex-col gap-4">
-              {me ? (
+              {/* {me ? (
                 <>
                   <NavbarButton href="/dashboard" variant="secondary">
                     Dashboard
@@ -166,7 +166,7 @@ export function NavbarDemo() {
                 <NavbarButton href="/login" variant="secondary">
                   Login
                 </NavbarButton>
-              )}
+              )} */}
               <NavbarButton target="_blank" href={resumeLink} variant="primary">
                 My Resume
               </NavbarButton>
