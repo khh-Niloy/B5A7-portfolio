@@ -4,7 +4,7 @@ A stunning, fully-featured portfolio website built with Next.js 15, featuring a 
 
 ## 🌐 Live Demo
 
-**[View Live Portfolio](https://your-portfolio-domain.com)** *(Replace with your actual deployment URL)*
+**[View Live Portfolio](https://b5a7-portfolio.vercel.app/)**
 
 ## ✨ Features
 
