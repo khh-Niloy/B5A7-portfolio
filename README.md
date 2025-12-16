@@ -4,7 +4,7 @@ A stunning, fully-featured portfolio website built with Next.js 15, featuring a 
 
 ## 🌐 Live Demo
 
-**[View Live Portfolio](https://b5a7-portfolio.vercel.app/)** *(Replace with your actual deployment URL)*
+**[View Live Portfolio](https://b5a7-portfolio.vercel.app/)**
 
 ## ✨ Features
 
@@ -196,3 +196,14 @@ npm run lint         # Run ESLint
 2. Connect your repository to Vercel
 3. Configure environment variables
 4. Deploy automatically
+
+### Other Platforms
+- **Netlify**: Compatible with Next.js
+- **Railway**: Easy deployment with database
+- **DigitalOcean**: VPS deployment option
+
+---
+
+**Built with ❤️ using Next.js 15 and modern web technologies**
+
+*Last updated: December 2024*
