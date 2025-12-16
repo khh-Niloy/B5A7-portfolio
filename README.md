@@ -189,40 +189,6 @@ npm run lint         # Run ESLint
 - **Secure Headers**: Configured security headers
 - **Environment Variables**: Sensitive data in environment variables
 
-## 📱 Browser Support
-
-- **Modern Browsers**: Chrome, Firefox, Safari, Edge (latest versions)
-- **Mobile Browsers**: iOS Safari, Chrome Mobile
-- **Progressive Enhancement**: Graceful degradation for older browsers
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Next.js Team** for the amazing framework
-- **Vercel** for the deployment platform
-- **Tailwind CSS** for the utility-first CSS framework
-- **Radix UI** for accessible component primitives
-- **Framer Motion** for smooth animations
-
-## 📞 Support
-
-If you have any questions or need help:
-
-- **Email**: your-email@example.com
-- **GitHub Issues**: [Create an issue](https://github.com/your-username/portfolio/issues)
-- **Documentation**: Check the inline code comments
-
 ## 🚀 Deployment
 
 ### Vercel (Recommended)

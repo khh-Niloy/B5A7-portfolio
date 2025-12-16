@@ -9,7 +9,7 @@ import {
 } from "framer-motion";
 
 import React, { useRef, useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 
 
 interface NavbarProps {
@@ -195,7 +195,7 @@ export const MobileNavMenu: React.FC<MobileNavMenuProps> = ({
   children,
   className,
   isOpen,
-  onClose,
+  // onClose,
 }) => {
   return (
     <AnimatePresence>

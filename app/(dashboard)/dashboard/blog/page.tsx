@@ -55,8 +55,8 @@ export default function Blog() {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const data = await getBlogs();
-      setPosts(data || []);
+      const {fullData} = await getBlogs();
+      setPosts(fullData || []);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
       setPosts([]);

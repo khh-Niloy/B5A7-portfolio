@@ -1,141 +1,201 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import getEachProject from "@/helper/getEachProject";
 import { toArrayConvert } from "@/lib/ToArrayConvert";
+import { ExternalLink, Github } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Project } from "@/interfaces/interface";
 
-export async function Modal({ id }: { id: string }) {
-  const project = await getEachProject(id);
+export function Modal({ id }: { id: string }) {
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open && id && id.trim() !== "") {
+      setLoading(true);
+      setError(null);
+      setProject(null);
+      fetch(`${process.env.NEXT_PUBLIC_BASE_API}/projects/${id}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch project: ${res.statusText}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (data.data) {
+            setProject(data.data);
+          } else {
+            setError("Project data not found");
+          }
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch project:", error);
+          setError(error.message || "Failed to load project details");
+          setLoading(false);
+        });
+    } else if (!open) {
+      // Reset state when dialog closes
+      setProject(null);
+      setError(null);
+    }
+  }, [open, id]);
 
   return (
-    <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button size="sm" className="cursor-pointer" variant="outline">
-            Project Details
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="w-[85%] sm:w-[90%] max-h-[70vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl">
-              {project?.projectName || "Project Details"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-5">
-            {project?.tagline && (
-              <span className="inline-block px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-sm">
-                {project.tagline}
-              </span>
-            )}
-
-            {project?.shortDes && (
-              <div>
-                <h4 className="text-white font-semibold mb-1">Summary</h4>
-                <p className="text-gray-300 leading-relaxed">
-                  {project.shortDes}
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="cursor-pointer" variant="outline">
+          Details
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-[90%] max-w-2xl max-h-[70vh] overflow-y-auto bg-[#090D22]/95 border-[#3637497D]">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <p className="text-red-400 text-sm mb-2">{error}</p>
+            <p className="text-[#BEC1DD] text-xs">Please try again later</p>
+          </div>
+        ) : !project ? (
+          <div className="flex items-center justify-center py-12">
+            <p className="text-[#BEC1DD] text-sm">No project data available</p>
+          </div>
+        ) : (
+          <>
+            <DialogHeader className="border-b border-[#3637497D]/50 pb-4 mb-3">
+              <DialogTitle className="text-2xl font-semibold text-white">
+                {project?.projectName || "Project Details"}
+              </DialogTitle>
+              {project?.tagline && (
+                <p className="text-[#BEC1DD] text-sm font-light mt-1">
+                  {project.tagline}
                 </p>
-              </div>
-            )}
-
-            {project?.problemSolution && (
-              <div>
-                <h4 className="text-white font-semibold mb-1">
-                  Problem & Solution
-                </h4>
-                <p className="text-gray-300 leading-relaxed">
-                  {project.problemSolution}
-                </p>
-              </div>
-            )}
-
-            {toArrayConvert(project?.techStack).length > 0 && (
-              <div>
-                <h4 className="text-white font-semibold mb-2">Tech Stack</h4>
-                <div className="flex flex-wrap gap-2">
-                  {toArrayConvert(project?.techStack).map((t, i) => (
-                    <span
-                      key={`tech-${i}`}
-                      className="px-3 py-1.5 bg-white/10 text-gray-300 text-sm rounded-lg border border-white/10"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {toArrayConvert(project?.features).length > 0 && (
-              <div>
-                <h4 className="text-white font-semibold mb-2">Key Features</h4>
-                <ul className="list-disc list-inside text-gray-300 space-y-1">
-                  {toArrayConvert(project?.features).map((f, i) => (
-                    <li key={`feat-${i}`}>{f}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {project?.dependencies && (
-              <div>
-                <h4 className="text-white font-semibold mb-1">Dependencies</h4>
-                <p className="text-gray-300 leading-relaxed">
-                  {project.dependencies}
-                </p>
-              </div>
-            )}
-
-            {project?.responsibilities && (
-              <div>
-                <h4 className="text-white font-semibold mb-1">
-                  Responsibilities
-                </h4>
-                <p className="text-gray-300 leading-relaxed">
-                  {project.responsibilities}
-                </p>
-              </div>
-            )}
-
-            <div className="flex items-center gap-3 pt-2">
-              {project?.liveSite && (
-                <a
-                  href={project.liveSite}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-lg hover:text-emerald-300 hover:bg-emerald-500/20 transition"
-                >
-                  Live Site
-                </a>
               )}
-              {project?.githubRepo && (
-                <a
-                  href={project.githubRepo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 text-sm text-gray-300 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition"
-                >
-                  GitHub
-                </a>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              {(project?.liveSite || project?.githubRepo) && (
+                <div className="flex items-center gap-3">
+                {project?.liveSite && (
+                  <a
+                    href={project.liveSite}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-[#CBACF9] bg-[#13162d]/40 border border-[#3637497D] rounded-lg hover:bg-[#13162d]/60 hover:border-[#CBACF9]/30 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Live Site
+                  </a>
+                )}
+                {project?.githubRepo && (
+                  <a
+                    href={project.githubRepo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-[#BEC1DD] bg-[#13162d]/40 border border-[#3637497D] rounded-lg hover:bg-[#13162d]/60 hover:border-[#BEC1DD]/30 transition-colors"
+                  >
+                    <Github className="w-4 h-4" />
+                    GitHub
+                  </a>
+                )}
+                </div>
+              )}
+
+              {project?.responsibilities && (
+                <div>
+                  <h4 className="text-white font-medium mb-2 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Responsibilities
+                  </h4>
+                  <p className="text-[#BEC1DD] leading-relaxed text-sm">
+                    {project.responsibilities}
+                  </p>
+                </div>
+              )}
+
+              {project?.shortDes && (
+                <div>
+                  <h4 className="text-white font-medium mb-2 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Overview
+                  </h4>
+                  <p className="text-[#BEC1DD] leading-relaxed text-sm">
+                    {project.shortDes}
+                  </p>
+                </div>
+              )}
+
+              {project?.problemSolution && (
+                <div>
+                  <h4 className="text-white font-medium mb-2 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Problem & Solution
+                  </h4>
+                  <p className="text-[#BEC1DD] leading-relaxed text-sm">
+                    {project.problemSolution}
+                  </p>
+                </div>
+              )}
+
+              {toArrayConvert(project?.techStack).length > 0 && (
+                <div>
+                  <h4 className="text-white font-medium mb-3 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Tech Stack
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {toArrayConvert(project?.techStack).map((t, i) => (
+                      <span
+                        key={`tech-${i}`}
+                        className="px-3 py-1 bg-[#13162d]/60 text-[#BEC1DD] text-xs rounded-lg border border-[#3637497D]"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {toArrayConvert(project?.features).length > 0 && (
+                <div>
+                  <h4 className="text-white font-medium mb-3 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Key Features
+                  </h4>
+                  <ul className="space-y-2">
+                    {toArrayConvert(project?.features).map((f, i) => (
+                      <li
+                        key={`feat-${i}`}
+                        className="text-[#BEC1DD] text-sm flex items-start gap-2"
+                      >
+                        <span className="text-[#CBACF9] mt-1.5">•</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {project?.dependencies && (
+                <div>
+                  <h4 className="text-white font-medium mb-2 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Dependencies
+                  </h4>
+                  <p className="text-[#BEC1DD] leading-relaxed text-sm">
+                    {project.dependencies}
+                  </p>
+                </div>
               )}
             </div>
-          </div>
-
-          <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button className="cursor-pointer w-full" variant="outline">
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+          </>
+        )}
+      </DialogContent>
     </Dialog>
   );
 }

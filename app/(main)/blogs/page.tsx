@@ -4,7 +4,7 @@ import BlogCard from '@/components/modules/Blog/BlogCard';
 
 export default async function Blogs() {
 
-    const blogs = await getBlogs();
+    const {slicedData} = await getBlogs();
 
     interface Blog {
         _id: string;
@@ -24,8 +24,8 @@ export default async function Blogs() {
       </div>
 
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-16">
-        {blogs && blogs.length > 0 ? (
-          blogs.map((blog: Blog) => (
+        {slicedData && slicedData.length > 0 ? (
+          slicedData.map((blog: Blog) => (
             <BlogCard
               key={blog._id}
               title={blog.title}

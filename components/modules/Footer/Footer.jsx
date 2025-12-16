@@ -42,7 +42,7 @@ export default function Footer() {
     <div className="text-white relative flex items-center justify-center flex-col overflow-hidden py-24">
       <img
         src="/pattern.png"
-        className="w-[50%] absolute top-32 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40"
+        className="sm:w-[50%] w-[100%] absolute top-32 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40"
         alt=""
       />
       <h1 className="text-4xl font-bold text-center">
@@ -54,7 +54,7 @@ export default function Footer() {
         achieve your goals.
       </h1>
 
-      <div className="mt-10 flex items-center gap-2">
+      <div className="mt-10 flex items-center gap-2 z-50">
         <a
           href="https://github.com/khh-Niloy"
           target="_blank"
@@ -84,11 +84,11 @@ export default function Footer() {
         </a>
       </div>
 
-      <div className="mt-20 w-full max-w-2xl mx-auto px-6">
+      <div className="mt-20 w-full max-w-2xl mx-auto px-6 ">
         <form
           ref={form}
           onSubmit={sendEmail}
-          className="bg-white/3 border border-white/8 rounded-2xl p-8 backdrop-blur-sm"
+          className="border border-white/10 bg-white/5 rounded-3xl p-8 backdrop-blur-sm"
         >
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-white mb-2">Get In Touch</h3>

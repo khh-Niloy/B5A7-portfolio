@@ -3,7 +3,11 @@ const getBlogs = async () => {
     next: { tags: ["blogs"] }
   });
   const data = await res.json();
-  return data.data;
+
+  const fullData = data.data
+  const slicedData = data.data.slice(0, 2)
+  
+  return {fullData, slicedData};
 };
 
 export default getBlogs;

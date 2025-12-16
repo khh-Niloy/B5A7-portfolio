@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/ui/file-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import toast from "react-hot-toast";
 import getProjects from "@/helper/getProjects";
 import getEachProject from "@/helper/getEachProject";
@@ -16,13 +23,13 @@ interface ProjectFormValues {
   shortDes: string;
   techStack: string;
   liveSite: string;
-
   tagline: string;
   problemSolution: string;
   features: string;
   dependencies: string;
   responsibilities: string;
   githubRepo: string;
+  projectType: "client project" | "personal project";
 }
 
 interface UpdateProjectsProps {
@@ -49,9 +56,10 @@ export default function UpdateProjects({
   const {
     register,
     handleSubmit,
-    formState: {},
+    formState: { dirtyFields, isDirty },
     reset,
     setValue,
+    watch,
   } = useForm<ProjectFormValues>({
     defaultValues: {
       projectName: "",
@@ -64,8 +72,12 @@ export default function UpdateProjects({
       dependencies: "",
       responsibilities: "",
       githubRepo: "",
+      projectType: "personal project",
     },
   });
+
+  const projectType = watch("projectType");
+  const hasChanges = isDirty || (files && files.length > 0);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -96,30 +108,23 @@ export default function UpdateProjects({
       setSelectedProject(projectData);
 
       if (projectData) {
-        setValue("projectName", projectData.projectName || "");
-        setValue("shortDes", projectData.shortDes || "");
-        setValue("liveSite", projectData.liveSite || "");
-
-        setValue("tagline", projectData.tagline);
-        setValue("problemSolution", projectData.problemSolution ?? "");
-        setValue("responsibilities", projectData.responsibilities ?? "");
-        setValue("githubRepo", projectData.githubRepo ?? "");
-
         const featuresArr = projectData.features ?? "";
-        setValue(
-          "features",
-          Array.isArray(featuresArr) ? featuresArr.join(", ") : ""
-        );
-
-        setValue("dependencies", projectData.dependencies ?? "");
-        
-
-        setValue(
-          "techStack",
-          Array.isArray(projectData.techStack)
+        const resetValues = {
+          projectName: projectData.projectName || "",
+          shortDes: projectData.shortDes || "",
+          liveSite: projectData.liveSite || "",
+          tagline: projectData.tagline || "",
+          problemSolution: projectData.problemSolution ?? "",
+          responsibilities: projectData.responsibilities ?? "",
+          githubRepo: projectData.githubRepo ?? "",
+          features: Array.isArray(featuresArr) ? featuresArr.join(", ") : "",
+          dependencies: projectData.dependencies ?? "",
+          techStack: Array.isArray(projectData.techStack)
             ? projectData.techStack.join(", ")
-            : ""
-        );
+            : "",
+          projectType: (projectData.projectType as "client project" | "personal project") || "personal project",
+        };
+        reset(resetValues);
       }
     } catch (error) {
       console.error("Failed to fetch project details:", error);
@@ -133,27 +138,53 @@ export default function UpdateProjects({
       return;
     }
 
+    if (!isDirty && (!files || files.length === 0)) {
+      toast.error("No changes detected. Please modify at least one field.");
+      return;
+    }
+
     try {
       const formData = new FormData();
 
+      // Only append file if a new one is uploaded
       if (files && files.length > 0) {
         formData.append("files", files[0]);
       }
 
-      const techStackString = data.techStack ?? "";
-      const featuresString = data.features ?? "";
-      const dependenciesString = data.dependencies ?? "";
-
-      formData.append("projectName", data.projectName || "");
-      formData.append("shortDes", data.shortDes || "");
-      formData.append("techStack", techStackString);
-      formData.append("liveSite", data.liveSite || "");
-      formData.append("tagline", data.tagline || "");
-      formData.append("problemSolution", data.problemSolution || "");
-      formData.append("features", featuresString);
-      formData.append("dependencies", dependenciesString);
-      formData.append("responsibilities", data.responsibilities || "");
-      formData.append("githubRepo", data.githubRepo || "");
+      // Only append fields that have been changed (dirty)
+      if (dirtyFields.projectName) {
+        formData.append("projectName", data.projectName);
+      }
+      if (dirtyFields.shortDes) {
+        formData.append("shortDes", data.shortDes);
+      }
+      if (dirtyFields.tagline) {
+        formData.append("tagline", data.tagline);
+      }
+      if (dirtyFields.liveSite) {
+        formData.append("liveSite", data.liveSite);
+      }
+      if (dirtyFields.githubRepo) {
+        formData.append("githubRepo", data.githubRepo);
+      }
+      if (dirtyFields.problemSolution) {
+        formData.append("problemSolution", data.problemSolution);
+      }
+      if (dirtyFields.responsibilities) {
+        formData.append("responsibilities", data.responsibilities);
+      }
+      if (dirtyFields.techStack) {
+        formData.append("techStack", data.techStack);
+      }
+      if (dirtyFields.features) {
+        formData.append("features", data.features);
+      }
+      if (dirtyFields.dependencies) {
+        formData.append("dependencies", data.dependencies);
+      }
+      if (dirtyFields.projectType) {
+        formData.append("projectType", data.projectType);
+      }
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/projects/${selectedProject._id}`,
@@ -302,6 +333,25 @@ export default function UpdateProjects({
                   required
                 />
               </div>
+
+              <div>
+                <Label htmlFor="update-projectType">Project Type</Label>
+                <Select
+                  value={projectType}
+                  onValueChange={(value) => setValue("projectType", value as "client project" | "personal project", { shouldDirty: true })}
+                >
+                  <SelectTrigger
+                    id="update-projectType"
+                    className="mt-2 w-full"
+                  >
+                    <SelectValue placeholder="Select project type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="client project">Client Project</SelectItem>
+                    <SelectItem value="personal project">Personal Project</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -403,6 +453,7 @@ export default function UpdateProjects({
             <Button
               type="submit"
               size="lg"
+              disabled={!hasChanges}
               className="disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Update Project

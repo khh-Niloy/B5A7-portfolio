@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default async function AllBlogList() {
-  const blogs = await getBlogs();
+  const {fullData} = await getBlogs();
 
   return (
     <div className="text-white pt-32 pb-20">
@@ -17,8 +17,8 @@ export default async function AllBlogList() {
       </div>
 
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-16">
-        {blogs && blogs.length > 0 ? (
-          blogs.slice(0, 2).map((blog) => (
+        {fullData && fullData.length > 0 ? (
+          fullData.slice(0, 2).map((blog) => (
             <BlogCard
               key={blog._id}
               id={blog._id}

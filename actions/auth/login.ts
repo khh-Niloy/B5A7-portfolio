@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 const login = async (data: { email: string; password: string }) => {
   try {
-    console.log(data);
+    // console.log(data);
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/login`, {
       method: "POST",
       headers: {
@@ -12,7 +12,7 @@ const login = async (data: { email: string; password: string }) => {
       credentials: "include",
     });
     const result = await res.json();
-    console.log(result);
+    // console.log(result);
     
     if (!res.ok) {
       return {

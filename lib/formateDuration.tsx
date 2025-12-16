@@ -14,9 +14,9 @@ export const formatDuration = (
   const years = Math.floor(months / 12);
   const rem = months % 12;
   if (years === 0 && rem === 0) return "<1 mo";
-  if (years === 0) return `${rem} mo${rem > 1 ? "s" : ""}`;
+  if (years === 0) return `${rem} month${rem > 1 ? "s" : ""}`;
   if (rem === 0) return `${years} yr${years > 1 ? "s" : ""}`;
-  return `${years} yr${years > 1 ? "s" : ""} ${rem} mo${rem > 1 ? "s" : ""}`;
+  return `${years} yr${years > 1 ? "s" : ""} ${rem} month${rem > 1 ? "s" : ""}`;
 };
 
 export const formatMonthYear = (val: string | Date): string =>

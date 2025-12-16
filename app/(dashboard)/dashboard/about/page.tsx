@@ -3,7 +3,12 @@ import React, { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { createAbout } from "@/actions/about/createAbout";
 import { updateAbout } from "@/actions/about/updateAbout";
-import type { Contact, UniversityInfo, AboutInfo, Journey } from "@/interfaces/interface";
+import type {
+  Contact,
+  UniversityInfo,
+  AboutInfo,
+  Journey,
+} from "@/interfaces/interface";
 import getAbout from "@/helper/getAbout";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,6 +95,7 @@ export default function About() {
     const fetchData = async () => {
       try {
         const data = await getAbout();
+        // console.log(data);
         if (data) {
           setHasExistingData(true);
           setAboutId(data._id || null);
@@ -110,28 +116,34 @@ export default function About() {
                 email: data.aboutInfo?.email || "",
                 sampleText: data.aboutInfo?.sampleText?.join(", ") || "",
               },
-              experience: (data.experience || []).map((exp: Record<string, unknown>) => ({
-                companyName: exp.companyName || "",
-                role: exp.role || "",
-                startDate: exp.startDate
-                  ? new Date(exp.startDate as string).toISOString().slice(0, 10)
-                  : "",
-                endDate:
-                  exp.endDate === "present"
-                    ? ""
-                    : exp.endDate
-                    ? new Date(exp.endDate as string).toISOString().slice(0, 10)
+              experience: (data.experience || []).map(
+                (exp: Record<string, unknown>) => ({
+                  companyName: exp.companyName || "",
+                  role: exp.role || "",
+                  startDate: exp.startDate
+                    ? new Date(exp.startDate as string)
+                        .toISOString()
+                        .slice(0, 10)
                     : "",
-                location: exp.location || "remote",
-                jobType: exp.jobType || "full-time",
-                jobTechStack: Array.isArray(exp.jobTechStack)
-                  ? exp.jobTechStack.join(", ")
-                  : exp.jobTechStack || "",
-                worked: Array.isArray(exp.worked)
-                  ? exp.worked.join(", ")
-                  : exp.worked || "",
-                isCurrent: exp.endDate === "present",
-              })) || [
+                  endDate:
+                    exp.endDate === "present"
+                      ? ""
+                      : exp.endDate
+                      ? new Date(exp.endDate as string)
+                          .toISOString()
+                          .slice(0, 10)
+                      : "",
+                  location: exp.location || "remote",
+                  jobType: exp.jobType || "full-time",
+                  jobTechStack: Array.isArray(exp.jobTechStack)
+                    ? exp.jobTechStack.join(", ")
+                    : exp.jobTechStack || "",
+                  worked: Array.isArray(exp.worked)
+                    ? exp.worked.join(", ")
+                    : exp.worked || "",
+                  isCurrent: exp.endDate === "present",
+                })
+              ) || [
                 {
                   companyName: "",
                   role: "",
@@ -165,7 +177,10 @@ export default function About() {
     fetchData();
   }, [reset]);
 
-  const getDirtyValues = (dirtyFields: Record<string, unknown>, allValues: Record<string, unknown>): Record<string, unknown> => {
+  const getDirtyValues = (
+    dirtyFields: Record<string, unknown>,
+    allValues: Record<string, unknown>
+  ): Record<string, unknown> => {
     const dirtyValues: Record<string, unknown> = {};
 
     Object.keys(dirtyFields).forEach((key) => {
@@ -190,7 +205,13 @@ export default function About() {
             return keys.some(
               (k) =>
                 (item as Record<string, unknown>)[k] === true ||
-                (typeof (item as Record<string, unknown>)[k] === "object" && Object.keys((item as Record<string, unknown>)[k] as Record<string, unknown>).length > 0)
+                (typeof (item as Record<string, unknown>)[k] === "object" &&
+                  Object.keys(
+                    (item as Record<string, unknown>)[k] as Record<
+                      string,
+                      unknown
+                    >
+                  ).length > 0)
             );
           }
           return item === true;
@@ -205,7 +226,9 @@ export default function About() {
     return dirtyValues;
   };
 
-  const normalizeAboutPayload = (values: Record<string, unknown>): Record<string, unknown> => {
+  const normalizeAboutPayload = (
+    values: Record<string, unknown>
+  ): Record<string, unknown> => {
     const normalized: Record<string, unknown> = { ...values };
 
     const splitCsv = (str: unknown) =>
@@ -227,16 +250,21 @@ export default function About() {
 
     if (
       normalized.aboutInfo &&
-      typeof (normalized.aboutInfo as Record<string, unknown>).sampleText !== "undefined"
+      typeof (normalized.aboutInfo as Record<string, unknown>).sampleText !==
+        "undefined"
     ) {
       normalized.aboutInfo = {
         ...(normalized.aboutInfo as Record<string, unknown>),
-        sampleText: splitCsv((normalized.aboutInfo as Record<string, unknown>).sampleText),
+        sampleText: splitCsv(
+          (normalized.aboutInfo as Record<string, unknown>).sampleText
+        ),
       };
     }
 
     if (Array.isArray(normalized.experience)) {
-      normalized.experience = (normalized.experience as Record<string, unknown>[]).map((exp: Record<string, unknown>) => {
+      normalized.experience = (
+        normalized.experience as Record<string, unknown>[]
+      ).map((exp: Record<string, unknown>) => {
         const next: Record<string, unknown> = { ...exp };
         if (typeof next.jobTechStack !== "undefined") {
           next.jobTechStack = splitCsv(next.jobTechStack);
@@ -272,14 +300,19 @@ export default function About() {
         if (hasExistingData && aboutId) {
           const changedData = getDirtyValues(dirtyFields, data);
           const normalizedChanged = normalizeAboutPayload(changedData);
-          result = await updateAbout(normalizedChanged as unknown as AboutData, aboutId);
+          result = await updateAbout(
+            normalizedChanged as unknown as AboutData,
+            aboutId
+          );
         } else {
           const normalizedData = normalizeAboutPayload(data);
           result = await createAbout(normalizedData as unknown as AboutData);
         }
 
         if (!result?.success) {
-          throw new Error(result?.message || "Failed to save about information");
+          throw new Error(
+            result?.message || "Failed to save about information"
+          );
         }
 
         if (!hasExistingData && result?.id) {
@@ -290,8 +323,8 @@ export default function About() {
         return result;
       },
       {
-        successMessage: hasExistingData 
-          ? "About information updated successfully! ✅" 
+        successMessage: hasExistingData
+          ? "About information updated successfully! ✅"
           : "About information created successfully! ✅",
         errorMessage: "Failed to save about information. Please try again.",
       }

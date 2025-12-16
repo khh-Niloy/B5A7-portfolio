@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/ui/file-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
 import { createProject } from "@/actions/projects/createProject";
 import { projectSchema, type ProjectFormValues } from "@/lib/validation";
@@ -26,6 +33,8 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
     mode: "onBlur",
@@ -40,8 +49,11 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
       dependencies: "",
       responsibilities: "",
       githubRepo: "",
+      projectType: undefined as "client project" | "personal project" | undefined,
     },
   });
+
+  const projectType = watch("projectType");
 
   const handleFileUpload = (uploadedFiles: File[]) => {
     setFiles(uploadedFiles);
@@ -73,6 +85,9 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
         formData.append("dependencies", dependenciesString);
         formData.append("responsibilities", data.responsibilities);
         formData.append("githubRepo", data.githubRepo || "");
+        // Ensure projectType is always a valid value
+        const projectTypeValue = data.projectType || "personal project";
+        formData.append("projectType", projectTypeValue);
 
         const result = await createProject(formData);
 
@@ -195,6 +210,32 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
                 {errors.githubRepo.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="projectType">Project Type</Label>
+            <Select
+              value={projectType}
+              onValueChange={(value) => setValue("projectType", value as "client project" | "personal project")}
+              disabled={isSubmitting}
+            >
+              <SelectTrigger
+                id="projectType"
+                className={`mt-2 w-full ${errors.projectType ? "border-red-500 focus:border-red-500" : ""}`}
+              >
+                <SelectValue placeholder="Select project type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="client project">Client Project</SelectItem>
+                <SelectItem value="personal project">Personal Project</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.projectType && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.projectType.message}
               </p>
             )}
           </div>
