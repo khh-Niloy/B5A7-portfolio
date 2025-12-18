@@ -35,7 +35,7 @@ export const updateSkills = async (data: SkillData[]) => {
     }
 
     if (result?.success) {
-      revalidateTag("skills");
+      revalidateTag("skills", "max");
       revalidatePath("/");
     }
 

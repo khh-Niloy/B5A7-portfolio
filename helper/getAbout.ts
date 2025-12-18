@@ -1,7 +1,10 @@
 const getAbout = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/about/about-content`, {
-    cache: "force-cache",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_API}/about/about-content`,
+    {
+      next: { tags: ["about"] },
+    }
+  );
   const data = await res.json();
   return data.data[0];
 };

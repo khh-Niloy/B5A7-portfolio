@@ -19,7 +19,7 @@ export async function createBlog(formData: FormData) {
     }
 
     const result = await response.json();
-    revalidateTag("blogs");
+    revalidateTag("blogs", "max");
 
     return {
       success: true,

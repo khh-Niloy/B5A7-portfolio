@@ -18,7 +18,7 @@ export async function updateBlog(blogId: string, formData: FormData) {
         message: result.message || "Failed to update blog post",
       };
     }
-    revalidateTag("blogs");
+    revalidateTag("blogs", "max");
 
     return {
       success: true,

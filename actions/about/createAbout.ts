@@ -40,7 +40,7 @@ export const createAbout = async (data: AboutData) => {
     const result = await res.json();
 
     if (result?.id) {
-      revalidateTag("about");
+      revalidateTag("about", "max");
       revalidatePath("/");
       return {
         success: true,
