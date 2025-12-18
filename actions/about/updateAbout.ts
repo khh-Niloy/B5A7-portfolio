@@ -32,7 +32,7 @@ export const updateAbout = async (data: AboutData, id: string) => {
     const result = await res.json();
 
     if (result?.id) {
-      revalidateTag("about");
+      revalidateTag("about", "max");
       revalidatePath("/");
       redirect("/");
     }

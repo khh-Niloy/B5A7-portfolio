@@ -18,7 +18,7 @@ export async function deleteBlog(blogId: string) {
         message: result.message || "Failed to delete blog post",
       };
     }
-    revalidateTag("blogs");
+    revalidateTag("blogs", "max");
 
     return {
       success: true,

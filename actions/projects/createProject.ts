@@ -21,7 +21,7 @@ export const createProject = async (formData: FormData) => {
     const result = await res.json();
 
     if (result?.success) {
-      revalidateTag("projects");
+      revalidateTag("projects", "max");
       revalidatePath("/");
     }
 
