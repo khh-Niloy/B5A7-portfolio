@@ -5,9 +5,7 @@ export const emailSchema = z
   .min(1, "Email is required")
   .email("Please enter a valid email address");
 
-export const passwordSchema = z
-  .string()
-  .min(1, "Password is required")
+export const passwordSchema = z.string().min(1, "Password is required");
 
 export const urlSchema = z
   .string()
@@ -39,7 +37,9 @@ export const projectSchema = z.object({
   features: requiredStringSchema("Key features"),
   dependencies: optionalStringSchema,
   responsibilities: requiredStringSchema("Responsibilities"),
-  githubRepo: urlSchema,
+  frontendRepo: urlSchema,
+  backendRepo: urlSchema,
+  technicalHighlights: requiredStringSchema("Technical highlights"),
   projectType: z.enum(["client project", "personal project"]).optional(),
 });
 
@@ -58,10 +58,7 @@ export type BlogFormValues = z.infer<typeof blogSchema>;
 
 export const contactSchema = z.object({
   name: requiredStringSchema("Contact name"),
-  link: z
-    .string()
-    .min(1, "Link is required")
-    .url("Please enter a valid URL"),
+  link: z.string().min(1, "Link is required").url("Please enter a valid URL"),
 });
 
 export const journeySchema = z.object({
@@ -89,14 +86,18 @@ export const universityInfoSchema = z.object({
     .string()
     .optional()
     .refine(
-      (val) => !val || (!isNaN(Number(val)) && Number(val) >= 1900 && Number(val) <= 2100),
+      (val) =>
+        !val ||
+        (!isNaN(Number(val)) && Number(val) >= 1900 && Number(val) <= 2100),
       "Please enter a valid year (1900-2100)"
     ),
   endYear: z
     .string()
     .optional()
     .refine(
-      (val) => !val || (!isNaN(Number(val)) && Number(val) >= 1900 && Number(val) <= 2100),
+      (val) =>
+        !val ||
+        (!isNaN(Number(val)) && Number(val) >= 1900 && Number(val) <= 2100),
       "Please enter a valid year (1900-2100)"
     ),
 });
@@ -139,7 +140,9 @@ export const getErrorMessage = (error: unknown): string => {
   return "An unexpected error occurred";
 };
 
-export const handleApiError = (error: unknown): { message: string; details?: string } => {
+export const handleApiError = (
+  error: unknown
+): { message: string; details?: string } => {
   if (error instanceof Error) {
     if (error.message.includes("fetch")) {
       return {
@@ -147,41 +150,48 @@ export const handleApiError = (error: unknown): { message: string; details?: str
         details: error.message,
       };
     }
-    
-    if (error.message.includes("401") || error.message.includes("unauthorized")) {
+
+    if (
+      error.message.includes("401") ||
+      error.message.includes("unauthorized")
+    ) {
       return {
-        message: "You are not authorized to perform this action. Please log in again.",
+        message:
+          "You are not authorized to perform this action. Please log in again.",
         details: error.message,
       };
     }
-    
+
     if (error.message.includes("500") || error.message.includes("server")) {
       return {
         message: "Server error. Please try again later.",
         details: error.message,
       };
     }
-    
+
     return {
       message: error.message,
       details: error.message,
     };
   }
-  
+
   if (typeof error === "object" && error !== null && "message" in error) {
     return {
       message: (error as { message: string }).message,
       details: JSON.stringify(error),
     };
   }
-  
+
   return {
     message: "An unexpected error occurred. Please try again.",
     details: String(error),
   };
 };
 
-export const validateForm = <T>(schema: z.ZodSchema<T>, data: unknown): {
+export const validateForm = <T>(
+  schema: z.ZodSchema<T>,
+  data: unknown
+): {
   success: boolean;
   data?: T;
   errors?: string[];

@@ -63,11 +63,11 @@ export default function BlogCard({
           {truncatedContent}
         </p>
 
-        <div className="flex items-center justify-between">
-          <Link className="cursor-pointer hover:underline" href={`/blogs/${id}`}>Read More →</Link>
+        <div className="w-full">
+          {/* <Link className="cursor-pointer hover:underline" href={`/blogs/${id}`}>Read More →</Link> */}
           <DialogTrigger asChild>
-            <Button size="sm" className="cursor-pointer" variant="outline">
-              Quick View
+            <Button size="sm" className="cursor-pointer w-full" variant="outline">
+              Quick Details
             </Button>
           </DialogTrigger>
         </div>
