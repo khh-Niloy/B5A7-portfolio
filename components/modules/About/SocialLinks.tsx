@@ -11,6 +11,9 @@ export default function SocialLinks({
   content: Record<string, unknown>;
 }) {
   const { socialLinks, email } = content;
+  const finalSocial = (socialLinks as Record<string, unknown>[]).filter(
+    (e: any) => e.name !== "resume"
+  );
   // console.log(socialLinks);
 
   const icons = {
@@ -31,8 +34,11 @@ export default function SocialLinks({
         </div>
 
         <div className="flex gap-5 mt-2 px-3 ">
-          {(socialLinks as Record<string, unknown>[]).map((e, index) => (
-            <div key={index} className="flex items-center justify-center flex-col gap-1.5">
+          {(finalSocial as Record<string, unknown>[]).map((e, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-center flex-col gap-1.5"
+            >
               <a href={e.link as string} target="_blank" className="z-50">
                 <div
                   className="p-3 bg-[#241446]/50
