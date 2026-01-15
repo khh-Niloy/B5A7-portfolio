@@ -19,7 +19,6 @@ import { createProject } from "@/actions/projects/createProject";
 import { projectSchema, type ProjectFormValues } from "@/lib/validation";
 import { withErrorHandling } from "@/lib/error-handler";
 
-
 interface AddProjectsProps {
   files: File[];
   setFiles: (files: File[]) => void;
@@ -27,7 +26,7 @@ interface AddProjectsProps {
 
 export default function AddProjects({ files, setFiles }: AddProjectsProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -48,8 +47,13 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
       features: "",
       dependencies: "",
       responsibilities: "",
-      githubRepo: "",
-      projectType: undefined as "client project" | "personal project" | undefined,
+      frontendRepo: "",
+      backendRepo: "",
+      technicalHighlights: "",
+      projectType: undefined as
+        | "client project"
+        | "personal project"
+        | undefined,
     },
   });
 
@@ -84,7 +88,9 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
         formData.append("features", featuresString);
         formData.append("dependencies", dependenciesString);
         formData.append("responsibilities", data.responsibilities);
-        formData.append("githubRepo", data.githubRepo || "");
+        formData.append("frontendRepo", data.frontendRepo || "");
+        formData.append("backendRepo", data.backendRepo || "");
+        formData.append("technicalHighlights", data.technicalHighlights);
         // Ensure projectType is always a valid value
         const projectTypeValue = data.projectType || "personal project";
         formData.append("projectType", projectTypeValue);
@@ -113,9 +119,7 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-        <h2 className="text-xl font-semibold text-white mb-6">
-          Project Image
-        </h2>
+        <h2 className="text-xl font-semibold text-white mb-6">Project Image</h2>
         <div className="w-full max-w-4xl mx-auto">
           <FileUpload onChange={handleFileUpload} />
         </div>
@@ -133,7 +137,9 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               id="projectName"
               placeholder="e.g., MadChef - Restaurant Management App"
               {...register("projectName")}
-              className={`mt-2 ${errors.projectName ? "border-red-500 focus:border-red-500" : ""}`}
+              className={`mt-2 ${
+                errors.projectName ? "border-red-500 focus:border-red-500" : ""
+              }`}
               disabled={isSubmitting}
             />
             {errors.projectName && (
@@ -150,7 +156,9 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               id="tagline"
               placeholder="A catchy tagline for your project"
               {...register("tagline")}
-              className={`mt-2 ${errors.tagline ? "border-red-500 focus:border-red-500" : ""}`}
+              className={`mt-2 ${
+                errors.tagline ? "border-red-500 focus:border-red-500" : ""
+              }`}
               disabled={isSubmitting}
             />
             {errors.tagline && (
@@ -162,12 +170,14 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor="shortDes">Short Description</Label>
+            <Label htmlFor="shortDes">Overview</Label>
             <Textarea
               id="shortDes"
-              placeholder="Brief description of your project..."
+              placeholder="Brief overview of your project..."
               {...register("shortDes")}
-              className={`mt-2 min-h-[80px] ${errors.shortDes ? "border-red-500 focus:border-red-500" : ""}`}
+              className={`mt-2 min-h-[80px] ${
+                errors.shortDes ? "border-red-500 focus:border-red-500" : ""
+              }`}
               disabled={isSubmitting}
             />
             {errors.shortDes && (
@@ -185,7 +195,9 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               type="url"
               placeholder="https://example.com"
               {...register("liveSite")}
-              className={`mt-2 ${errors.liveSite ? "border-red-500 focus:border-red-500" : ""}`}
+              className={`mt-2 ${
+                errors.liveSite ? "border-red-500 focus:border-red-500" : ""
+              }`}
               disabled={isSubmitting}
             />
             {errors.liveSite && (
@@ -197,19 +209,41 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
           </div>
 
           <div>
-            <Label htmlFor="githubRepo">GitHub Repository</Label>
+            <Label htmlFor="frontendRepo">Frontend GitHub Repository</Label>
             <Input
-              id="githubRepo"
+              id="frontendRepo"
               type="url"
               placeholder="https://github.com/username/repo"
-              {...register("githubRepo")}
-              className={`mt-2 ${errors.githubRepo ? "border-red-500 focus:border-red-500" : ""}`}
+              {...register("frontendRepo")}
+              className={`mt-2 ${
+                errors.frontendRepo ? "border-red-500 focus:border-red-500" : ""
+              }`}
               disabled={isSubmitting}
             />
-            {errors.githubRepo && (
+            {errors.frontendRepo && (
               <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
-                {errors.githubRepo.message}
+                {errors.frontendRepo.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="backendRepo">Backend GitHub Repository</Label>
+            <Input
+              id="backendRepo"
+              type="url"
+              placeholder="https://github.com/username/repo"
+              {...register("backendRepo")}
+              className={`mt-2 ${
+                errors.backendRepo ? "border-red-500 focus:border-red-500" : ""
+              }`}
+              disabled={isSubmitting}
+            />
+            {errors.backendRepo && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.backendRepo.message}
               </p>
             )}
           </div>
@@ -218,18 +252,29 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
             <Label htmlFor="projectType">Project Type</Label>
             <Select
               value={projectType}
-              onValueChange={(value) => setValue("projectType", value as "client project" | "personal project")}
+              onValueChange={(value) =>
+                setValue(
+                  "projectType",
+                  value as "client project" | "personal project"
+                )
+              }
               disabled={isSubmitting}
             >
               <SelectTrigger
                 id="projectType"
-                className={`mt-2 w-full ${errors.projectType ? "border-red-500 focus:border-red-500" : ""}`}
+                className={`mt-2 w-full ${
+                  errors.projectType
+                    ? "border-red-500 focus:border-red-500"
+                    : ""
+                }`}
               >
                 <SelectValue placeholder="Select project type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="client project">Client Project</SelectItem>
-                <SelectItem value="personal project">Personal Project</SelectItem>
+                <SelectItem value="personal project">
+                  Personal Project
+                </SelectItem>
               </SelectContent>
             </Select>
             {errors.projectType && (
@@ -249,13 +294,28 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
 
         <div className="space-y-6">
           <div>
+            <Label htmlFor="technicalHighlights">Technical Highlights</Label>
+            <Textarea
+              id="technicalHighlights"
+              placeholder="Key technical highlights of your project..."
+              {...register("technicalHighlights")}
+              className="mt-2 min-h-[100px]"
+            />
+            {errors.technicalHighlights && (
+              <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.technicalHighlights.message}
+              </p>
+            )}
+          </div>
+
+          <div>
             <Label htmlFor="problemSolution">Problem & Solution</Label>
             <Textarea
               id="problemSolution"
               placeholder="What problem does this project solve and how?"
               {...register("problemSolution")}
               className="mt-2 min-h-[120px]"
-              
             />
           </div>
 
@@ -266,7 +326,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="Feature 1, Feature 2, Feature 3"
               {...register("features")}
               className="mt-2 min-h-[100px]"
-              
             />
             <p className="text-sm text-gray-400 mt-1">
               Separate features with commas
@@ -280,7 +339,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="What was your role and responsibilities in this project?"
               {...register("responsibilities")}
               className="mt-2 min-h-[100px]"
-              
             />
           </div>
         </div>
@@ -312,7 +370,6 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
               placeholder="axios, framer-motion, tailwindcss"
               {...register("dependencies")}
               className="mt-2 min-h-[100px]"
-              
             />
             <p className="text-sm text-gray-400 mt-1">
               Separate dependencies with commas

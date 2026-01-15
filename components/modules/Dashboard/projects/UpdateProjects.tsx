@@ -28,7 +28,9 @@ interface ProjectFormValues {
   features: string;
   dependencies: string;
   responsibilities: string;
-  githubRepo: string;
+  frontendRepo: string;
+  backendRepo: string;
+  technicalHighlights: string;
   projectType: "client project" | "personal project";
 }
 
@@ -71,7 +73,9 @@ export default function UpdateProjects({
       features: "",
       dependencies: "",
       responsibilities: "",
-      githubRepo: "",
+      frontendRepo: "",
+      backendRepo: "",
+      technicalHighlights: "",
       projectType: "personal project",
     },
   });
@@ -116,13 +120,18 @@ export default function UpdateProjects({
           tagline: projectData.tagline || "",
           problemSolution: projectData.problemSolution ?? "",
           responsibilities: projectData.responsibilities ?? "",
-          githubRepo: projectData.githubRepo ?? "",
+          frontendRepo: projectData.frontendRepo ?? "",
+          backendRepo: projectData.backendRepo ?? "",
           features: Array.isArray(featuresArr) ? featuresArr.join(", ") : "",
           dependencies: projectData.dependencies ?? "",
+          technicalHighlights: projectData.technicalHighlights ?? "",
           techStack: Array.isArray(projectData.techStack)
             ? projectData.techStack.join(", ")
             : "",
-          projectType: (projectData.projectType as "client project" | "personal project") || "personal project",
+          projectType:
+            (projectData.projectType as
+              | "client project"
+              | "personal project") || "personal project",
         };
         reset(resetValues);
       }
@@ -164,8 +173,11 @@ export default function UpdateProjects({
       if (dirtyFields.liveSite) {
         formData.append("liveSite", data.liveSite);
       }
-      if (dirtyFields.githubRepo) {
-        formData.append("githubRepo", data.githubRepo);
+      if (dirtyFields.frontendRepo) {
+        formData.append("frontendRepo", data.frontendRepo);
+      }
+      if (dirtyFields.backendRepo) {
+        formData.append("backendRepo", data.backendRepo);
       }
       if (dirtyFields.problemSolution) {
         formData.append("problemSolution", data.problemSolution);
@@ -185,6 +197,11 @@ export default function UpdateProjects({
       if (dirtyFields.projectType) {
         formData.append("projectType", data.projectType);
       }
+      if (dirtyFields.technicalHighlights || data.technicalHighlights) {
+        formData.append("technicalHighlights", data.technicalHighlights);
+      }
+
+      console.log(formData);
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/projects/${selectedProject._id}`,
@@ -300,10 +317,10 @@ export default function UpdateProjects({
               </div>
 
               <div className="md:col-span-2">
-                <Label htmlFor="update-shortDes">Short Description</Label>
+                <Label htmlFor="update-shortDes">Overview</Label>
                 <Textarea
                   id="update-shortDes"
-                  placeholder="Brief description of your project..."
+                  placeholder="Brief overview of your project..."
                   {...register("shortDes")}
                   className="mt-2 min-h-[80px]"
                   required
@@ -323,12 +340,28 @@ export default function UpdateProjects({
               </div>
 
               <div>
-                <Label htmlFor="update-githubRepo">GitHub Repository</Label>
+                <Label htmlFor="update-frontendRepo">
+                  Frontend GitHub Repository
+                </Label>
                 <Input
-                  id="update-githubRepo"
+                  id="update-frontendRepo"
                   type="url"
                   placeholder="https://github.com/username/repo"
-                  {...register("githubRepo")}
+                  {...register("frontendRepo")}
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="update-backendRepo">
+                  Backend GitHub Repository
+                </Label>
+                <Input
+                  id="update-backendRepo"
+                  type="url"
+                  placeholder="https://github.com/username/repo"
+                  {...register("backendRepo")}
                   className="mt-2"
                   required
                 />
@@ -338,7 +371,13 @@ export default function UpdateProjects({
                 <Label htmlFor="update-projectType">Project Type</Label>
                 <Select
                   value={projectType}
-                  onValueChange={(value) => setValue("projectType", value as "client project" | "personal project", { shouldDirty: true })}
+                  onValueChange={(value) =>
+                    setValue(
+                      "projectType",
+                      value as "client project" | "personal project",
+                      { shouldDirty: true }
+                    )
+                  }
                 >
                   <SelectTrigger
                     id="update-projectType"
@@ -347,8 +386,12 @@ export default function UpdateProjects({
                     <SelectValue placeholder="Select project type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="client project">Client Project</SelectItem>
-                    <SelectItem value="personal project">Personal Project</SelectItem>
+                    <SelectItem value="client project">
+                      Client Project
+                    </SelectItem>
+                    <SelectItem value="personal project">
+                      Personal Project
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -361,6 +404,19 @@ export default function UpdateProjects({
             </h2>
 
             <div className="space-y-6">
+              <div>
+                <Label htmlFor="update-technicalHighlights">
+                  Technical Highlights
+                </Label>
+                <Textarea
+                  id="update-technicalHighlights"
+                  placeholder="Key technical highlights of your project..."
+                  {...register("technicalHighlights")}
+                  className="mt-2 min-h-[100px]"
+                  required
+                />
+              </div>
+
               <div>
                 <Label htmlFor="update-problemSolution">
                   Problem & Solution

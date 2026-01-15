@@ -85,41 +85,64 @@ export function Modal({ id }: { id: string }) {
             </DialogHeader>
 
             <div className="space-y-6">
-              {(project?.liveSite || project?.githubRepo) && (
+              {(project?.liveSite ||
+                project?.frontendRepo ||
+                project?.backendRepo) && (
                 <div className="flex items-center gap-3">
-                {project?.liveSite && (
-                  <a
-                    href={project.liveSite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-[#CBACF9] bg-[#13162d]/40 border border-[#3637497D] rounded-lg hover:bg-[#13162d]/60 hover:border-[#CBACF9]/30 transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Live Site
-                  </a>
-                )}
-                {project?.githubRepo && (
-                  <a
-                    href={project.githubRepo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-[#BEC1DD] bg-[#13162d]/40 border border-[#3637497D] rounded-lg hover:bg-[#13162d]/60 hover:border-[#BEC1DD]/30 transition-colors"
-                  >
-                    <Github className="w-4 h-4" />
-                    GitHub
-                  </a>
-                )}
+                  {project?.liveSite && (
+                    <a
+                      href={project.liveSite}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-[#CBACF9] bg-[#13162d]/40 border border-[#3637497D] rounded-lg hover:bg-[#13162d]/60 hover:border-[#CBACF9]/30 transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Live Site
+                    </a>
+                  )}
+                  {project?.frontendRepo && (
+                    <a
+                      href={project.frontendRepo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-[#BEC1DD] bg-[#13162d]/40 border border-[#3637497D] rounded-lg hover:bg-[#13162d]/60 hover:border-[#BEC1DD]/30 transition-colors"
+                    >
+                      <Github className="w-4 h-4" />
+                      Frontend repository
+                    </a>
+                  )}
+                  {project?.backendRepo && (
+                    <a
+                      href={project.backendRepo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-[#BEC1DD] bg-[#13162d]/40 border border-[#3637497D] rounded-lg hover:bg-[#13162d]/60 hover:border-[#BEC1DD]/30 transition-colors"
+                    >
+                      <Github className="w-4 h-4" />
+                      Backend repository
+                    </a>
+                  )}
                 </div>
               )}
 
-              {project?.responsibilities && (
+              {project?.technicalHighlights && (
                 <div>
-                  <h4 className="text-white font-medium mb-2 text-sm uppercase tracking-wider text-[#BEC1DD]">
-                    Responsibilities
+                  <h4 className="text-white font-medium mb-3 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Technical Highlights
                   </h4>
-                  <p className="text-[#BEC1DD] leading-relaxed text-sm">
-                    {project.responsibilities}
-                  </p>
+                  <ul className="space-y-2">
+                    {project.technicalHighlights
+                      .split(",")
+                      .map((highlight, i) => (
+                        <li
+                          key={`highlight-${i}`}
+                          className="text-[#BEC1DD] text-sm flex items-start gap-2"
+                        >
+                          <span className="text-[#CBACF9]">•</span>
+                          <span>{highlight.trim()}</span>
+                        </li>
+                      ))}
+                  </ul>
                 </div>
               )}
 
@@ -168,13 +191,13 @@ export function Modal({ id }: { id: string }) {
                   <h4 className="text-white font-medium mb-3 text-sm uppercase tracking-wider text-[#BEC1DD]">
                     Key Features
                   </h4>
-                  <ul className="space-y-2">
+                  <ul className="space-y-2 grid grid-cols-2">
                     {toArrayConvert(project?.features).map((f, i) => (
                       <li
                         key={`feat-${i}`}
                         className="text-[#BEC1DD] text-sm flex items-start gap-2"
                       >
-                        <span className="text-[#CBACF9] mt-1.5">•</span>
+                        <span className="text-[#CBACF9]">•</span>
                         <span>{f}</span>
                       </li>
                     ))}
@@ -189,6 +212,17 @@ export function Modal({ id }: { id: string }) {
                   </h4>
                   <p className="text-[#BEC1DD] leading-relaxed text-sm">
                     {project.dependencies}
+                  </p>
+                </div>
+              )}
+
+              {project?.responsibilities && (
+                <div>
+                  <h4 className="text-white font-medium mb-2 text-sm uppercase tracking-wider text-[#BEC1DD]">
+                    Responsibilities
+                  </h4>
+                  <p className="text-[#BEC1DD] leading-relaxed text-sm">
+                    {project.responsibilities}
                   </p>
                 </div>
               )}

@@ -13,6 +13,7 @@ import {
 import getMe from "@/helper/getMe";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import getAbout from "@/helper/getAbout";
 
 export function NavbarDemo() {
   const navItems = [
@@ -42,8 +43,6 @@ export function NavbarDemo() {
     },
   ];
 
-  const resumeLink =
-    "https://drive.google.com/file/d/1IVZabxdfAz6Nktx5SQCgWNYLBgOCy6rS/view?usp=sharing";
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -72,13 +71,19 @@ export function NavbarDemo() {
   };
 
   const [me, setMe] = useState<Record<string, unknown> | null>(null);
+  const [resumeLink, setResumeLink] = useState<string | null>(null);
   const router = useRouter();
   useEffect(() => {
     const fetchMe = async () => {
       const me = await getMe();
       setMe(me);
     };
+    const fetchLink = async()=>{
+      const link = await getAbout()
+    setResumeLink(link.contacts[3].link)
+    }
     fetchMe();
+    fetchLink()
   }, []);
 
   const handleLogout = async () => {
@@ -119,7 +124,7 @@ export function NavbarDemo() {
               </NavbarButton>
             )} */}
 
-            <NavbarButton target="_blank" href={resumeLink} variant="primary">
+            <NavbarButton target="_blank" href={resumeLink as string} variant="primary">
               My Resume
             </NavbarButton>
           </div>
@@ -167,7 +172,7 @@ export function NavbarDemo() {
                   Login
                 </NavbarButton>
               )} */}
-              <NavbarButton target="_blank" href={resumeLink} variant="primary">
+              <NavbarButton target="_blank" href={resumeLink as string} variant="primary">
                 My Resume
               </NavbarButton>
             </div>

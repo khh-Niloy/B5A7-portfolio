@@ -32,7 +32,9 @@ interface Project {
   features: string[];
   dependencies: string[];
   responsibilities: string;
-  githubRepo: string;
+  frontendRepo: string;
+  backendRepo: string;
+  technicalHighlights: string;
   projectType: "client project" | "personal project";
   createdAt: string;
   updatedAt: string;
@@ -48,7 +50,9 @@ interface ProjectFormValues {
   features: string;
   dependencies: string;
   responsibilities: string;
-  githubRepo: string;
+  frontendRepo: string;
+  backendRepo: string;
+  technicalHighlights: string;
   projectType: "client project" | "personal project";
 }
 
@@ -78,7 +82,9 @@ export default function Projects() {
       features: "",
       dependencies: "",
       responsibilities: "",
-      githubRepo: "",
+      frontendRepo: "",
+      backendRepo: "",
+      technicalHighlights: "",
       projectType: "personal project",
     },
   });
@@ -126,7 +132,8 @@ export default function Projects() {
         tagline: fresh?.tagline || "",
         problemSolution: fresh?.problemSolution || "",
         responsibilities: fresh?.responsibilities || "",
-        githubRepo: fresh?.githubRepo || "",
+        frontendRepo: fresh?.frontendRepo || "",
+        backendRepo: fresh?.backendRepo || "",
         features: Array.isArray(fresh?.features)
           ? fresh.features.join(", ")
           : "",
@@ -134,6 +141,7 @@ export default function Projects() {
         techStack: Array.isArray(fresh?.techStack)
           ? fresh.techStack.join(", ")
           : "",
+        technicalHighlights: fresh?.technicalHighlights || "",
         projectType:
           (fresh?.projectType as "client project" | "personal project") ||
           "personal project",
@@ -153,9 +161,12 @@ export default function Projects() {
         responsibilities:
           ((project as unknown as Record<string, unknown>)
             .responsibilities as string) || "",
-        githubRepo:
+        frontendRepo:
           ((project as unknown as Record<string, unknown>)
-            .githubRepo as string) || "",
+            .frontendRepo as string) || "",
+        backendRepo:
+          ((project as unknown as Record<string, unknown>)
+            .backendRepo as string) || "",
         features: Array.isArray(
           (project as unknown as Record<string, unknown>).features
         )
@@ -175,6 +186,9 @@ export default function Projects() {
         techStack: Array.isArray(project.techStack)
           ? project.techStack.join(", ")
           : "",
+        technicalHighlights:
+          ((project as unknown as Record<string, unknown>)
+            .technicalHighlights as string) || "",
         projectType:
           (project.projectType as "client project" | "personal project") ||
           "personal project",
@@ -196,6 +210,7 @@ export default function Projects() {
   // };
 
   const onSubmit = async (data: ProjectFormValues) => {
+    console.log(data);
     try {
       if (files.length === 0 && !isEditing) {
         toast.error("Please upload a project image");
@@ -229,8 +244,14 @@ export default function Projects() {
         if (dirtyFields.liveSite) {
           formData.append("liveSite", data.liveSite);
         }
-        if (dirtyFields.githubRepo) {
-          formData.append("githubRepo", data.githubRepo);
+        if (dirtyFields.frontendRepo) {
+          formData.append("frontendRepo", data.frontendRepo);
+        }
+        if (dirtyFields.backendRepo) {
+          formData.append("backendRepo", data.backendRepo);
+        }
+        if (dirtyFields.technicalHighlights || data.technicalHighlights) {
+          formData.append("technicalHighlights", data.technicalHighlights);
         }
         if (dirtyFields.problemSolution) {
           formData.append("problemSolution", data.problemSolution);
@@ -279,13 +300,16 @@ export default function Projects() {
         formData.append("features", JSON.stringify(featuresArray));
         formData.append("dependencies", data.dependencies);
         formData.append("responsibilities", data.responsibilities);
-        formData.append("githubRepo", data.githubRepo);
+        formData.append("frontendRepo", data.frontendRepo);
+        formData.append("backendRepo", data.backendRepo);
+        formData.append("technicalHighlights", data.technicalHighlights);
         // Ensure projectType is always a valid value
         const projectTypeValue = data.projectType || "personal project";
         formData.append("projectType", projectTypeValue);
       }
 
       if (isEditing && editingProject) {
+        console.log(formData);
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_API}/projects/${editingProject._id}`,
           {
@@ -295,6 +319,7 @@ export default function Projects() {
           }
         );
         const result = await res.json();
+        console.log(result);
         if (!res.ok || !result?.success) {
           toast.error(result?.message || "Failed to update project");
           return;
@@ -438,12 +463,24 @@ export default function Projects() {
               </div>
 
               <div>
-                <Label htmlFor="githubRepo">GitHub Repository</Label>
+                <Label htmlFor="frontendRepo">Frontend repository</Label>
                 <Input
-                  id="githubRepo"
+                  id="frontendRepo"
                   type="url"
                   placeholder="https://github.com/username/repo"
-                  {...register("githubRepo")}
+                  {...register("frontendRepo")}
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="backendRepo">Backend repository</Label>
+                <Input
+                  id="backendRepo"
+                  type="url"
+                  placeholder="https://github.com/username/repo"
+                  {...register("backendRepo")}
                   className="mt-2"
                   required
                 />
@@ -477,12 +514,23 @@ export default function Projects() {
             </div>
 
             <div>
-              <Label htmlFor="shortDes">Short Description</Label>
+              <Label htmlFor="shortDes">Overview</Label>
               <Textarea
                 id="shortDes"
-                placeholder="Brief description of your project..."
+                placeholder="Brief overview of your project..."
                 {...register("shortDes")}
                 className="mt-2 min-h-[80px]"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="technicalHighlights">Technical Highlights</Label>
+              <Textarea
+                id="technicalHighlights"
+                placeholder="Key technical highlights of your project..."
+                {...register("technicalHighlights")}
+                className="mt-2 min-h-[100px]"
                 required
               />
             </div>
@@ -671,15 +719,26 @@ export default function Projects() {
                             Live Site
                           </a>
                         )}
-                        {project?.githubRepo && (
+                        {project?.frontendRepo && (
                           <a
-                            href={project.githubRepo}
+                            href={project.frontendRepo}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm text-gray-400 hover:text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200 w-full sm:w-auto justify-center sm:justify-start"
                           >
                             <ExternalLink className="w-4 h-4" />
-                            GitHub
+                            Frontend repository
+                          </a>
+                        )}
+                        {project?.backendRepo && (
+                          <a
+                            href={project.backendRepo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm text-gray-400 hover:text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-200 w-full sm:w-auto justify-center sm:justify-start"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Backend repository
                           </a>
                         )}
                       </div>

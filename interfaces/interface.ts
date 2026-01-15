@@ -33,6 +33,8 @@ export interface Project {
   features: string[];
   dependencies: string;
   responsibilities: string;
-  githubRepo: string;
+  frontendRepo: string;
+  backendRepo: string;
+  technicalHighlights: string;
   projectType: "client project" | "personal project";
 }
