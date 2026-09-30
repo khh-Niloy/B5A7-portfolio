@@ -11,7 +11,7 @@ import Experience from "@/components/modules/Experience/Experience";
 import { Suspense } from "react";
 
 // Force dynamic rendering
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 async function AboutSection() {
   const aboutContent = await getAbout();
