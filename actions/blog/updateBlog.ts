@@ -1,5 +1,5 @@
 "use server";
-import { revalidateTag } from "next/cache";
+
 
 export async function updateBlog(blogId: string, formData: FormData) {
   try {
@@ -18,7 +18,7 @@ export async function updateBlog(blogId: string, formData: FormData) {
         message: result.message || "Failed to update blog post",
       };
     }
-    revalidateTag("blogs", "max");
+
 
     return {
       success: true,

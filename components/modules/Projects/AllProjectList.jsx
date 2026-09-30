@@ -14,8 +14,9 @@ export default function AllProjectList() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/projects`);
         const result = await res.json();
         const data = result.data || [];
-        setProjects(data);
-        setFilteredProjects(data);
+        const activeData = data.filter(project => project.isActive !== false);
+        setProjects(activeData);
+        setFilteredProjects(activeData);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
         setProjects([]);

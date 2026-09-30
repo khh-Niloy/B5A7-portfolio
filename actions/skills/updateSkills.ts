@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 
 interface SkillData {
   category: string;
@@ -35,7 +35,7 @@ export const updateSkills = async (data: SkillData[]) => {
     }
 
     if (result?.success) {
-      revalidateTag("skills", "max");
+
       revalidatePath("/");
     }
 

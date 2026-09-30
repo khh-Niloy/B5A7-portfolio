@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 
 export const createProject = async (formData: FormData) => {
   try {
@@ -21,7 +21,7 @@ export const createProject = async (formData: FormData) => {
     const result = await res.json();
 
     if (result?.success) {
-      revalidateTag("projects", "max");
+
       revalidatePath("/");
     }
 

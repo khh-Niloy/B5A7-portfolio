@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   Contact,
@@ -32,7 +32,7 @@ export const updateAbout = async (data: AboutData, id: string) => {
     const result = await res.json();
 
     if (result?.id) {
-      revalidateTag("about", "max");
+
       revalidatePath("/");
       redirect("/");
     }

@@ -1,5 +1,5 @@
 "use server";
-import { revalidateTag } from "next/cache";
+
 
 export async function deleteBlog(blogId: string) {
   try {
@@ -18,7 +18,7 @@ export async function deleteBlog(blogId: string) {
         message: result.message || "Failed to delete blog post",
       };
     }
-    revalidateTag("blogs", "max");
+
 
     return {
       success: true,

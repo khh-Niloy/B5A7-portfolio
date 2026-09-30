@@ -1,12 +1,12 @@
 "use server";
-import { revalidateTag } from "next/cache";
+
 
 export async function createBlog(formData: FormData) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/blog`, {
       method: "POST",
       body: formData,
-      next: { tags: ["blogs"] },
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -19,7 +19,7 @@ export async function createBlog(formData: FormData) {
     }
 
     const result = await response.json();
-    revalidateTag("blogs", "max");
+
 
     return {
       success: true,

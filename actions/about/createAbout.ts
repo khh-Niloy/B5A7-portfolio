@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import {
   Contact,
   UniversityInfo,
@@ -40,7 +40,7 @@ export const createAbout = async (data: AboutData) => {
     const result = await res.json();
 
     if (result?.id) {
-      revalidateTag("about", "max");
+
       revalidatePath("/");
       return {
         success: true,

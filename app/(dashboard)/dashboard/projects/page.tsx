@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, ExternalLink } from "lucide-react";
+import { Plus, Edit, ExternalLink, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { createProject } from "@/actions/projects/createProject";
 import getProjects from "@/helper/getProjects";
@@ -38,6 +38,7 @@ interface Project {
   projectType: "client project" | "personal project";
   createdAt: string;
   updatedAt: string;
+  isActive?: boolean;
 }
 
 interface ProjectFormValues {
@@ -206,8 +207,37 @@ export default function Projects() {
   //       console.error("Failed to delete project:", error);
   //       toast.error("Failed to delete project");
   //     }
-  //   }
   // };
+
+  const handleToggleActive = async (project: Project) => {
+    try {
+      const newStatus = project.isActive === false ? true : false;
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/projects/${project._id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ isActive: newStatus }),
+          credentials: "include",
+        }
+      );
+      const result = await res.json();
+      if (!res.ok || !result?.success) {
+        toast.error(result?.message || "Failed to update project status");
+        return;
+      }
+      toast.success(`Project marked as ${newStatus ? 'active' : 'inactive'}!`);
+      // Update local state without refetching everything
+      setProjects((prev) =>
+        prev.map((p) =>
+          p._id === project._id ? { ...p, isActive: newStatus } : p
+        )
+      );
+    } catch (error) {
+      console.error("Failed to toggle project status:", error);
+      toast.error("Failed to toggle project status");
+    }
+  };
 
   const onSubmit = async (data: ProjectFormValues) => {
     console.log(data);
@@ -683,6 +713,19 @@ export default function Projects() {
                             className="border-white/10 text-gray-300 hover:bg-white/5 hover:text-white transition-all duration-200"
                           >
                             <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={project.isActive !== false ? "default" : "outline"}
+                            onClick={() => handleToggleActive(project)}
+                            className={
+                              project.isActive !== false
+                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all duration-200"
+                                : "border-white/10 text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"
+                            }
+                            title={project.isActive !== false ? "Active (Visible)" : "Inactive (Hidden)"}
+                          >
+                            {project.isActive !== false ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </Button>
                         </div>
                       </div>
