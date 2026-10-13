@@ -35,6 +35,7 @@ export interface Project {
   responsibilities: string;
   frontendRepo: string;
   backendRepo: string;
+  githubRepo?: string;
   technicalHighlights: string;
   projectType: "client project" | "personal project";
 }

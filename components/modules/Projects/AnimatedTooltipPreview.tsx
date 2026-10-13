@@ -7,6 +7,7 @@ export default function AnimatedTooltipPreview({ techStack }: { techStack: strin
   const items =
     techStack
       ?.filter((tech: string) => Boolean(getSkillIcon(tech).icon))
+      .slice(0, 7)
       .map((tech: string, idx: number) => {
         const { icon } = getSkillIcon(tech);
         return {
@@ -16,7 +17,7 @@ export default function AnimatedTooltipPreview({ techStack }: { techStack: strin
         };
       }) || [];
   return (
-    <div className="flex flex-row items-center justify-center w-full">
+    <div className="flex flex-row items-center py-1">
       <AnimatedTooltip items={items} />
     </div>
   );

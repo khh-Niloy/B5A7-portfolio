@@ -1,49 +1,63 @@
-import getBlogs from '@/helper/getBlogs';
-import React from 'react';
-import BlogCard from '@/components/modules/Blog/BlogCard';
+import getBlogs from "@/helper/getBlogs";
+import React from "react";
+import BlogCard from "@/components/modules/Blog/BlogCard";
+import { AppShell } from "@/components/shell/AppShell";
+import { ProfileFooter } from "@/components/profile/ProfileFooter";
+import { BookOpen } from "lucide-react";
 
-export default async function Blogs() {
+interface Blog {
+  _id: string;
+  title: string;
+  content: string;
+  coverImage: string;
+  category: string;
+  createdAt: string;
+}
 
-    const {slicedData} = await getBlogs();
-
-    interface Blog {
-        _id: string;
-        title: string;
-        content: string;
-        coverImage: string;
-        category: string;
-        createdAt: string;
-    }
+export default async function BlogsPage() {
+  let blogs: Blog[] = [];
+  try {
+    const { fullData, slicedData } = await getBlogs();
+    blogs = fullData || slicedData || [];
+  } catch (error) {
+    console.error("Failed to load blogs:", error);
+  }
 
   return (
-    <div className='text-white pt-32 w-[85%] lg:w-[90%] mx-auto'>
-      <div className="mb-16 flex items-center justify-center flex-col">
-        <h1 id="blog" className="text-4xl text-center mb-2 font-semibold">
-          Insights from my dev journey.
-        </h1>
-      </div>
+    <AppShell pageTitle="Library & Blogs">
+      <div className="text-left">
+        <div className="flex items-center gap-2 mb-2">
+          <BookOpen className="h-5 w-5 text-emerald-400" />
+          <h1 className="text-lg font-semibold text-white">Engineering Library & Insights</h1>
+        </div>
+        <p className="text-sm text-zinc-400 mb-8 leading-relaxed">
+          Technical thoughts, deep-dives into software development life cycles, and React performance.
+        </p>
 
-      <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-16">
-        {slicedData && slicedData.length > 0 ? (
-          slicedData.map((blog: Blog) => (
-            <BlogCard
-              key={blog._id}
-              title={blog.title}
-              content={blog.content}
-              coverImage={blog.coverImage}
-              category={blog.category}
-              createdAt={blog.createdAt}
-              id={blog._id}
-            />
-          ))
-        ) : (
-          <div className="col-span-2 text-center py-12">
-            <p className="text-gray-400 text-lg">
-              No blog posts available yet.
-            </p>
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {blogs && blogs.length > 0 ? (
+            blogs.map((blog: Blog) => (
+              <BlogCard
+                key={blog._id}
+                title={blog.title}
+                content={blog.content}
+                coverImage={blog.coverImage}
+                category={blog.category}
+                createdAt={blog.createdAt}
+                id={blog._id}
+              />
+            ))
+          ) : (
+            <div className="col-span-2 text-center py-12 rounded-2xl border border-white/5 bg-[#141414] p-8">
+              <p className="text-zinc-400 text-sm">
+                No blog posts available at the moment.
+              </p>
+            </div>
+          )}
+        </div>
+
+        <ProfileFooter />
       </div>
-    </div>
-  )
+    </AppShell>
+  );
 }

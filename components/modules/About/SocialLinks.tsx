@@ -12,7 +12,7 @@ export default function SocialLinks({
 }) {
   const { socialLinks, email } = content;
   const finalSocial = (socialLinks as Record<string, unknown>[]).filter(
-    (e: any) => e.name !== "resume"
+    (e: Record<string, unknown>) => e.name !== "resume"
   );
   // console.log(socialLinks);
 

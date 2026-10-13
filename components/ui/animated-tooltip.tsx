@@ -35,7 +35,7 @@ export const AnimatedTooltip: React.FC<AnimatedTooltipProps> = ({ items }) => {
     <>
       {items.map((item) => (
         <div
-          className="group relative "
+          className="group relative -mr-2 sm:-mr-2.5"
           key={item.name}
           onMouseEnter={() => setHoveredIndex(item.id)}
           onMouseLeave={() => setHoveredIndex(null)}
@@ -60,17 +60,16 @@ export const AnimatedTooltip: React.FC<AnimatedTooltipProps> = ({ items }) => {
                   rotate: rotate,
                   whiteSpace: "nowrap",
                 }}
-                className="absolute -top-11 left-1/2 z-50 flex -translate-x-1/2 flex-col items-center justify-center rounded-md bg-[#0C0E23] border border-[#3637497D] px-4 py-2 text-xs shadow-xl"
+                className="absolute -top-11 left-1/2 z-50 flex -translate-x-1/2 flex-col items-center justify-center rounded-md bg-[#0C0E23] border border-[#3637497D] px-3.5 py-1 text-xs shadow-xl pointer-events-none"
               >
                 <div className="relative z-30 text-xs font-semibold text-white">
                   {item.name}
                 </div>
-                {/* <div className="text-xs text-white">{item.designation}</div> */}
               </motion.div>
             )}
           </AnimatePresence>
 
-          <div className="p-2 rounded-full border border-[#66699C6E] bg-[radial-gradient(circle,_rgba(255,255,255,1)_0%,_rgba(255,255,255,0.0)_4%,_rgba(255,255,255,0.07)_100%)] hover:-translate-y-1 duration-300 transition-all">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#66699C6E] bg-[#10132E] bg-[radial-gradient(circle,_rgba(255,255,255,1)_0%,_rgba(255,255,255,0.0)_4%,_rgba(255,255,255,0.07)_100%)] text-sm transition-all duration-300 group-hover:scale-110 group-hover:z-30 group-hover:-translate-y-1">
             {item.image}
           </div>
         </div>

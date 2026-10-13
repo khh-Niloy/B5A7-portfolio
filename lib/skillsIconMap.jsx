@@ -1,9 +1,28 @@
-import { IoLogoJavascript } from "react-icons/io5";
+import { IoLogoJavascript, IoLogoFirebase } from "react-icons/io5";
 import { BiLogoTypescript, BiLogoMongodb, BiLogoPostgresql } from "react-icons/bi";
 import { FaReact, FaNodeJs, FaGitAlt } from "react-icons/fa";
 import { RiNextjsFill } from "react-icons/ri";
-import { SiReactrouter, SiTailwindcss, SiShadcnui, SiExpress, SiMongoose, SiPostman, SiJsonwebtokens, SiVite, SiPrisma } from "react-icons/si";
-import { IoLogoFirebase } from "react-icons/io5";
+import {
+  SiReactrouter,
+  SiTailwindcss,
+  SiShadcnui,
+  SiExpress,
+  SiMongoose,
+  SiPostman,
+  SiJsonwebtokens,
+  SiVite,
+  SiPrisma,
+  SiNestjs,
+  SiRedis,
+  SiSupabase,
+  SiSocketdotio,
+  SiGooglegemini,
+  SiRedux,
+  SiZod,
+  SiDocker,
+  SiGithub,
+} from "react-icons/si";
+import { GiBullHorns } from "react-icons/gi";
 
 export const skillsIconMap = {
   javascript: {
@@ -19,6 +38,10 @@ export const skillsIconMap = {
     color: "#58C4DC",
   },
   reactjs: {
+    icon: <FaReact className="text-[#58C4DC]" />,
+    color: "#58C4DC",
+  },
+  "react.js": {
     icon: <FaReact className="text-[#58C4DC]" />,
     color: "#58C4DC",
   },
@@ -42,6 +65,14 @@ export const skillsIconMap = {
     icon: <RiNextjsFill className="text-white" />,
     color: "white",
   },
+  "next.js 15": {
+    icon: <RiNextjsFill className="text-white" />,
+    color: "white",
+  },
+  "next 15": {
+    icon: <RiNextjsFill className="text-white" />,
+    color: "white",
+  },
   tailwind: {
     icon: <SiTailwindcss className="text-[#00BCFF]" />,
     color: "#00BCFF",
@@ -55,6 +86,10 @@ export const skillsIconMap = {
     color: "#00BCFF",
   },
   shadcn: {
+    icon: <SiShadcnui className="text-white" />,
+    color: "white",
+  },
+  "shadcn ui": {
     icon: <SiShadcnui className="text-white" />,
     color: "white",
   },
@@ -87,8 +122,44 @@ export const skillsIconMap = {
     icon: <SiExpress className="text-white" />,
     color: "white",
   },
+  nestjs: {
+    icon: <SiNestjs className="text-[#E0234E]" />,
+    color: "#E0234E",
+  },
+  "nest.js": {
+    icon: <SiNestjs className="text-[#E0234E]" />,
+    color: "#E0234E",
+  },
+  nest: {
+    icon: <SiNestjs className="text-[#E0234E]" />,
+    color: "#E0234E",
+  },
+  redis: {
+    icon: <SiRedis className="text-[#DC382D]" />,
+    color: "#DC382D",
+  },
+  bullmq: {
+    icon: <GiBullHorns className="text-[#FF5722]" />,
+    color: "#FF5722",
+  },
+  supabase: {
+    icon: <SiSupabase className="text-[#3ECF8E]" />,
+    color: "#3ECF8E",
+  },
+  "socket.io": {
+    icon: <SiSocketdotio className="text-white" />,
+    color: "white",
+  },
+  socketio: {
+    icon: <SiSocketdotio className="text-white" />,
+    color: "white",
+  },
 
   mongodb: {
+    icon: <BiLogoMongodb className="text-[#27FF82]" />,
+    color: "#27FF82",
+  },
+  "mongodb (mongoose)": {
     icon: <BiLogoMongodb className="text-[#27FF82]" />,
     color: "#27FF82",
   },
@@ -113,6 +184,10 @@ export const skillsIconMap = {
     icon: <FaGitAlt className="text-[#F05133]" />,
     color: "#F05133",
   },
+  github: {
+    icon: <SiGithub className="text-white" />,
+    color: "white",
+  },
   postman: {
     icon: <SiPostman className="text-[#FF6C37]" />,
     color: "#FF6C37",
@@ -129,13 +204,44 @@ export const skillsIconMap = {
     icon: <SiVite className="text-white" />,
     color: "white",
   },
+  docker: {
+    icon: <SiDocker className="text-[#2496ED]" />,
+    color: "#2496ED",
+  },
+  zod: {
+    icon: <SiZod className="text-[#3E67B1]" />,
+    color: "#3E67B1",
+  },
+  redux: {
+    icon: <SiRedux className="text-[#764ABC]" />,
+    color: "#764ABC",
+  },
+  "redux toolkit": {
+    icon: <SiRedux className="text-[#764ABC]" />,
+    color: "#764ABC",
+  },
+  "rtk query": {
+    icon: <SiRedux className="text-[#764ABC]" />,
+    color: "#764ABC",
+  },
+  "gemini ai": {
+    icon: <SiGooglegemini className="text-[#4E75F8]" />,
+    color: "#4E75F8",
+  },
+  gemini: {
+    icon: <SiGooglegemini className="text-[#4E75F8]" />,
+    color: "#4E75F8",
+  },
 };
 
 export const getSkillIcon = (skillName) => {
+  if (!skillName) return { icon: null, color: "#666666" };
   const normalizedName = skillName.toLowerCase().trim();
-  return skillsIconMap[normalizedName] || {
-    icon: null,
-    color: "#666666",
-  };
+  return (
+    skillsIconMap[normalizedName] || {
+      icon: null,
+      color: "#666666",
+    }
+  );
 };
 
