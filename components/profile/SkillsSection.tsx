@@ -32,7 +32,9 @@ import {
   SiFirebase,
   SiHtml5,
   SiCss3,
+  SiReactrouter,
 } from "react-icons/si";
+import { GiBullHorns } from "react-icons/gi";
 
 function AntigravityIcon({
   className,
@@ -106,6 +108,10 @@ const ICON_MAP: Record<string, { icon: any; color?: string }> = {
   github: { icon: SiGithub },
   postman: { icon: SiPostman, color: "#FF6C37" },
   docker: { icon: SiDocker, color: "#2496ED" },
+  reactrouterdom: { icon: SiReactrouter, color: "#CA4245" },
+  "react router dom": { icon: SiReactrouter, color: "#CA4245" },
+  bullmq: { icon: GiBullHorns, color: "#FF5722" },
+  nodemailer: { icon: Wrench, color: "#10b981" },
   python: { icon: SiPython, color: "#3776AB" },
   graphql: { icon: SiGraphql, color: "#E10098" },
   aws: { icon: SiAmazonwebservices, color: "#FF9900" },

@@ -9,7 +9,6 @@ import { InfoCards } from "@/components/profile/InfoCards";
 import { ExperienceTimeline } from "@/components/profile/ExperienceTimeline";
 import { SkillsSection } from "@/components/profile/SkillsSection";
 import { ProjectsView } from "@/components/projects/ProjectsView";
-import { FaqSection } from "@/components/profile/FaqSection";
 import { ContactView } from "@/components/contact/ContactView";
 import { ProfileFooter } from "@/components/profile/ProfileFooter";
 import { PortfolioProvider } from "@/components/portfolio/PortfolioContext";
@@ -122,10 +121,7 @@ export default function HomePage() {
             <ProjectsView />
           </div>
 
-          {/* 5. Frequently Asked Questions */}
-          <FaqSection />
-
-          {/* 6. Contact Section */}
+          {/* 5. Contact Section */}
           <div id="contact" className="mt-14 scroll-mt-32">
             <div className="flex items-center gap-2.5 mb-6">
               <Mail className="h-6 w-6 text-emerald-400" />
