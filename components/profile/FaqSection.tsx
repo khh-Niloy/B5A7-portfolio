@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { HelpCircle, ChevronDown, ExternalLink } from "lucide-react";
 import { playUiClick } from "@/lib/sound";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
 
 interface FaqItem {
   id: string;
@@ -91,12 +92,26 @@ const defaultFaqs: FaqItem[] = [
 ];
 
 export function FaqSection() {
+  const { data } = usePortfolio();
   const [openId, setOpenId] = useState<string | null>("faq-1");
+
+  const faqs =
+    data?.faqs && data.faqs.length > 0
+      ? data.faqs
+          .filter((f) => f.isPublic !== false)
+          .map((f, idx) => ({
+            id: f.id || `faq-${idx + 1}`,
+            question: f.question,
+            answer: f.answer,
+          }))
+      : defaultFaqs;
 
   const toggleFaq = (id: string) => {
     playUiClick();
     setOpenId((prev) => (prev === id ? null : id));
   };
+
+  if (!faqs || faqs.length === 0) return null;
 
   return (
     <section id="faq" className="mt-14 scroll-mt-28" aria-label="Frequently Asked Questions">
@@ -114,7 +129,7 @@ export function FaqSection() {
 
       {/* Accordion List */}
       <div className="mt-5 flex flex-col gap-3">
-        {defaultFaqs.map((faq, index) => {
+        {faqs.map((faq, index) => {
           const isOpen = openId === faq.id;
           return (
             <div

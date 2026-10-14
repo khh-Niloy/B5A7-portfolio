@@ -3,9 +3,13 @@
 import React from "react";
 import { FileDown, ExternalLink } from "lucide-react";
 import { playUiClick } from "@/lib/sound";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
 
 export function ResumeNote() {
+  const { data } = usePortfolio();
   const resumeUrl =
+    data?.resumeUrl ||
+    data?.contacts?.find((c) => c.name.toLowerCase().includes("resume"))?.link ||
     "https://drive.google.com/file/d/1mepMM01uzz6R7qLAdUZM-ODszg-Kvz7V/view?usp=sharing";
 
   return (
@@ -27,7 +31,7 @@ export function ResumeNote() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={playUiClick}
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-5 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500 hover:text-black transition-all"
+        className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-5 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500 hover:text-black transition-all cursor-pointer"
       >
         <span>View Full PDF Résumé</span>
         <ExternalLink className="h-3.5 w-3.5" />

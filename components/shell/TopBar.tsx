@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShareModal } from "./ShareModal";
 import { playUiClick } from "@/lib/sound";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
 
 interface TopBarProps {
   pageTitle?: string;
@@ -12,6 +13,16 @@ interface TopBarProps {
 
 export function TopBar({ pageTitle }: TopBarProps) {
   const [shareOpen, setShareOpen] = useState(false);
+  const { data } = usePortfolio();
+
+  const name = data?.name || "Hasib Hossain Niloy";
+  const shortName = name.split(" ")[0] || "Niloy";
+  const avatar = data?.avatar || "https://avatars.githubusercontent.com/u/174131986?v=4";
+  const title = data?.title || "Software Engineer & Full-Stack Builder";
+  const resumeUrl =
+    data?.resumeUrl ||
+    data?.contacts?.find((c) => c.name.toLowerCase().includes("resume"))?.link ||
+    "https://drive.google.com/file/d/1mepMM01uzz6R7qLAdUZM-ODszg-Kvz7V/view?usp=sharing";
 
   return (
     <>
@@ -25,8 +36,8 @@ export function TopBar({ pageTitle }: TopBarProps) {
           >
             <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/10 group-hover:border-emerald-500/50 transition-colors">
               <Image
-                src="https://avatars.githubusercontent.com/u/174131986?v=4"
-                alt="Niloy"
+                src={avatar}
+                alt={name}
                 fill
                 className="object-cover scale-[1.35] origin-[center_42%] transition-transform duration-300"
                 unoptimized
@@ -35,32 +46,20 @@ export function TopBar({ pageTitle }: TopBarProps) {
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-semibold text-white">
-                  {pageTitle ? pageTitle : "Niloy"}
+                  {pageTitle ? pageTitle : shortName}
                 </span>
               </div>
-              <span className="text-[11px] text-zinc-400">
-                {pageTitle ? "Hasib Hossain Niloy" : "Junior Software Engineer"}
+              <span className="text-[11px] text-zinc-400 line-clamp-1 max-w-[200px] sm:max-w-[320px]">
+                {pageTitle ? name : title}
               </span>
             </div>
           </Link>
         </div>
 
-        {/* Right: Share Button & Get in Touch CTA */}
+        {/* Right: Resume Button */}
         <div className="flex items-center gap-2.5">
-          {/* <button
-            onClick={() => {
-              playUiClick();
-              setShareOpen(true);
-            }}
-            className="flex h-[43px] w-[43px] items-center justify-center rounded-[17px] border border-white/10 bg-white/5 text-zinc-400 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-white transition-all"
-            aria-label="Share profile"
-            title="Share profile"
-          >
-            <Share2 className="h-4 w-4" />
-          </button> */}
-
           <a
-            href="https://drive.google.com/file/d/1mepMM01uzz6R7qLAdUZM-ODszg-Kvz7V/view?usp=sharing"
+            href={resumeUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={playUiClick}

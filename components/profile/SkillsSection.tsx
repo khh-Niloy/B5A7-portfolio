@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Wrench } from "lucide-react";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
 import {
   SiGooglegemini,
   SiClaude,
@@ -22,6 +23,15 @@ import {
   SiGithub,
   SiPostman,
   SiDocker,
+  SiReact,
+  SiJavascript,
+  SiPython,
+  SiGraphql,
+  SiAmazonwebservices,
+  SiVercel,
+  SiFirebase,
+  SiHtml5,
+  SiCss3,
 } from "react-icons/si";
 
 function AntigravityIcon({
@@ -67,69 +77,114 @@ function CodexIcon({
   );
 }
 
-interface SkillItem {
-  name: string;
-  icon: React.ComponentType<{
-    className?: string;
-    style?: React.CSSProperties;
-  }>;
-  color?: string;
-}
+const ICON_MAP: Record<string, { icon: any; color?: string }> = {
+  gemini: { icon: SiGooglegemini, color: "#4e75f8" },
+  claude: { icon: SiClaude, color: "#d97757" },
+  antigravity: { icon: AntigravityIcon, color: "#38bdf8" },
+  codex: { icon: CodexIcon, color: "#10a37f" },
+  typescript: { icon: SiTypescript, color: "#3178C6" },
+  javascript: { icon: SiJavascript, color: "#F7DF1E" },
+  nextjs: { icon: SiNextdotjs },
+  "next.js": { icon: SiNextdotjs },
+  react: { icon: SiReact, color: "#61DAFB" },
+  reactjs: { icon: SiReact, color: "#61DAFB" },
+  tailwindcss: { icon: SiTailwindcss, color: "#06B6D4" },
+  tailwind: { icon: SiTailwindcss, color: "#06B6D4" },
+  nodejs: { icon: SiNodedotjs, color: "#339933" },
+  "node.js": { icon: SiNodedotjs, color: "#339933" },
+  express: { icon: SiExpress },
+  expressjs: { icon: SiExpress },
+  nestjs: { icon: SiNestjs, color: "#E0234E" },
+  redis: { icon: SiRedis, color: "#DC382D" },
+  postgresql: { icon: SiPostgresql, color: "#4169E1" },
+  postgres: { icon: SiPostgresql, color: "#4169E1" },
+  prisma: { icon: SiPrisma },
+  mongodb: { icon: SiMongodb, color: "#47A248" },
+  mongoose: { icon: SiMongoose, color: "#880000" },
+  supabase: { icon: SiSupabase, color: "#3ECF8E" },
+  git: { icon: SiGit, color: "#F05032" },
+  github: { icon: SiGithub },
+  postman: { icon: SiPostman, color: "#FF6C37" },
+  docker: { icon: SiDocker, color: "#2496ED" },
+  python: { icon: SiPython, color: "#3776AB" },
+  graphql: { icon: SiGraphql, color: "#E10098" },
+  aws: { icon: SiAmazonwebservices, color: "#FF9900" },
+  vercel: { icon: SiVercel },
+  firebase: { icon: SiFirebase, color: "#FFCA28" },
+  html: { icon: SiHtml5, color: "#E34F26" },
+  css: { icon: SiCss3, color: "#1572B6" },
+};
 
-interface SkillCategory {
-  category: string;
-  skills: SkillItem[];
-}
+const defaultSkillGroups = [
+  {
+    category: "AI",
+    skills: [
+      { name: "Gemini", icon: SiGooglegemini, color: "#4e75f8" },
+      { name: "Claude", icon: SiClaude, color: "#d97757" },
+      { name: "Antigravity", icon: AntigravityIcon, color: "#38bdf8" },
+      { name: "Codex", icon: CodexIcon, color: "#10a37f" },
+    ],
+  },
+  {
+    category: "Backend",
+    skills: [
+      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+      { name: "Nodejs", icon: SiNodedotjs, color: "#339933" },
+      { name: "Expressjs", icon: SiExpress },
+      { name: "Nestjs", icon: SiNestjs, color: "#E0234E" },
+      { name: "Redis", icon: SiRedis, color: "#DC382D" },
+    ],
+  },
+  {
+    category: "Databases",
+    skills: [
+      { name: "PostgreSQL", icon: SiPostgresql, color: "#4169E1" },
+      { name: "Prisma", icon: SiPrisma },
+      { name: "MongoDB", icon: SiMongodb, color: "#47A248" },
+      { name: "Mongoose", icon: SiMongoose, color: "#880000" },
+      { name: "Supabase", icon: SiSupabase, color: "#3ECF8E" },
+    ],
+  },
+  {
+    category: "Frontend",
+    skills: [
+      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+      { name: "Nextjs", icon: SiNextdotjs },
+      { name: "Tailwindcss", icon: SiTailwindcss, color: "#06B6D4" },
+    ],
+  },
+  {
+    category: "Tools & DevOps",
+    skills: [
+      { name: "Git", icon: SiGit, color: "#F05032" },
+      { name: "GitHub", icon: SiGithub },
+      { name: "Postman", icon: SiPostman, color: "#FF6C37" },
+      { name: "Docker", icon: SiDocker, color: "#2496ED" },
+    ],
+  },
+];
 
 export function SkillsSection() {
-  const skillGroups: SkillCategory[] = [
-    {
-      category: "AI",
-      skills: [
-        { name: "Gemini", icon: SiGooglegemini, color: "#4e75f8" },
-        { name: "Claude", icon: SiClaude, color: "#d97757" },
-        { name: "Antigravity", icon: AntigravityIcon, color: "#38bdf8" },
-        { name: "Codex", icon: CodexIcon, color: "#10a37f" },
-      ],
-    },
-    {
-      category: "Backend",
-      skills: [
-        { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
-        { name: "Nodejs", icon: SiNodedotjs, color: "#339933" },
-        { name: "Expressjs", icon: SiExpress },
-        { name: "Nestjs", icon: SiNestjs, color: "#E0234E" },
-        { name: "Redis", icon: SiRedis, color: "#DC382D" },
-      ],
-    },
-    {
-      category: "Databases",
-      skills: [
-        { name: "PostgreSQL", icon: SiPostgresql, color: "#4169E1" },
-        { name: "Prisma", icon: SiPrisma },
-        { name: "MongoDB", icon: SiMongodb, color: "#47A248" },
-        { name: "Mongoose", icon: SiMongoose, color: "#880000" },
-        { name: "Supabase", icon: SiSupabase, color: "#3ECF8E" },
-      ],
-    },
-    {
-      category: "Frontend",
-      skills: [
-        { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
-        { name: "Nextjs", icon: SiNextdotjs },
-        { name: "Tailwindcss", icon: SiTailwindcss, color: "#06B6D4" },
-      ],
-    },
-    {
-      category: "Tools & DevOps",
-      skills: [
-        { name: "Git", icon: SiGit, color: "#F05032" },
-        { name: "GitHub", icon: SiGithub },
-        { name: "Postman", icon: SiPostman, color: "#FF6C37" },
-        { name: "Docker", icon: SiDocker, color: "#2496ED" },
-      ],
-    },
-  ];
+  const { skills: dbSkills } = usePortfolio();
+
+  const skillGroups =
+    dbSkills && dbSkills.length > 0
+      ? dbSkills.map((group) => ({
+          category: group.category,
+          skills: group.skills.map((skillName) => {
+            const key = skillName.toLowerCase().replace(/[\s\.\-_]/g, "");
+            const match =
+              ICON_MAP[key] ||
+              ICON_MAP[skillName.toLowerCase().trim()] ||
+              { icon: Wrench, color: "#10b981" };
+            return {
+              name: skillName,
+              icon: match.icon || Wrench,
+              color: match.color,
+            };
+          }),
+        }))
+      : defaultSkillGroups;
 
   return (
     <section
@@ -141,14 +196,14 @@ export function SkillsSection() {
         <div className="flex items-center gap-2.5 mb-6">
           <Wrench className="h-6 w-6 text-emerald-400" />
           <h2 className="text-2xl font-bold tracking-tight text-white">
-            Skills & Tools
+            Skills &amp; Tools
           </h2>
         </div>
 
         <div className="space-y-5">
           {skillGroups.map((group) => (
             <div key={group.category} className="">
-              <span className="text-xs font-semibold text-zinc-400 mb-3 block">
+              <span className="text-xs font-semibold text-zinc-400 mb-3 block capitalize">
                 {group.category}
               </span>
               <div className="flex flex-wrap gap-2">
@@ -159,10 +214,12 @@ export function SkillsSection() {
                       key={skill.name}
                       className="inline-flex items-center gap-1.5 rounded-full border-t border-white/40 bg-gradient-to-b from-[#313134] to-[#101011] px-3.5 py-1.25 text-[13px] font-medium text-white hover:text-zinc-200 hover:border-white/15 transition-all select-none cursor-default"
                     >
-                      <Icon
-                        className="h-3.5 w-3.5 shrink-0"
-                        style={{ color: skill.color }}
-                      />
+                      {Icon && (
+                        <Icon
+                          className="h-3.5 w-3.5 shrink-0"
+                          style={{ color: skill.color }}
+                        />
+                      )}
                       <span>{skill.name}</span>
                     </span>
                   );

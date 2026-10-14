@@ -2,45 +2,114 @@
 
 import React, { useState } from "react";
 import { ArrowUpRight, Hammer, BookOpen } from "lucide-react";
-import { FaGithub, FaLinkedin, FaWhatsapp, FaFacebook } from "react-icons/fa";
+import {
+  FaGithub,
+  FaLinkedin,
+  FaWhatsapp,
+  FaFacebook,
+  FaTwitter,
+  FaGlobe,
+} from "react-icons/fa";
 import { playUiClick } from "@/lib/sound";
 import { LearningModal } from "./LearningModal";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
+
+const SOCIAL_ICONS: Record<string, any> = {
+  github: FaGithub,
+  linkedin: FaLinkedin,
+  whatsapp: FaWhatsapp,
+  facebook: FaFacebook,
+  twitter: FaTwitter,
+};
 
 export function RightSidebar() {
+  const { data } = usePortfolio();
   const [buildingTab, setBuildingTab] = useState<"working" | "learning">(
-    "working",
+    "working"
   );
   const [learningModalOpen, setLearningModalOpen] = useState(false);
   const [learningTopic, setLearningTopic] = useState<
     "system-design" | "llm-rag"
   >("system-design");
 
-  const socials = [
-    {
-      platform: "GitHub",
-      handle: "@khh-Niloy",
-      href: "https://github.com/khh-Niloy",
-      icon: FaGithub,
-    },
-    {
-      platform: "LinkedIn",
-      handle: "/in/hasibhossain-niloy01",
-      href: "https://www.linkedin.com/in/hasibhossain-niloy01/",
-      icon: FaLinkedin,
-    },
-    {
-      platform: "WhatsApp",
-      handle: "+880 1915-910291",
-      href: "https://wa.me/8801915910291",
-      icon: FaWhatsapp,
-    },
-    {
-      platform: "Facebook",
-      handle: "/khhniloy.niloy",
-      href: "https://www.facebook.com/khhniloy.niloy/",
-      icon: FaFacebook,
-    },
-  ];
+  const rawBuilding = Array.isArray(data?.currentlyBuilding)
+    ? data.currentlyBuilding[0]
+    : data?.currentlyBuilding;
+
+  const currentlyBuilding = rawBuilding
+    ? {
+        title: rawBuilding.title,
+        desc: rawBuilding.desc || rawBuilding.description || "",
+        liveUrl: rawBuilding.liveUrl || rawBuilding.link || "",
+        repoUrl: rawBuilding.repoUrl || "",
+      }
+    : {
+        title: "ProcureAI Platform",
+        desc: "AI-powered procurement management platform streamlining purchase workflows, vendor quotation comparisons, and intelligent decision support with Gemini AI.",
+        liveUrl: "https://procureai-platform-frontend.vercel.app/",
+        repoUrl: "https://github.com/khh-Niloy/procureai-platform-frontend",
+      };
+
+  const rawLearning = Array.isArray(data?.currentlyLearning)
+    ? data.currentlyLearning[0]
+    : data?.currentlyLearning;
+
+  const currentlyLearning = rawLearning
+    ? {
+        title: rawLearning.title || rawLearning.topic || "AI Engineering Lab",
+        desc: rawLearning.desc || rawLearning.notes || "",
+        badge: rawLearning.badge || rawLearning.level || "Ongoing",
+        repoUrl: rawLearning.repoUrl || "",
+        topics: rawLearning.topics || ["System design", "LLM-RAG"],
+      }
+    : {
+        title: "AI Engineering Lab",
+        desc: "An ongoing collection of practical AI/LLM engineering projects built while learning production oriented AI integration. Currently includes an AI Ticket Classifier implementing structured outputs, prompt engineering, retries, timeouts, model fallback, and runtime validation.",
+        badge: "Ongoing",
+        repoUrl: "https://github.com/khh-Niloy/ai-engineering-lab",
+        topics: ["System design", "LLM-RAG"],
+      };
+
+  const socials =
+    data?.socialLinks && data.socialLinks.length > 0
+      ? data.socialLinks
+          .filter((s) => s.name.toLowerCase() !== "email" && s.name.toLowerCase() !== "gmail")
+          .map((s) => {
+            const key = s.name.toLowerCase().trim();
+            const Icon = SOCIAL_ICONS[key] || FaGlobe;
+            return {
+              platform: s.name,
+              handle: s.handle || s.link,
+              href: s.link,
+              icon: Icon,
+            };
+          })
+      : [
+          {
+            platform: "GitHub",
+            handle: "@khh-Niloy",
+            href: "https://github.com/khh-Niloy",
+            icon: FaGithub,
+          },
+          {
+            platform: "LinkedIn",
+            handle: "/in/hasibhossain-niloy01",
+            href: "https://www.linkedin.com/in/hasibhossain-niloy01/",
+            icon: FaLinkedin,
+          },
+          {
+            platform: "WhatsApp",
+            handle: "+880 1915-910291",
+            href: "https://wa.me/8801915910291",
+            icon: FaWhatsapp,
+          },
+          {
+            platform: "Facebook",
+            handle: "/khhniloy.niloy",
+            href: "https://www.facebook.com/khhniloy.niloy/",
+            icon: FaFacebook,
+          },
+        ];
 
   return (
     <aside
@@ -48,7 +117,7 @@ export function RightSidebar() {
       aria-label="Sidebar information"
     >
       {/* Featured Highlight / Currently Building */}
-      <div className="rounded-2xl border border-white/5 bg-[#141414] p-5 transition-all hover:border-white/10">
+      <div className="rounded-2xl border border-white/5 bg-[#141414] p-5 transition-all hover:border-white/10 text-left">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400">
             <Hammer className="h-3.5 w-3.5 text-emerald-400" />
@@ -89,62 +158,60 @@ export function RightSidebar() {
         {buildingTab === "working" ? (
           <div className="mt-3 animate-in fade-in duration-200">
             <h4 className="text-sm font-semibold text-white">
-              ProcureAI Platform
+              {currentlyBuilding.title}
             </h4>
             <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
-              AI-powered procurement management platform streamlining purchase
-              workflows, vendor quotation comparisons, and intelligent decision
-              support with Gemini AI.
+              {currentlyBuilding.desc}
             </p>
 
-            <a
-              href="https://procureai-platform-frontend.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={playUiClick}
-              className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:underline"
-            >
-              <span>Visit live preview</span>
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
+            {currentlyBuilding.liveUrl && (
+              <a
+                href={currentlyBuilding.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={playUiClick}
+                className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:underline"
+              >
+                <span>Visit live preview</span>
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+            )}
           </div>
         ) : (
           <div className="mt-3 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-semibold text-white">
-                AI Engineering Lab
+                {currentlyLearning.title}
               </h4>
               <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-medium">
-                Ongoing
+                {currentlyLearning.badge || "Ongoing"}
               </span>
             </div>
             <span className="inline-block text-[11px] font-medium text-zinc-400 mt-0.5">
               Learning &amp; Ongoing Repository
             </span>
             <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
-              An ongoing collection of practical AI/LLM engineering projects
-              built while learning production oriented AI integration. Currently
-              includes an AI Ticket Classifier implementing structured outputs,
-              prompt engineering, retries, timeouts, model fallback, and runtime
-              validation.
+              {currentlyLearning.desc}
             </p>
 
-            <a
-              href="https://github.com/khh-Niloy"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={playUiClick}
-              className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:underline"
-            >
-              <span>Explore repository</span>
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
+            {currentlyLearning.repoUrl && (
+              <a
+                href={currentlyLearning.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={playUiClick}
+                className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:underline"
+              >
+                <span>Explore repository</span>
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+            )}
           </div>
         )}
       </div>
 
       {/* Featured Highlight / Currently Learning */}
-      <div className="rounded-2xl border border-white/5 bg-[#141414] p-5 transition-all hover:border-white/10">
+      <div className="rounded-2xl border border-white/5 bg-[#141414] p-5 transition-all hover:border-white/10 text-left">
         <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400">
           <BookOpen className="h-3.5 w-3.5 text-emerald-400" />
           <span>Currently Learning</span>
@@ -192,7 +259,7 @@ export function RightSidebar() {
       </div>
 
       {/* Section: Find me on */}
-      <div className="mt-5">
+      <div className="mt-5 text-left">
         <div className="flex items-center gap-2.5 text-base font-bold text-white mb-4">
           <span>Find me on</span>
         </div>

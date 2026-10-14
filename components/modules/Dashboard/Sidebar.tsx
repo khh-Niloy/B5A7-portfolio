@@ -4,11 +4,17 @@ import { usePathname } from "next/navigation";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
   IconHome,
-  IconCode,
   IconUser,
+  IconFileText,
+  IconBriefcase,
   IconBulb,
+  IconCode,
   IconArticle,
+  IconSparkles,
+  IconHelp,
   IconBrandFacebook,
+  IconMail,
+  IconWorld,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -19,75 +25,147 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
 
   const links = [
     {
-      label: "Back to Home",
+      label: "Live Portfolio",
       href: "/",
       icon: (
-        <IconHome className={cn(
-          "h-5 w-5 shrink-0 transition-colors",
-          pathname === "/" 
-            ? "text-emerald-400" 
-            : "text-gray-400"
-        )} />
+        <IconHome
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
       ),
     },
     {
-      label: "About",
+      label: "Hero & Profile",
+      href: "/dashboard",
+      icon: (
+        <IconUser
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
+      ),
+    },
+    {
+      label: "About & Academics",
       href: "/dashboard/about",
       icon: (
-        <IconUser className={cn(
-          "h-5 w-5 shrink-0 transition-colors",
-          pathname === "/dashboard/about" 
-            ? "text-emerald-400" 
-            : "text-gray-400"
-        )} />
+        <IconFileText
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/about" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
       ),
     },
     {
-      label: "Skills",
+      label: "Experience",
+      href: "/dashboard/experience",
+      icon: (
+        <IconBriefcase
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/experience" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
+      ),
+    },
+    {
+      label: "Skills & Tech",
       href: "/dashboard/skills",
       icon: (
-        <IconBulb className={cn(
-          "h-5 w-5 shrink-0 transition-colors",
-          pathname === "/dashboard/skills" 
-            ? "text-emerald-400" 
-            : "text-gray-400"
-        )} />
+        <IconBulb
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/skills" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
       ),
     },
     {
       label: "Projects",
       href: "/dashboard/projects",
       icon: (
-        <IconCode className={cn(
-          "h-5 w-5 shrink-0 transition-colors",
-          pathname === "/dashboard/projects" 
-            ? "text-emerald-400" 
-            : "text-gray-400"
-        )} />
+        <IconCode
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/projects" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
       ),
     },
     {
-      label: "Blog",
+      label: "Blog Posts",
       href: "/dashboard/blog",
       icon: (
-        <IconArticle className={cn(
-          "h-5 w-5 shrink-0 transition-colors",
-          pathname === "/dashboard/blog" 
-            ? "text-emerald-400" 
-            : "text-gray-400"
-        )} />
+        <IconArticle
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/blog" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
+      ),
+    },
+    {
+      label: "Highlights & Services",
+      href: "/dashboard/highlights",
+      icon: (
+        <IconSparkles
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/highlights" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
+      ),
+    },
+    {
+      label: "FAQs",
+      href: "/dashboard/faqs",
+      icon: (
+        <IconHelp
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/faqs" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
       ),
     },
     {
       label: "Footer & Socials",
       href: "/dashboard/footer",
       icon: (
-        <IconBrandFacebook className={cn(
-          "h-5 w-5 shrink-0 transition-colors",
-          pathname === "/dashboard/footer" 
-            ? "text-emerald-400" 
-            : "text-gray-400"
-        )} />
+        <IconBrandFacebook
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/footer" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
+      ),
+    },
+    {
+      label: "Inquiries & Inbox",
+      href: "/dashboard/contact",
+      icon: (
+        <IconMail
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/contact" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
+      ),
+    },
+    {
+      label: "SEO Metadata",
+      href: "/dashboard/seo",
+      icon: (
+        <IconWorld
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/seo" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
       ),
     },
   ];

@@ -1,44 +1,39 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import {
-  Contact,
-  UniversityInfo,
-  AboutInfo,
-  Journey,
-} from "@/interfaces/interface";
+import { PortfolioData } from "@/interfaces/interface";
 
-interface AboutData {
-  contacts?: Contact[];
-  universityInfo?: Partial<UniversityInfo>;
-  aboutInfo?: Partial<AboutInfo>;
-  journey?: Journey[];
-}
-
-export const updateAbout = async (data: AboutData, id: string) => {
+export const updateAbout = async (data: Partial<PortfolioData> | FormData, id?: string) => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/about/about-content/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
+    const isFormData = data instanceof FormData;
+    const url = id && id !== "undefined"
+      ? `${process.env.NEXT_PUBLIC_BASE_API}/about/about-content/${id}`
+      : `${process.env.NEXT_PUBLIC_BASE_API}/about/about-content`;
+
+    const headers: HeadersInit = {};
+    let body: any;
+
+    if (isFormData) {
+      body = data;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(data);
+    }
+
+    const res = await fetch(url, {
+      method: "PATCH",
+      headers,
+      body,
+    });
 
     const result = await res.json();
-
-    if (result?.id) {
-
+    if (result?.success || result?.data) {
       revalidatePath("/");
-      redirect("/");
+      revalidatePath("/dashboard/about");
     }
     return result;
   } catch (error) {
-    console.error("Failed to submit:", error);
-    return { error: "Failed to submit" };
+    console.error("Failed to update about data:", error);
+    return { success: false, message: "Failed to submit" };
   }
 };

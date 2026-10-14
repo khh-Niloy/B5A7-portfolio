@@ -6,13 +6,37 @@ import {
   ArrowUpRight,
   Rocket,
   Send,
+  Database,
+  Code2,
+  Bot,
+  Laptop,
 } from "lucide-react";
-import { FaGithub, FaLinkedin, FaWhatsapp } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaWhatsapp, FaFacebook, FaTwitter, FaGlobe } from "react-icons/fa";
 import { SiGmail } from "react-icons/si";
 import toast from "react-hot-toast";
 import { playUiClick } from "@/lib/sound";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
+
+const SERVICE_ICONS: Record<string, any> = {
+  database: Database,
+  code2: Code2,
+  bot: Bot,
+  laptop: Laptop,
+  rocket: Rocket,
+};
+
+const SOCIAL_ICONS: Record<string, { icon: any; color: string }> = {
+  email: { icon: SiGmail, color: "#EA4335" },
+  gmail: { icon: SiGmail, color: "#EA4335" },
+  whatsapp: { icon: FaWhatsapp, color: "#25D366" },
+  linkedin: { icon: FaLinkedin, color: "#0A66C2" },
+  github: { icon: FaGithub, color: "#FFFFFF" },
+  facebook: { icon: FaFacebook, color: "#1877F2" },
+  twitter: { icon: FaTwitter, color: "#1DA1F2" },
+};
 
 export function ContactView() {
+  const { data } = usePortfolio();
   const [sending, setSending] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -23,7 +47,11 @@ export function ContactView() {
 
   const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.message.trim()
+    ) {
       toast.error("Please fill in all fields.");
       return;
     }
@@ -32,7 +60,8 @@ export function ContactView() {
     playUiClick();
 
     try {
-      const baseApi = process.env.NEXT_PUBLIC_BASE_API || "http://localhost:8000/api/v1";
+      const baseApi =
+        process.env.NEXT_PUBLIC_BASE_API || "http://localhost:8000/api/v1";
       const res = await fetch(`${baseApi}/contact`, {
         method: "POST",
         headers: {
@@ -45,9 +74,9 @@ export function ContactView() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Failed to send message");
+      const resData = await res.json();
+      if (!res.ok || !resData.success) {
+        throw new Error(resData.message || "Failed to send message");
       }
 
       toast.success("Your message has been sent successfully!");
@@ -55,61 +84,59 @@ export function ContactView() {
     } catch (error) {
       console.error("Email send failed:", error);
       toast.error(
-        (error as Error).message || "Failed to send message. Please email directly."
+        (error as Error).message ||
+          "Failed to send message. Please email directly."
       );
     } finally {
       setSending(false);
     }
   };
 
-  // const services = [
-  //   {
-  //     title: "Backend & Systems",
-  //     desc: "High-performance Node/Nest APIs, PostgreSQL, Prisma, Redis queues, and WebSocket infrastructure.",
-  //     icon: Database,
-  //   },
-  //   {
-  //     title: "Frontend Engineering",
-  //     desc: "Responsive web apps in Next.js, React 19, Tailwind CSS, polished animations, and fluid UI.",
-  //     icon: Code2,
-  //   },
-  //   {
-  //     title: "AI Integration",
-  //     desc: "Agentic pipelines with Gemini AI, structured JSON reasoning, automated document processing.",
-  //     icon: Bot,
-  //   },
-  // ];
+  const directContacts =
+    data?.socialLinks && data.socialLinks.length > 0
+      ? data.socialLinks.map((s) => {
+          const key = s.name.toLowerCase().trim();
+          const match = SOCIAL_ICONS[key] || { icon: FaGlobe, color: "#10b981" };
+          return {
+            title: s.name,
+            handle: s.handle || s.link,
+            href: s.link,
+            icon: match.icon,
+            iconColor: match.color,
+          };
+        })
+      : [
+          {
+            title: "Email me",
+            handle: "khhniloy0@gmail.com",
+            href: "mailto:khhniloy0@gmail.com",
+            icon: SiGmail,
+            iconColor: "#EA4335",
+          },
+          {
+            title: "WhatsApp",
+            handle: "+880 1915-910291",
+            href: "https://wa.me/8801915910291",
+            icon: FaWhatsapp,
+            iconColor: "#25D366",
+          },
+          {
+            title: "LinkedIn Message",
+            handle: "/in/hasibhossain-niloy01",
+            href: "https://www.linkedin.com/in/hasibhossain-niloy01/",
+            icon: FaLinkedin,
+            iconColor: "#0A66C2",
+          },
+          {
+            title: "GitHub Discussions",
+            handle: "@khh-Niloy",
+            href: "https://github.com/khh-Niloy",
+            icon: FaGithub,
+            iconColor: "#FFFFFF",
+          },
+        ];
 
-  const directContacts = [
-    {
-      title: "Email me",
-      handle: "khhniloy0@gmail.com",
-      href: "mailto:khhniloy0@gmail.com",
-      icon: SiGmail,
-      iconColor: "#EA4335",
-    },
-    {
-      title: "WhatsApp",
-      handle: "+880 1915-910291",
-      href: "https://wa.me/8801915910291",
-      icon: FaWhatsapp,
-      iconColor: "#25D366",
-    },
-    {
-      title: "LinkedIn Message",
-      handle: "/in/hasibhossain-niloy01",
-      href: "https://www.linkedin.com/in/hasibhossain-niloy01/",
-      icon: FaLinkedin,
-      iconColor: "#0A66C2",
-    },
-    {
-      title: "GitHub Discussions",
-      handle: "@khh-Niloy",
-      href: "https://github.com/khh-Niloy",
-      icon: FaGithub,
-      iconColor: "#FFFFFF",
-    },
-  ];
+  const services = data?.services || [];
 
   return (
     <div className="text-left space-y-12">
@@ -134,12 +161,12 @@ export function ContactView() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>Open to new conversations</span>
+            <span>{data?.statusText || "Open to new conversations"}</span>
           </div>
 
           <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-[#161616] px-3.5 py-1 text-xs text-zinc-400">
             <Clock className="h-3.5 w-3.5 text-zinc-500" />
-            <span>Dhaka, GMT+6</span>
+            <span>{data?.location || "Dhaka, Bangladesh"}</span>
           </div>
         </div>
       </div>
@@ -177,36 +204,41 @@ export function ContactView() {
           </div>
         </div>
 
-        {/* 3-Column Service Row */}
-        {/* <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {services.map((srv) => {
-            const Icon = srv.icon;
-            return (
-              <div
-                key={srv.title}
-                className="flex flex-col justify-between rounded-xl border border-white/5 bg-[#141414] p-4 transition-all hover:border-white/10"
-              >
-                <div>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-emerald-400 mb-3">
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <h4 className="text-xs font-semibold text-white">{srv.title}</h4>
-                  <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">
-                    {srv.desc}
-                  </p>
-                </div>
-                <a
-                  href="#message-form"
-                  onClick={playUiClick}
-                  className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:underline"
+        {/* Dynamic Services Row if services exist */}
+        {services.length > 0 && (
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {services.map((srv) => {
+              const iconKey = (srv.icon || "").toLowerCase();
+              const Icon = SERVICE_ICONS[iconKey] || Database;
+              return (
+                <div
+                  key={srv.title}
+                  className="flex flex-col justify-between rounded-xl border border-white/5 bg-[#141414] p-4 transition-all hover:border-white/10"
                 >
-                  <span>Inquire</span>
-                  <ArrowUpRight className="h-3 w-3" />
-                </a>
-              </div>
-            );
-          })}
-        </div> */}
+                  <div>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-emerald-400 mb-3">
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <h4 className="text-xs font-semibold text-white">
+                      {srv.title}
+                    </h4>
+                    <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">
+                      {srv.desc}
+                    </p>
+                  </div>
+                  <a
+                    href="#message-form"
+                    onClick={playUiClick}
+                    className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:underline"
+                  >
+                    <span>Inquire</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* 3. Reach Me Direct Links */}
@@ -247,7 +279,7 @@ export function ContactView() {
         </div>
       </div>
 
-      {/* 4. Active Contact Form (EmailJS) */}
+      {/* 4. Active Contact Form */}
       <div id="message-form" className="pt-6 border-t border-white/5">
         <h2 className="text-sm font-semibold tracking-wide uppercase text-zinc-400 mb-4">
           Send a direct message
@@ -315,7 +347,7 @@ export function ContactView() {
             <button
               type="submit"
               disabled={sending}
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-2.5 text-xs font-semibold text-black hover:bg-emerald-400 disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-2.5 text-xs font-semibold text-black hover:bg-emerald-400 disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] cursor-pointer"
             >
               <span>{sending ? "Sending..." : "Send Message"}</span>
               <Send className="h-3.5 w-3.5" />

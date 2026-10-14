@@ -1,30 +1,17 @@
 "use client";
-import React, { useEffect } from "react";
-import { useForm, useFieldArray, Controller, Control, UseFormRegister } from "react-hook-form";
-import { Plus, Trash2, Edit } from "lucide-react";
+
+import React, { useEffect, useState } from "react";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { Plus, Trash2, Edit, Lightbulb, Sparkles, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import toast from "react-hot-toast";
 import { createSkills } from "@/actions/skills/createSkills";
 import { updateSkills } from "@/actions/skills/updateSkills";
+import { deleteSkill } from "@/actions/skills/deleteSkill";
 import getSkills from "@/helper/getSkills";
-
-interface Category {
-  category: string;
-  skills: string;
-}
-
-interface SkillFormValues {
-  categories: Category[];
-}
 
 interface ExistingSkill {
   _id: string;
@@ -34,50 +21,45 @@ interface ExistingSkill {
   updatedAt: string;
 }
 
-const PREDEFINED_CATEGORIES = [
-  { label: "Frontend", value: "frontend" },
-  { label: "Backend", value: "backend" },
-  { label: "Database", value: "database" },
-  { label: "Tools & Services", value: "Tools & Services" },
+const CATEGORY_PRESETS = [
+  "Frontend",
+  "Backend",
+  "Database",
+  "Tools & DevOps",
+  "AI & Data Science",
+  "Languages",
+  "Mobile",
+  "Cloud & Architecture",
 ];
 
-export default function Skills() {
-  const [existingSkills, setExistingSkills] = React.useState<ExistingSkill[]>(
-    []
-  );
-  const [loading, setLoading] = React.useState(true);
-  const [showForm, setShowForm] = React.useState(false);
-  const [isEditing, setIsEditing] = React.useState(false);
-  const { control, handleSubmit, register, reset } =
-    useForm<SkillFormValues>({
-      defaultValues: {
-        categories: [
-          {
-            category: "frontend",
-            skills: "",
-          },
-        ],
-      },
-    });
+export default function SkillsPage() {
+  const [skillsList, setSkillsList] = useState<ExistingSkill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const {
-    fields: categoryFields,
-    append: appendCategory,
-    remove: removeCategory,
-  } = useFieldArray({
-    control,
-    name: "categories",
+  const { register, handleSubmit, reset, setValue, watch } = useForm<{
+    category: string;
+    skills: string;
+  }>({
+    defaultValues: {
+      category: "",
+      skills: "",
+    },
   });
+
+  const selectedCategory = watch("category");
 
   const fetchSkills = async () => {
     setLoading(true);
     try {
       const data = await getSkills();
-      // console.log("Fetched skills:", data);
-      setExistingSkills(data?.data || []);
+      setSkillsList(data?.data || []);
     } catch (error) {
       console.error("Failed to fetch skills:", error);
-      setExistingSkills([]);
+      setSkillsList([]);
     } finally {
       setLoading(false);
     }
@@ -89,99 +71,94 @@ export default function Skills() {
 
   const handleCreate = () => {
     setIsEditing(false);
-    setShowForm(true);
-    reset();
+    setEditingId(null);
+    reset({ category: "", skills: "" });
+    setShowModal(true);
   };
 
   const handleEdit = (skill: ExistingSkill) => {
     setIsEditing(true);
-    setShowForm(true);
+    setEditingId(skill._id);
     reset({
-      categories: [
-        {
-          category: skill.category,
-          skills: skill.skills.join(", "),
-        },
-      ],
+      category: skill.category,
+      skills: skill.skills.join(", "),
     });
+    setShowModal(true);
   };
 
-  // const handleDelete = async (skillId: string) => {
-  //   if (confirm("Are you sure you want to delete this skill category?")) {
-  //     try {
-  //       // TODO: Implement delete skills API
-  //       setExistingSkills(existingSkills.filter(skill => skill._id !== skillId));
-  //       toast.success("Skill category deleted successfully!");
-  //     } catch (error) {
-  //       console.error("Failed to delete skill:", error);
-  //       toast.error("Failed to delete skill category");
-  //     }
-  //   }
-  // };
-
-  const handleCancel = () => {
-    setShowForm(false);
-    setIsEditing(false);
-    reset();
-  };
-
-  const handleAdd = async (data: SkillFormValues) => {
-    const transformedData = data.categories.map((category) => ({
-      category: category.category,
-      skills: category.skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter((skill) => skill !== ""),
-    }));
+  const handleDelete = async (skillId: string, categoryName: string) => {
+    if (!confirm(`Are you sure you want to delete the "${categoryName}" category and all its skills?`)) {
+      return;
+    }
 
     try {
-      const result = await createSkills(transformedData);
-
+      const result = await deleteSkill(skillId);
       if (result?.success) {
-        toast.success("Skills added successfully! 💪");
-        setShowForm(false);
-        reset();
-        fetchSkills();
+        toast.success(`Category "${categoryName}" deleted successfully! 🗑️`);
+        setSkillsList((prev) => prev.filter((s) => s._id !== skillId));
       } else {
-        toast.error(result?.message || "Failed to add skills");
+        toast.error(result?.message || "Failed to delete skill category");
       }
     } catch (error) {
-      console.error("Failed to add skills:", error);
-      toast.error("Failed to add skills");
+      console.error("Failed to delete skill:", error);
+      toast.error("Failed to delete skill category");
     }
   };
 
-  const handleUpdate = async (data: SkillFormValues) => {
-    const transformedData = data.categories.map((category) => ({
-      category: category.category,
-      skills: category.skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter((skill) => skill !== ""),
-    }));
+  const onSubmit = async (data: { category: string; skills: string }) => {
+    if (!data.category.trim()) {
+      toast.error("Please provide a category name");
+      return;
+    }
 
+    const skillsArray = data.skills
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    if (skillsArray.length === 0) {
+      toast.error("Please add at least one skill");
+      return;
+    }
+
+    setSaving(true);
     try {
-      const result = await updateSkills(transformedData);
+      const payload = [
+        {
+          category: data.category.trim(),
+          skills: skillsArray,
+        },
+      ];
 
-      if (result?.success) {
-        toast.success("Skills updated successfully! 🔥");
-        setShowForm(false);
-        reset();
+      let res;
+      if (isEditing) {
+        res = await updateSkills(payload);
+      } else {
+        res = await createSkills(payload);
+      }
+
+      if (res?.success) {
+        toast.success(
+          isEditing ? "Skills category updated! 🔥" : "New skills category created! 💪"
+        );
+        setShowModal(false);
         fetchSkills();
       } else {
-        toast.error(result?.message || "Failed to update skills");
+        toast.error(res?.message || "Failed to save skills");
       }
-    } catch (error) {
-      console.error("Failed to update skills:", error);
-      toast.error("Failed to update skills");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save skills");
+    } finally {
+      setSaving(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto" />
           <p className="mt-4 text-gray-400">Loading skills...</p>
         </div>
       </div>
@@ -189,244 +166,190 @@ export default function Skills() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">
-            Skills & Technologies
+          <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+            <Sparkles className="w-8 h-8 text-emerald-400" />
+            Skills & Technical Stack
           </h1>
           <p className="mt-2 text-gray-400">
-            Manage your technical skills organized by categories.
+            Organize, create, edit, and delete technical skills grouped by category.
           </p>
         </div>
 
-        {!showForm && (
-          <Button
-            onClick={handleCreate}
-            className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            New Category
-          </Button>
-        )}
+        <Button
+          onClick={handleCreate}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium shadow-lg shadow-emerald-500/20"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Category
+        </Button>
       </div>
 
-      {/* Skills Form */}
-      {showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">
-              {isEditing ? "Edit Skill Category" : "Create New Skill Category"}
-            </h2>
-            <Button
-              variant="outline"
-              onClick={handleCancel}
-              className="border-white/10 text-gray-300 hover:bg-white/5"
-            >
-              Cancel
+      {/* Skills Categories Grid */}
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm space-y-6">
+        <h2 className="text-xl font-semibold text-white">
+          Active Categories ({skillsList.length})
+        </h2>
+
+        {skillsList.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400 mb-4">No skills categories found.</p>
+            <Button onClick={handleCreate} className="bg-emerald-500 hover:bg-emerald-600 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Your First Category
             </Button>
           </div>
-
-          <form className="space-y-6">
-            {categoryFields.map((categoryField, categoryIndex) => (
-              <CategorySection
-                key={categoryField.id}
-                categoryIndex={categoryIndex}
-                control={control}
-                register={register}
-                onRemove={() => removeCategory(categoryIndex)}
-                canRemove={categoryFields.length > 1}
-              />
-            ))}
-
-            {!isEditing && (
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    appendCategory({
-                      category: "frontend",
-                      skills: "",
-                    })
-                  }
-                  className="w-full border-white/10 text-gray-300 hover:bg-white/5"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Another Category
-                </Button>
-              </div>
-            )}
-
-            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancel}
-                className="border-white/10 text-gray-300 hover:bg-white/5"
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {skillsList.map((cat) => (
+              <div
+                key={cat._id}
+                className="p-5 rounded-xl border border-white/10 bg-black/30 hover:border-white/20 transition-all flex flex-col justify-between space-y-4"
               >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSubmit(isEditing ? handleUpdate : handleAdd)}
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
-              >
-                {isEditing ? "Update Skills" : "Add Skills"}
-              </Button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Skills List */}
-      {!showForm && (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <h2 className="text-xl font-semibold text-white mb-6">
-            All Skill Categories ({existingSkills.length})
-          </h2>
-
-          {existingSkills.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-400 mb-4">No skill categories yet.</p>
-              <Button
-                onClick={handleCreate}
-                className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-200"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Category
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {existingSkills.map((skillCategory) => (
-                <div
-                  key={skillCategory._id}
-                  className="border border-white/10 rounded-lg p-6 bg-white/5 hover:bg-white/10 transition-all duration-200"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <h3 className="text-xl font-semibold text-white capitalize">
-                          {skillCategory.category}
-                        </h3>
-                        <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs">
-                          {skillCategory.skills.length} skills
-                        </span>
-                      </div>
-
-                      <div className="text-sm text-gray-400 mb-4">
-                        Created{" "}
-                        {new Date(skillCategory.createdAt).toLocaleDateString()}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        {skillCategory.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1.5 bg-white/10 text-gray-300 text-sm rounded-lg border border-white/10 hover:bg-white/20 transition-all duration-200"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-lg font-bold text-white capitalize">{cat.category}</h3>
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        {cat.skills.length} skills
+                      </span>
                     </div>
 
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center gap-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEdit(skillCategory)}
-                        className="border-white/10 text-gray-300 hover:bg-white/5"
+                        onClick={() => handleEdit(cat)}
+                        className="border-white/10 text-gray-300 hover:bg-white/5 text-xs h-8"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3.5 h-3.5 mr-1" />
+                        Edit
                       </Button>
-                      {/* <Button
+                      <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDelete(skillCategory._id)}
-                        className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                        onClick={() => handleDelete(cat._id, cat.category)}
+                        className="border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs h-8"
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </Button> */}
+                        <Trash2 className="w-3.5 h-3.5 mr-1" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
-function CategorySection({
-  categoryIndex,
-  control,
-  register,
-  onRemove,
-  canRemove,
-}: {
-  categoryIndex: number;
-  control: Control<SkillFormValues>;
-  register: UseFormRegister<SkillFormValues>;
-  onRemove: () => void;
-  canRemove: boolean;
-}) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1 mr-4">
-          <Label htmlFor={`category-${categoryIndex}`}>Category Name</Label>
-          <div className="mt-2">
-            <Controller
-              control={control}
-              name={`categories.${categoryIndex}.category`}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="text-lg font-semibold">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PREDEFINED_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </SelectItem>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {cat.skills.map((skill, sIdx) => (
+                      <span
+                        key={sIdx}
+                        className="px-2.5 py-1 rounded-lg text-xs bg-white/[0.05] text-gray-200 border border-white/10 hover:border-emerald-500/30 transition-all"
+                      >
+                        {skill}
+                      </span>
                     ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </div>
-        </div>
+                  </div>
+                </div>
 
-        {canRemove && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onRemove}
-            className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+                <div className="text-[11px] text-gray-500 pt-2 border-t border-white/5">
+                  Last updated {new Date(cat.updatedAt || cat.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      <div className="mt-4">
-        <Label htmlFor={`skills-${categoryIndex}`}>Skills</Label>
-        <Textarea
-          id={`skills-${categoryIndex}`}
-          placeholder="React, Next.js, TypeScript, Tailwind CSS"
-          {...register(`categories.${categoryIndex}.skills`)}
-          className="mt-2 min-h-[100px]"
-        />
-        <p className="text-sm text-gray-400 mt-1">
-          Separate skills with commas (e.g., React, Next.js, TypeScript)
-        </p>
-      </div>
+      {/* Create / Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-xl rounded-2xl border border-white/10 bg-[#000319] p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-emerald-400" />
+                {isEditing ? "Edit Skill Category" : "Add Skill Category"}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div>
+                <Label htmlFor="category" className="text-gray-300">
+                  Category Name
+                </Label>
+                <Input
+                  id="category"
+                  {...register("category")}
+                  placeholder="e.g. Frontend, DevOps, AI & Machine Learning"
+                  className="mt-1.5 bg-black/40 border-white/10 text-white"
+                  required
+                />
+
+                {/* Quick Presets */}
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  <span className="text-xs text-gray-500 mr-1 self-center">Presets:</span>
+                  {CATEGORY_PRESETS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setValue("category", preset)}
+                      className={`text-[11px] px-2 py-0.5 rounded border transition-all ${
+                        selectedCategory === preset
+                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                          : "bg-white/[0.03] text-gray-400 border-white/10 hover:text-white hover:bg-white/[0.08]"
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="skills" className="text-gray-300">
+                  Skills (Comma-separated)
+                </Label>
+                <Textarea
+                  id="skills"
+                  {...register("skills")}
+                  rows={4}
+                  placeholder="React, Next.js, TypeScript, Tailwind CSS, Redux, Zustand"
+                  className="mt-1.5 bg-black/40 border-white/10 text-white"
+                  required
+                />
+                <p className="text-xs text-gray-400 mt-1.5">
+                  Separate each technology or tool with a comma.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowModal(false)}
+                  className="border-white/10 text-gray-300 hover:bg-white/5"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium shadow-lg shadow-emerald-500/20"
+                >
+                  {saving ? "Saving..." : isEditing ? "Update Category" : "Create Category"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

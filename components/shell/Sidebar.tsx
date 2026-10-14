@@ -6,13 +6,12 @@ import {
   ChevronDown,
   Sun,
   Moon,
-  Volume2,
-  VolumeX,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
-import { isSoundEnabled, setSoundEnabled, playUiClick } from "@/lib/sound";
+import { playUiClick } from "@/lib/sound";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
 
 interface FaqItem {
   id: string;
@@ -20,7 +19,7 @@ interface FaqItem {
   answer: React.ReactNode;
 }
 
-const sidebarFaqs: FaqItem[] = [
+const defaultSidebarFaqs: FaqItem[] = [
   {
     id: "sfaq-1",
     question: "Are you open to full time or remote opportunities?",
@@ -30,36 +29,8 @@ const sidebarFaqs: FaqItem[] = [
   {
     id: "sfaq-2",
     question: "What is the best way to get in touch?",
-    answer: (
-      <span>
-        You can reach me through the Contact section, email me at{" "}
-        <a
-          href="mailto:khhniloy0@gmail.com"
-          className="font-medium text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors"
-        >
-          khhniloy0@gmail.com
-        </a>
-        , or connect with me on{" "}
-        <a
-          href="https://www.linkedin.com/in/hasibhossain-niloy01/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors"
-        >
-          LinkedIn
-        </a>{" "}
-        or WhatsApp at{" "}
-        <a
-          href="https://wa.me/8801915910291"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors"
-        >
-          +880 1915 910291
-        </a>
-        . I’d be happy to connect and discuss potential opportunities.
-      </span>
-    ),
+    answer:
+      "You can reach me through the Contact section, email me at khhniloy0@gmail.com, or connect with me on LinkedIn or WhatsApp at +880 1915 910291. I’d be happy to connect and discuss potential opportunities.",
   },
   {
     id: "sfaq-3",
@@ -82,20 +53,8 @@ const sidebarFaqs: FaqItem[] = [
   {
     id: "sfaq-6",
     question: "Have you worked with AI and LLM APIs?",
-    answer: (
-      <span>
-        Yes. I’ve integrated the Gemini API in my previous professional work and in ProcureAI, an AI powered procurement project. I’m also building my knowledge of production grade AI engineering through my{" "}
-        <a
-          href="https://github.com/khh-Niloy/ai-engineering-lab"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-emerald-400 hover:text-emerald-300 underline underline-offset-2 transition-colors"
-        >
-          AI Engineering Lab
-        </a>
-        , focusing on reliable LLM integration, error handling, and practical implementation patterns.
-      </span>
-    ),
+    answer:
+      "Yes. I’ve integrated the Gemini API in my previous professional work and in ProcureAI, an AI powered procurement project. I’m also building my knowledge of production grade AI engineering through my AI Engineering Lab, focusing on reliable LLM integration, error handling, and practical implementation patterns.",
   },
 ];
 
@@ -108,26 +67,26 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
   const { theme, toggleTheme } = useTheme();
-  const [soundOn, setSoundOn] = useState(false);
+  const { data } = usePortfolio();
   const [openFaq, setOpenFaq] = useState<string | null>("sfaq-1");
 
-  useEffect(() => {
-    setSoundOn(isSoundEnabled());
-  }, []);
-
-  const handleToggleSound = () => {
-    const next = !soundOn;
-    setSoundOn(next);
-    setSoundEnabled(next);
-    if (next) {
-      setTimeout(() => playUiClick(), 50);
-    }
-  };
+  const sidebarFaqs =
+    data?.faqs && data.faqs.length > 0
+      ? data.faqs
+          .filter((f) => f.isSidebar !== false)
+          .map((f, idx) => ({
+            id: f.id || `sfaq-${idx + 1}`,
+            question: f.question,
+            answer: f.answer,
+          }))
+      : defaultSidebarFaqs;
 
   const handleToggleFaq = (id: string) => {
     playUiClick();
     setOpenFaq((prev) => (prev === id ? null : id));
   };
+
+  const name = data?.name || "Hasib Hossain Niloy";
 
   return (
     <aside
@@ -256,21 +215,6 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
             )}
           </button>
 
-          {/* Sound Toggle */}
-          {/* <button
-            id="sound-toggle-btn"
-            onClick={handleToggleSound}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-[var(--text-primary)] transition-all cursor-pointer"
-            aria-label="Toggle interaction sounds"
-            title={soundOn ? "Mute UI sounds" : "Enable UI sounds"}
-          >
-            {soundOn ? (
-              <Volume2 className="h-4 w-4 text-emerald-400" />
-            ) : (
-              <VolumeX className="h-4 w-4" />
-            )}
-          </button> */}
-
           {/* Collapse Toggle */}
           {onToggleCollapse && (
             <button
@@ -294,7 +238,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
 
         {!collapsed && (
           <p className="mt-2 text-center text-[10px] text-[var(--text-tertiary)]">
-            © {new Date().getFullYear()} Hasib Hossain Niloy
+            © {new Date().getFullYear()} {name}
           </p>
         )}
       </div>

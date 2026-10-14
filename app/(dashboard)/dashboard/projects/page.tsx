@@ -13,9 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit, ExternalLink, Eye, EyeOff, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { createProject } from "@/actions/projects/createProject";
+import { deleteProject } from "@/actions/projects/deleteProject";
 import getProjects from "@/helper/getProjects";
 import getEachProject from "@/helper/getEachProject";
 import Image from "next/image";
@@ -198,16 +199,22 @@ export default function Projects() {
     }
   };
 
-  // const handleDelete = async (projectId: string) => {
-  //   if (confirm("Are you sure you want to delete this project?")) {
-  //     try {
-  //       setProjects(projects.filter((project) => project._id !== projectId));
-  //       toast.success("Project deleted successfully!");
-  //     } catch (error) {
-  //       console.error("Failed to delete project:", error);
-  //       toast.error("Failed to delete project");
-  //     }
-  // };
+  const handleDelete = async (projectId: string, projectName: string) => {
+    if (confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`)) {
+      try {
+        const result = await deleteProject(projectId);
+        if (result?.success) {
+          setProjects(projects.filter((project) => project._id !== projectId));
+          toast.success("Project deleted successfully! 🗑️");
+        } else {
+          toast.error(result?.message || "Failed to delete project");
+        }
+      } catch (error) {
+        console.error("Failed to delete project:", error);
+        toast.error("Failed to delete project");
+      }
+    }
+  };
 
   const handleToggleActive = async (project: Project) => {
     try {
@@ -726,6 +733,15 @@ export default function Projects() {
                             title={project.isActive !== false ? "Active (Visible)" : "Inactive (Hidden)"}
                           >
                             {project.isActive !== false ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(project._id, project.projectName)}
+                            className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200"
+                            title="Delete Project"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>

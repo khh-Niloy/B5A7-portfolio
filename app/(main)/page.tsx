@@ -12,11 +12,12 @@ import { ProjectsView } from "@/components/projects/ProjectsView";
 import { FaqSection } from "@/components/profile/FaqSection";
 import { ContactView } from "@/components/contact/ContactView";
 import { ProfileFooter } from "@/components/profile/ProfileFooter";
+import { PortfolioProvider } from "@/components/portfolio/PortfolioContext";
 import { FolderGit2, Mail } from "lucide-react";
 
 export default function HomePage() {
   const [activeSection, setActiveSection] = useState<string>("profile");
-  const [dhakaTime, setDhakaTime] = useState<string>("");
+  const [localTime, setLocalTime] = useState<string>("");
   const isManualScrolling = useRef(false);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function HomePage() {
         minute: "2-digit",
         hour12: true,
       }).format(now);
-      setDhakaTime(formatted);
+      setLocalTime(formatted);
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
@@ -62,6 +63,7 @@ export default function HomePage() {
         "experience",
         "skills",
         "projects",
+        "faq",
         "contact",
       ];
       const scrollY = window.pageYOffset;
@@ -85,57 +87,59 @@ export default function HomePage() {
   }, []);
 
   return (
-    <AppShell activeSection={activeSection} onSelectSection={scrollToSection}>
-      <div className="flex flex-col">
-        {/* Profile Header (Banner, Avatar, Identity, Tech Chips) */}
-        <ProfileHeader dhakaTime={dhakaTime} />
+    <PortfolioProvider>
+      <AppShell activeSection={activeSection} onSelectSection={scrollToSection}>
+        <div className="flex flex-col">
+          {/* Profile Header (Banner, Avatar, Identity, Tech Chips) */}
+          <ProfileHeader dhakaTime={localTime} />
 
-        {/* Tab-based navigation bar in the middle */}
-        <SectionTabs
-          activeSection={activeSection}
-          onSelectSection={scrollToSection}
-        />
+          {/* Tab-based navigation bar in the middle */}
+          <SectionTabs
+            activeSection={activeSection}
+            onSelectSection={scrollToSection}
+          />
 
-        {/* 1. About / Profile Section */}
-        <div id="profile" className="scroll-mt-32">
-          <AboutSection />
-          <InfoCards />
-        </div>
-
-        {/* 2. Experience Section */}
-        <ExperienceTimeline />
-
-        {/* 3. Skills Section */}
-        <SkillsSection />
-
-        {/* 4. Projects Section */}
-        <div id="projects" className="mt-14 scroll-mt-32">
-          <div className="flex items-center gap-2.5 mb-6">
-            <FolderGit2 className="h-6 w-6 text-emerald-400" />
-            <h2 className="text-2xl font-bold tracking-tight text-white">
-              Featured Projects
-            </h2>
+          {/* 1. About / Profile Section */}
+          <div id="profile" className="scroll-mt-32">
+            <AboutSection />
+            <InfoCards />
           </div>
-          <ProjectsView />
-        </div>
 
-        {/* 5. Frequently Asked Questions */}
-        {/* <FaqSection /> */}
+          {/* 2. Experience Section */}
+          <ExperienceTimeline />
 
-        {/* 6. Contact Section */}
-        <div id="contact" className="mt-14 scroll-mt-32">
-          <div className="flex items-center gap-2.5 mb-6">
-            <Mail className="h-6 w-6 text-emerald-400" />
-            <h2 className="text-2xl font-bold tracking-tight text-white">
-              Get In Touch
-            </h2>
+          {/* 3. Skills Section */}
+          <SkillsSection />
+
+          {/* 4. Projects Section */}
+          <div id="projects" className="mt-14 scroll-mt-32">
+            <div className="flex items-center gap-2.5 mb-6">
+              <FolderGit2 className="h-6 w-6 text-emerald-400" />
+              <h2 className="text-2xl font-bold tracking-tight text-white">
+                Featured Projects
+              </h2>
+            </div>
+            <ProjectsView />
           </div>
-          <ContactView />
-        </div>
 
-        {/* Footer */}
-        <ProfileFooter />
-      </div>
-    </AppShell>
+          {/* 5. Frequently Asked Questions */}
+          <FaqSection />
+
+          {/* 6. Contact Section */}
+          <div id="contact" className="mt-14 scroll-mt-32">
+            <div className="flex items-center gap-2.5 mb-6">
+              <Mail className="h-6 w-6 text-emerald-400" />
+              <h2 className="text-2xl font-bold tracking-tight text-white">
+                Get In Touch
+              </h2>
+            </div>
+            <ContactView />
+          </div>
+
+          {/* Footer */}
+          <ProfileFooter />
+        </div>
+      </AppShell>
+    </PortfolioProvider>
   );
 }

@@ -1,26 +1,59 @@
 "use client";
 
 import React from "react";
-import { FaGithub, FaLinkedin, FaWhatsapp, FaFacebook } from "react-icons/fa";
+import {
+  FaGithub,
+  FaLinkedin,
+  FaWhatsapp,
+  FaFacebook,
+  FaTwitter,
+  FaGlobe,
+} from "react-icons/fa";
 import { Mail } from "lucide-react";
 import { playUiClick } from "@/lib/sound";
+import { usePortfolio } from "@/components/portfolio/PortfolioContext";
+
+const SOCIAL_ICONS: Record<string, any> = {
+  github: FaGithub,
+  linkedin: FaLinkedin,
+  whatsapp: FaWhatsapp,
+  facebook: FaFacebook,
+  twitter: FaTwitter,
+  email: Mail,
+  gmail: Mail,
+};
 
 export function ProfileFooter() {
-  const socials = [
-    { name: "GitHub", href: "https://github.com/khh-Niloy", icon: FaGithub },
-    {
-      name: "LinkedIn",
-      href: "https://www.linkedin.com/in/hasibhossain-niloy01/",
-      icon: FaLinkedin,
-    },
-    { name: "WhatsApp", href: "https://wa.me/8801915910291", icon: FaWhatsapp },
-    {
-      name: "Facebook",
-      href: "https://www.facebook.com/khhniloy.niloy/",
-      icon: FaFacebook,
-    },
-    { name: "Email", href: "mailto:khhniloy0@gmail.com", icon: Mail },
-  ];
+  const { data } = usePortfolio();
+
+  const socials =
+    data?.socialLinks && data.socialLinks.length > 0
+      ? data.socialLinks.map((s) => {
+          const key = s.name.toLowerCase().trim();
+          const Icon = SOCIAL_ICONS[key] || FaGlobe;
+          return {
+            name: s.name,
+            href: s.link,
+            icon: Icon,
+          };
+        })
+      : [
+          { name: "GitHub", href: "https://github.com/khh-Niloy", icon: FaGithub },
+          {
+            name: "LinkedIn",
+            href: "https://www.linkedin.com/in/hasibhossain-niloy01/",
+            icon: FaLinkedin,
+          },
+          { name: "WhatsApp", href: "https://wa.me/8801915910291", icon: FaWhatsapp },
+          {
+            name: "Facebook",
+            href: "https://www.facebook.com/khhniloy.niloy/",
+            icon: FaFacebook,
+          },
+          { name: "Email", href: "mailto:khhniloy0@gmail.com", icon: Mail },
+        ];
+
+  const authorName = data?.name || "Hasib Hossain Niloy";
 
   return (
     <footer className="mt-14 pt-8 border-t border-white/10 text-center">
@@ -43,7 +76,7 @@ export function ProfileFooter() {
         })}
       </div>
       <p className="mt-4 text-xs text-zinc-600">
-        Designed & built by Hasib Hossain Niloy · {new Date().getFullYear()}
+        Designed &amp; built by {authorName} · {new Date().getFullYear()}
       </p>
     </footer>
   );
