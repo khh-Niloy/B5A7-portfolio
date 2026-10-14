@@ -6,24 +6,12 @@ import {
   ArrowUpRight,
   Rocket,
   Send,
-  Database,
-  Code2,
-  Bot,
-  Laptop,
 } from "lucide-react";
 import { FaGithub, FaLinkedin, FaWhatsapp, FaFacebook, FaTwitter, FaGlobe } from "react-icons/fa";
 import { SiGmail } from "react-icons/si";
 import toast from "react-hot-toast";
 import { playUiClick } from "@/lib/sound";
 import { usePortfolio } from "@/components/portfolio/PortfolioContext";
-
-const SERVICE_ICONS: Record<string, any> = {
-  database: Database,
-  code2: Code2,
-  bot: Bot,
-  laptop: Laptop,
-  rocket: Rocket,
-};
 
 const SOCIAL_ICONS: Record<string, { icon: any; color: string }> = {
   email: { icon: SiGmail, color: "#EA4335" },
@@ -136,8 +124,6 @@ export function ContactView() {
           },
         ];
 
-  const services = data?.services || [];
-
   return (
     <div className="text-left space-y-12">
       {/* 1. Hero Card */}
@@ -203,42 +189,6 @@ export function ContactView() {
             </div>
           </div>
         </div>
-
-        {/* Dynamic Services Row if services exist */}
-        {services.length > 0 && (
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {services.map((srv) => {
-              const iconKey = (srv.icon || "").toLowerCase();
-              const Icon = SERVICE_ICONS[iconKey] || Database;
-              return (
-                <div
-                  key={srv.title}
-                  className="flex flex-col justify-between rounded-xl border border-white/5 bg-[#141414] p-4 transition-all hover:border-white/10"
-                >
-                  <div>
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-emerald-400 mb-3">
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <h4 className="text-xs font-semibold text-white">
-                      {srv.title}
-                    </h4>
-                    <p className="mt-1 text-[11px] text-zinc-400 leading-relaxed">
-                      {srv.desc}
-                    </p>
-                  </div>
-                  <a
-                    href="#message-form"
-                    onClick={playUiClick}
-                    className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:underline"
-                  >
-                    <span>Inquire</span>
-                    <ArrowUpRight className="h-3 w-3" />
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* 3. Reach Me Direct Links */}
