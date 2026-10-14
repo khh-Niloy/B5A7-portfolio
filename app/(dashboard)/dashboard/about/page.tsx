@@ -140,7 +140,11 @@ export default function AboutManagement() {
             startYear: String(data.universityInfo?.startYear || ""),
             endYear: String(data.universityInfo?.endYear || ""),
           },
-          journey: data.journey || [],
+          journey: (data.journey || []).map((j: any) => ({
+            year: j.year || "",
+            title: j.title || "",
+            description: j.description || j.desc || "",
+          })),
           certifications: data.certifications || [],
         });
       }

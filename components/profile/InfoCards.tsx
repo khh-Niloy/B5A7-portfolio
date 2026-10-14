@@ -32,7 +32,7 @@ export function InfoCards() {
       ? data.journey.map((j) => ({
           year: j.year,
           title: j.title,
-          desc: j.description,
+          desc: (j as any).desc || (j as any).description || "",
         }))
       : [
           {
