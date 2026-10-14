@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme";
+import { PortfolioTracker } from "@/components/tracker/PortfolioTracker";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -74,6 +75,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           {children}
+          <PortfolioTracker />
           <Toaster
             position="top-right"
             toastOptions={{
