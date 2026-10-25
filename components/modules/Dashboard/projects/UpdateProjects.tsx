@@ -30,8 +30,20 @@ interface ProjectFormValues {
   responsibilities: string;
   frontendRepo: string;
   backendRepo: string;
+  backendLive?: string;
+  rerankerRepo?: string;
+  demoCheckerRepo?: string;
   technicalHighlights: string;
   projectType: "client project" | "personal project";
+  role?: string;
+  status?: string;
+  overview?: string;
+  problem?: string;
+  myContribution?: string;
+  architecture?: string;
+  keyDecisions?: string;
+  resultsEvidence?: string;
+  limitationsNextSteps?: string;
 }
 
 interface UpdateProjectsProps {
@@ -122,6 +134,18 @@ export default function UpdateProjects({
           responsibilities: projectData.responsibilities ?? "",
           frontendRepo: projectData.frontendRepo ?? "",
           backendRepo: projectData.backendRepo ?? "",
+          backendLive: projectData.backendLive ?? "",
+          rerankerRepo: projectData.rerankerRepo ?? "",
+          demoCheckerRepo: projectData.demoCheckerRepo ?? "",
+          role: projectData.role ?? "",
+          status: projectData.status ?? "",
+          overview: projectData.overview ?? "",
+          problem: projectData.problem ?? "",
+          myContribution: projectData.myContribution ?? "",
+          architecture: projectData.architecture ?? "",
+          keyDecisions: projectData.keyDecisions ?? "",
+          resultsEvidence: projectData.resultsEvidence ?? "",
+          limitationsNextSteps: projectData.limitationsNextSteps ?? "",
           features: Array.isArray(featuresArr) ? featuresArr.join(", ") : "",
           dependencies: projectData.dependencies ?? "",
           technicalHighlights: projectData.technicalHighlights ?? "",
@@ -179,6 +203,15 @@ export default function UpdateProjects({
       if (dirtyFields.backendRepo) {
         formData.append("backendRepo", data.backendRepo);
       }
+      if (dirtyFields.backendLive) {
+        formData.append("backendLive", data.backendLive || "");
+      }
+      if (dirtyFields.rerankerRepo) {
+        formData.append("rerankerRepo", data.rerankerRepo || "");
+      }
+      if (dirtyFields.demoCheckerRepo) {
+        formData.append("demoCheckerRepo", data.demoCheckerRepo || "");
+      }
       if (dirtyFields.problemSolution) {
         formData.append("problemSolution", data.problemSolution);
       }
@@ -198,8 +231,17 @@ export default function UpdateProjects({
         formData.append("projectType", data.projectType);
       }
       if (dirtyFields.technicalHighlights || data.technicalHighlights) {
-        formData.append("technicalHighlights", data.technicalHighlights);
+        formData.append("technicalHighlights", data.technicalHighlights || "");
       }
+      if (data.role) formData.append("role", data.role);
+      if (data.status) formData.append("status", data.status);
+      if (data.overview) formData.append("overview", data.overview);
+      if (data.problem) formData.append("problem", data.problem);
+      if (data.myContribution) formData.append("myContribution", data.myContribution);
+      if (data.architecture) formData.append("architecture", data.architecture);
+      if (data.keyDecisions) formData.append("keyDecisions", data.keyDecisions);
+      if (data.resultsEvidence) formData.append("resultsEvidence", data.resultsEvidence);
+      if (data.limitationsNextSteps) formData.append("limitationsNextSteps", data.limitationsNextSteps);
 
       console.log(formData);
 

@@ -80,17 +80,29 @@ export default function AddProjects({ files, setFiles }: AddProjectsProps) {
         const dependenciesString = data.dependencies ?? "";
 
         formData.append("projectName", data.projectName);
-        formData.append("shortDes", data.shortDes);
+        formData.append("shortDes", data.shortDes || "");
         formData.append("techStack", techStackString);
         formData.append("liveSite", data.liveSite || "");
         formData.append("tagline", data.tagline);
-        formData.append("problemSolution", data.problemSolution);
+        formData.append("problemSolution", data.problemSolution || "");
         formData.append("features", featuresString);
         formData.append("dependencies", dependenciesString);
-        formData.append("responsibilities", data.responsibilities);
+        formData.append("responsibilities", data.responsibilities || "");
         formData.append("frontendRepo", data.frontendRepo || "");
         formData.append("backendRepo", data.backendRepo || "");
-        formData.append("technicalHighlights", data.technicalHighlights);
+        formData.append("technicalHighlights", data.technicalHighlights || "");
+        if (data.backendLive) formData.append("backendLive", data.backendLive);
+        if (data.rerankerRepo) formData.append("rerankerRepo", data.rerankerRepo);
+        if (data.demoCheckerRepo) formData.append("demoCheckerRepo", data.demoCheckerRepo);
+        if (data.role) formData.append("role", data.role);
+        if (data.status) formData.append("status", data.status);
+        if (data.overview) formData.append("overview", data.overview);
+        if (data.problem) formData.append("problem", data.problem);
+        if (data.myContribution) formData.append("myContribution", data.myContribution);
+        if (data.architecture) formData.append("architecture", data.architecture);
+        if (data.keyDecisions) formData.append("keyDecisions", data.keyDecisions);
+        if (data.resultsEvidence) formData.append("resultsEvidence", data.resultsEvidence);
+        if (data.limitationsNextSteps) formData.append("limitationsNextSteps", data.limitationsNextSteps);
         // Ensure projectType is always a valid value
         const projectTypeValue = data.projectType || "personal project";
         formData.append("projectType", projectTypeValue);

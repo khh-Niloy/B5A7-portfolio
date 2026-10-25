@@ -106,7 +106,8 @@ export default function AllProjectList() {
               <ProjectCard
                 image={project.image}
                 projectName={project.projectName}
-                shortDes={project.shortDes}
+                overview={project.overview}
+                shortDes={project.shortDes || project.tagline || project.overview}
                 techStack={project.techStack}
                 liveSite={project.liveSite}
                 id={project._id}

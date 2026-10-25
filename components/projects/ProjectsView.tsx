@@ -1,18 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { ModernProjectCard } from "./ModernProjectCard";
-import { RepoCard } from "./RepoCard";
-import { Github } from "lucide-react";
+import { Modal } from "@/components/modules/Projects/Modal";
 
 interface ProjectItem {
   _id: string;
   projectName: string;
-  shortDes: string;
+  shortDes?: string;
+  overview?: string;
+  tagline?: string;
   techStack: string[];
   image?: string;
+  images?: string[];
   liveSite?: string;
   githubRepo?: string;
+  frontendRepo?: string;
+  backendRepo?: string;
   projectType?: string;
   isActive?: boolean;
   createdAt?: string;
@@ -21,12 +26,57 @@ interface ProjectItem {
 
 const defaultProjects: ProjectItem[] = [
   {
+    _id: "6add99ebd681fa3d0b844f2d",
+    projectName: "DocHook RAG",
+    tagline: "Document Intelligence & High-Speed Neural Retrieval Engine",
+    image:
+      "https://res.cloudinary.com/dwrvergmd/image/upload/v1790761369/60kxj6xi26a-1790761369555-screenshot-2026-09-30-at-3-36-51pm-png.png.png",
+    overview:
+      "DocHook RAG is an intelligent document Q&A platform that lets users upload large files (like PDFs, DOCX agreements, or policies) and ask questions to get instant, 100% grounded answers. Instead of letting AI guess or hallucinate answers, DocHook uses a two-stage search pipeline—combining MongoDB Atlas vector search with a Python Cross-Encoder neural reranker—to pinpoint the exact paragraphs needed before answering with Google Gemini 2.5 Flash.",
+    shortDes:
+      "DocHook RAG is an intelligent document Q&A platform that lets users upload large files and ask questions to get instant, 100% grounded answers using a two-stage search pipeline combining vector search with a Python Cross-Encoder neural reranker and Gemini 2.5 Flash.",
+    techStack: [
+      "NestJS 11",
+      "TypeScript",
+      "Python",
+      "FastAPI",
+      "MongoDB Atlas",
+      "BullMQ",
+      "Gemini 2.5 Flash",
+    ],
+    liveSite: "https://doc-hook-rag-frontend.vercel.app/",
+    githubRepo: "https://github.com/khh-Niloy/doc-hook-RAG-frontend",
+  },
+  {
+    _id: "6add99eed681fa3d0b844f2e",
+    projectName: "ReleaseOps AI",
+    tagline: "Autonomous AI CI/CD Failure Investigator with Gemini Tool Calling",
+    image:
+      "https://res.cloudinary.com/dwrvergmd/image/upload/v1790761369/60kxj6xi26a-1790761369555-screenshot-2026-09-30-at-3-36-51pm-png.png.png",
+    overview:
+      "ReleaseOps AI is an intelligent developer tool that automatically investigates failed GitHub Actions build and deployment pipelines. Instead of forcing engineers to read through thousands of lines of messy terminal logs, ReleaseOps uses Google Gemini AI with native autonomous tool calling to pinpoint what broke, extract the exact error lines, and recommend ready-to-use code fixes.",
+    shortDes:
+      "ReleaseOps AI is an intelligent developer tool that automatically investigates failed GitHub Actions build and deployment pipelines using Google Gemini AI with autonomous tool calling to pinpoint root causes and recommend ready-to-use code fixes.",
+    techStack: [
+      "NestJS",
+      "TypeScript",
+      "MongoDB",
+      "GitHub Actions API",
+      "Gemini AI (Tools)",
+      "Next.js 16",
+    ],
+    liveSite: "https://ai-cicd-investigator-frontend.vercel.app/",
+    githubRepo: "https://github.com/khh-Niloy/ai-cicd-investigator-frontend",
+  },
+  {
     _id: "6abcd99af74854517a94c551",
     projectName: "ProcureAI",
     image:
       "https://res.cloudinary.com/dwrvergmd/image/upload/v1790761369/60kxj6xi26a-1790761369555-screenshot-2026-09-30-at-3-36-51pm-png.png.png",
+    overview:
+      "ProcureAI is an AI-powered web platform that helps companies buy goods and services faster without messy paperwork and slow email chains. It brings team leaders, managers, procurement officers, and suppliers into one clear workflow: a team leader creates a purchase request, the manager approves it, and the procurement officer oversees quotes from vendors.",
     shortDes:
-      "AI-powered procurement management platform streamlining purchase workflows, vendor quotation comparisons, and intelligent decision support with Gemini AI.",
+      "ProcureAI is an AI-powered web platform that helps companies buy goods and services faster without messy paperwork and slow email chains with automated quote evaluations and Gemini AI.",
     techStack: [
       "Next.js",
       "NestJS",
@@ -39,57 +89,22 @@ const defaultProjects: ProjectItem[] = [
     githubRepo: "https://github.com/khh-Niloy/procureai-platform-frontend",
   },
   {
-    _id: "696943e5232760dfe1d022be",
-    projectName: "Realtime Notification System",
-    image:
-      "https://res.cloudinary.com/dwrvergmd/image/upload/v1768506891/37lumps5uqc-1768506890956-screenshot-2026-01-16-at-1-40-32am-png.png.png",
-    shortDes:
-      "High-performance alert platform eliminating polling delays through WebSocket room architecture, delivering instant category updates.",
-    techStack: [
-      "Reactjs",
-      "Socket.IO",
-      "Nodejs",
-      "Express",
-      "TypeScript",
-      "MongoDB",
-    ],
-    liveSite: "https://realtime-notification-system-fronte.vercel.app/",
-    githubRepo:
-      "https://github.com/khh-Niloy/realtime-notification-system-frontend",
-  },
-  {
-    _id: "68e3e6e2dc0d3b0b3e1b387a",
-    projectName: "RaizMart",
-    image:
-      "https://res.cloudinary.com/dwrvergmd/image/upload/v1763124914/kkz2ic47kp-1763124914625-screenshot-2025-11-14-at-5-21-41pm-png.png.png",
-    shortDes:
-      "Full-stack marketplace with attribute-based variant generation, cash-on-delivery, comprehensive admin analytics, and role-based authentication.",
-    techStack: [
-      "Next.js 15",
-      "TypeScript",
-      "Redux Toolkit",
-      "Express",
-      "MongoDB",
-      "Tailwind CSS",
-    ],
-    liveSite: "https://www.raizmart.com/",
-    githubRepo: "https://github.com/khh-Niloy/raizmart-frontend",
-  },
-  {
     _id: "68e61edb644076265bb4c780",
     projectName: "LocalLens",
     image:
       "https://res.cloudinary.com/dwrvergmd/image/upload/v1766826692/m03702vk3ph-1766826692542-screenshot-2025-12-27-at-3-11-02pm-png.png.png",
+    overview:
+      "LocalLens is a real-time tourism platform that connects travelers with verified local guides for authentic tours, activities, and local experiences. Instead of relying on static guidebooks or slow booking agencies, travelers can discover nearby adventures, chat live with local guides, and book excursions instantly.",
     shortDes:
-      "Real-time tourism marketplace connecting tourists with local guides with instant Socket.IO communication and Redis caching.",
+      "Real-time tourism marketplace connecting tourists with local guides with instant Socket.IO communication, Redis caching, and integrated SSLCommerz payment.",
     techStack: [
       "Next.js",
       "Node.js",
       "Express",
       "JWT",
       "TypeScript",
-      "Postman",
-      "Tailwind CSS",
+      "Redis",
+      "Socket.IO",
     ],
     liveSite: "https://local-lens-frontend.vercel.app/",
     githubRepo: "https://github.com/khh-Niloy/localLens-backend-prisma",
@@ -98,6 +113,11 @@ const defaultProjects: ProjectItem[] = [
 
 export function ProjectsView() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const searchParams = useSearchParams();
+  const urlProjectId = searchParams?.get("project");
+
+  const displayProjects = projects.length > 0 ? projects : defaultProjects;
+  const isProjectInList = displayProjects.some((p) => p._id === urlProjectId);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -137,71 +157,32 @@ export function ProjectsView() {
     fetchProjects();
   }, []);
 
-  // const openSourceRepos = [
-  //   {
-  //     owner: "khh-Niloy",
-  //     name: "procureai-platform-frontend",
-  //     description:
-  //       "Modern Next.js & TypeScript frontend with multi-factor quote analysis dashboards and automated PDF generators.",
-  //     language: "TypeScript",
-  //     languageColor: "#3178C6",
-  //     stars: 1,
-  //     forks: 0,
-  //     url: "https://github.com/khh-Niloy/procureai-platform-frontend",
-  //   },
-  //   {
-  //     owner: "khh-Niloy",
-  //     name: "procureai-platform-backend",
-  //     description:
-  //       "NestJS backend engine featuring structured Gemini AI reasoning pipelines and BullMQ asynchronous queues.",
-  //     language: "TypeScript",
-  //     languageColor: "#3178C6",
-  //     stars: 1,
-  //     forks: 0,
-  //     url: "https://github.com/khh-Niloy/procureai-platform-backend",
-  //   },
-  //   {
-  //     owner: "khh-Niloy",
-  //     name: "realtime-notification-system-backend",
-  //     description:
-  //       "Socket.IO real-time notification engine with dynamic category rooms and durable MongoDB message history.",
-  //     language: "JavaScript",
-  //     languageColor: "#F7DF1E",
-  //     stars: 1,
-  //     forks: 0,
-  //     url: "https://github.com/khh-Niloy/realtime-notification-system-backend",
-  //   },
-  //   {
-  //     owner: "khh-Niloy",
-  //     name: "localLens-backend-prisma",
-  //     description:
-  //       "Location-aware backend service using Prisma ORM and PostgreSQL for hyperlocal discovery.",
-  //     language: "TypeScript",
-  //     languageColor: "#3178C6",
-  //     stars: 0,
-  //     forks: 0,
-  //     url: "https://github.com/khh-Niloy/localLens-backend-prisma",
-  //   },
-  // ];
-
   return (
     <div className="text-left">
       {/* 2-Column Project Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {(projects.length > 0 ? projects : defaultProjects).map((p) => (
+        {displayProjects.map((p) => (
           <ModernProjectCard
             key={p._id}
             id={p._id}
             projectName={p.projectName}
             shortDes={p.shortDes}
+            overview={p.overview}
             techStack={p.techStack}
             image={p.image}
             liveSite={p.liveSite}
             githubRepo={p.githubRepo}
+            frontendRepo={p.frontendRepo}
+            backendRepo={p.backendRepo}
             initials={p.projectName.slice(0, 2).toUpperCase()}
           />
         ))}
       </div>
+
+      {/* Fallback standalone modal when a project URL is shared and not in the displayed list */}
+      {urlProjectId && !isProjectInList && (
+        <Modal id={urlProjectId} standalone />
+      )}
 
       {/* Open Source Section */}
       {/* <div className="mt-14 pt-8 border-t border-white/5">

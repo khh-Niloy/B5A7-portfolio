@@ -9,11 +9,14 @@ import { LinkPreview } from "@/components/ui/link-preview";
 interface ModernProjectCardProps {
   id: string;
   projectName: string;
-  shortDes: string;
+  shortDes?: string;
+  overview?: string;
   techStack: string[];
   image?: string;
   liveSite?: string;
   githubRepo?: string;
+  frontendRepo?: string;
+  backendRepo?: string;
   initials?: string;
 }
 
@@ -21,12 +24,29 @@ export function ModernProjectCard({
   id,
   projectName,
   shortDes,
+  overview,
   techStack = [],
   image,
   liveSite,
   githubRepo,
+  frontendRepo,
+  backendRepo,
   initials,
 }: ModernProjectCardProps) {
+  // Use the project overview part for showing the minimum description
+  const rawDescription = overview || shortDes || "";
+  const displayDescription = rawDescription
+    .replace(/^#+\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1")
+    .replace(/^[-*•]\s+/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const hasDualRepos = Boolean(frontendRepo && backendRepo);
+  const primaryRepo = githubRepo || frontendRepo || backendRepo;
+
   return (
     <div className="group relative flex flex-col justify-between rounded-2xl border border-white/5 bg-[#141414] p-3 sm:p-4 transition-all duration-300 hover:border-emerald-500/30 hover:bg-[#161616] hover:shadow-[0_0_30px_rgba(16,185,129,0.06)]">
       <div>
@@ -51,26 +71,62 @@ export function ModernProjectCard({
 
         {/* Content */}
         <div>
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-base font-semibold text-white group-hover:text-emerald-300 transition-colors">
+          <div className="flex items-center justify-between gap-2 min-h-[28px]">
+            <h3 className="text-base font-semibold text-white group-hover:text-emerald-300 transition-colors truncate">
               {projectName}
             </h3>
-            {githubRepo && (
-              <a
-                href={githubRepo}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={playUiClick}
-                className="text-zinc-500 hover:text-white transition-colors"
-                title="View Source on GitHub"
-              >
-                <Github className="h-4 w-4" />
-              </a>
-            )}
+
+            {/* Repository Links */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {hasDualRepos ? (
+                <>
+                  <a
+                    href={frontendRepo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="group/repo inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-emerald-500/10 hover:border-emerald-500/30 text-zinc-400 hover:text-emerald-300 text-xs font-medium transition-all duration-200 active:scale-95 shadow-sm"
+                    title="Frontend Repository"
+                  >
+                    <Github className="h-3 w-3 text-zinc-400 group-hover/repo:text-emerald-300 transition-colors" />
+                    <span className="text-[11px] font-medium">Client</span>
+                    <ArrowUpRight className="h-2.5 w-2.5 text-zinc-500 group-hover/repo:text-emerald-300 opacity-60 group-hover/repo:translate-x-0.5 group-hover/repo:-translate-y-0.5 transition-transform" />
+                  </a>
+                  <a
+                    href={backendRepo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="group/repo inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-emerald-500/10 hover:border-emerald-500/30 text-zinc-400 hover:text-emerald-300 text-xs font-medium transition-all duration-200 active:scale-95 shadow-sm"
+                    title="Backend Repository"
+                  >
+                    <Github className="h-3 w-3 text-zinc-400 group-hover/repo:text-emerald-300 transition-colors" />
+                    <span className="text-[11px] font-medium">API</span>
+                    <ArrowUpRight className="h-2.5 w-2.5 text-zinc-500 group-hover/repo:text-emerald-300 opacity-60 group-hover/repo:translate-x-0.5 group-hover/repo:-translate-y-0.5 transition-transform" />
+                  </a>
+                </>
+              ) : primaryRepo ? (
+                <a
+                  href={primaryRepo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={playUiClick}
+                  className="group/repo inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-emerald-500/10 hover:border-emerald-500/30 text-zinc-400 hover:text-emerald-300 text-xs font-medium transition-all duration-200 active:scale-95 shadow-sm"
+                  title="View Source on GitHub"
+                >
+                  <Github className="h-3.5 w-3.5 text-zinc-400 group-hover/repo:text-emerald-300 transition-colors" />
+                  <span className="text-[11px] font-medium tracking-tight">Repo</span>
+                  <ArrowUpRight className="h-3 w-3 text-zinc-500 group-hover/repo:text-emerald-300 opacity-60 group-hover/repo:translate-x-0.5 group-hover/repo:-translate-y-0.5 transition-transform" />
+                </a>
+              ) : null}
+            </div>
           </div>
 
-          <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed line-clamp-2">
-            {shortDes}
+          <p
+            className="mt-1.5 text-xs text-zinc-400 leading-relaxed line-clamp-2 min-h-[36px]"
+            title={displayDescription}
+          >
+            {displayDescription}
           </p>
         </div>
       </div>

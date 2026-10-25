@@ -4,12 +4,9 @@ import React, { useState, useEffect } from "react";
 import {
   HelpCircle,
   ChevronDown,
-  Sun,
-  Moon,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import { useTheme } from "@/lib/theme";
 import { playUiClick } from "@/lib/sound";
 import { usePortfolio } from "@/components/portfolio/PortfolioContext";
 
@@ -66,7 +63,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
-  const { theme, toggleTheme } = useTheme();
   const { data } = usePortfolio();
   const [openFaq, setOpenFaq] = useState<string | null>("sfaq-1");
 
@@ -196,27 +192,8 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
 
       {/* Bottom Controls */}
       <div className="p-4 border-t border-[var(--border-subtle)] shrink-0">
-        <div className="flex items-center justify-center gap-5 pb-2">
-          {/* Theme Toggle */}
-          <button
-            id="theme-toggle-btn"
-            onClick={() => {
-              playUiClick();
-              toggleTheme();
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-[var(--text-primary)] transition-all cursor-pointer"
-            aria-label="Toggle theme"
-            title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </button>
-
-          {/* Collapse Toggle */}
-          {onToggleCollapse && (
+        {onToggleCollapse && (
+          <div className="flex items-center justify-center pb-2">
             <button
               id="collapse-sidebar-btn"
               onClick={() => {
@@ -233,8 +210,8 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                 <PanelLeftClose className="h-4 w-4" />
               )}
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {!collapsed && (
           <p className="mt-2 text-center text-[10px] text-[var(--text-tertiary)]">

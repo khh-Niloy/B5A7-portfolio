@@ -24,9 +24,12 @@ const SOCIAL_ICONS: Record<string, any> = {
 
 export function RightSidebar() {
   const { data } = usePortfolio();
-  const [buildingTab, setBuildingTab] = useState<"working" | "learning">(
-    "working"
+  const [buildingTab, setBuildingTab] = useState<"recent" | "learning">(
+    "recent",
   );
+  const [recentProjectTab, setRecentProjectTab] = useState<
+    "dochook" | "releaseops"
+  >("dochook");
   const [learningModalOpen, setLearningModalOpen] = useState(false);
   const [learningTopic, setLearningTopic] = useState<
     "system-design" | "llm-rag"
@@ -35,20 +38,6 @@ export function RightSidebar() {
   const rawBuilding = Array.isArray(data?.currentlyBuilding)
     ? data.currentlyBuilding[0]
     : data?.currentlyBuilding;
-
-  const currentlyBuilding = rawBuilding
-    ? {
-        title: rawBuilding.title,
-        desc: rawBuilding.desc || rawBuilding.description || "",
-        liveUrl: rawBuilding.liveUrl || rawBuilding.link || "",
-        repoUrl: rawBuilding.repoUrl || "",
-      }
-    : {
-        title: "ProcureAI Platform",
-        desc: "AI-powered procurement management platform streamlining purchase workflows, vendor quotation comparisons, and intelligent decision support with Gemini AI.",
-        liveUrl: "https://procureai-platform-frontend.vercel.app/",
-        repoUrl: "https://github.com/khh-Niloy/procureai-platform-frontend",
-      };
 
   const rawLearning = Array.isArray(data?.currentlyLearning)
     ? data.currentlyLearning[0]
@@ -73,7 +62,11 @@ export function RightSidebar() {
   const socials =
     data?.socialLinks && data.socialLinks.length > 0
       ? data.socialLinks
-          .filter((s) => s.name.toLowerCase() !== "email" && s.name.toLowerCase() !== "gmail")
+          .filter(
+            (s) =>
+              s.name.toLowerCase() !== "email" &&
+              s.name.toLowerCase() !== "gmail",
+          )
           .map((s) => {
             const key = s.name.toLowerCase().trim();
             const Icon = SOCIAL_ICONS[key] || FaGlobe;
@@ -116,28 +109,28 @@ export function RightSidebar() {
       className="hidden xl:flex flex-col gap-6 w-[340px] shrink-0 sticky top-0 h-screen overflow-y-auto p-6 [scrollbar-width:none]"
       aria-label="Sidebar information"
     >
-      {/* Featured Highlight / Currently Building */}
+      {/* Featured Highlight / Recent Project & Learning */}
       <div className="rounded-2xl border border-white/5 bg-[#141414] p-5 transition-all hover:border-white/10 text-left">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400">
+          {/* <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400">
             <Hammer className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Currently Building</span>
-          </div>
+            <span>Recent &amp; Learning</span>
+          </div> */}
 
-          {/* Toggle: Working & Learning */}
+          {/* Toggle: Recent Project & Learning */}
           <div className="flex items-center gap-1 rounded-full bg-[#1b1b1e] p-0.5 border border-white/5">
             <button
               onClick={() => {
                 playUiClick();
-                setBuildingTab("working");
+                setBuildingTab("recent");
               }}
               className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold transition-all cursor-pointer ${
-                buildingTab === "working"
+                buildingTab === "recent"
                   ? "border-t border-white/40 bg-gradient-to-b from-[#313134] to-[#101011] text-emerald-400 shadow-sm"
                   : "text-zinc-400 hover:text-white"
               }`}
             >
-              Working
+              Recent Project
             </button>
             <button
               onClick={() => {
@@ -155,26 +148,158 @@ export function RightSidebar() {
           </div>
         </div>
 
-        {buildingTab === "working" ? (
-          <div className="mt-3 animate-in fade-in duration-200">
-            <h4 className="text-sm font-semibold text-white">
-              {currentlyBuilding.title}
-            </h4>
-            <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
-              {currentlyBuilding.desc}
-            </p>
-
-            {currentlyBuilding.liveUrl && (
-              <a
-                href={currentlyBuilding.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={playUiClick}
-                className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-emerald-400 hover:underline"
+        {buildingTab === "recent" ? (
+          <div className="mt-3.5 animate-in fade-in duration-200 space-y-3">
+            {/* Sub-selector between DocHook RAG and ReleaseOps */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#1b1b1e] border border-white/5">
+              <button
+                type="button"
+                onClick={() => {
+                  playUiClick();
+                  setRecentProjectTab("dochook");
+                }}
+                className={`flex-1 py-1 px-2 rounded-lg text-[11px] font-medium transition-all text-center cursor-pointer ${
+                  recentProjectTab === "dochook"
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
               >
-                <span>Visit live preview</span>
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
+                DocHook RAG
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playUiClick();
+                  setRecentProjectTab("releaseops");
+                }}
+                className={`flex-1 py-1 px-2 rounded-lg text-[11px] font-medium transition-all text-center cursor-pointer ${
+                  recentProjectTab === "releaseops"
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                ReleaseOps AI
+              </button>
+            </div>
+
+            {recentProjectTab === "dochook" ? (
+              <div className="animate-in fade-in duration-200">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="text-sm font-semibold text-white">
+                    DocHook RAG
+                  </h4>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-medium">
+                    AI RAG Engine
+                  </span>
+                </div>
+                <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+                  High-speed document intelligence &amp; retrieval engine with
+                  smart chunking, embeddings, cross-encoder reranking, and
+                  Gemini 2.5 Flash.
+                </p>
+
+                <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
+                  <a
+                    href="https://doc-hook-rag-frontend.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:underline"
+                  >
+                    <span>Live Preview</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
+                  <a
+                    href="https://github.com/khh-Niloy/doc-hook-RAG-frontend"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-white"
+                  >
+                    <span>Frontend</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                  <a
+                    href="https://github.com/khh-Niloy/doc-hook-RAG"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-white"
+                  >
+                    <span>Backend</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                  <a
+                    href="https://github.com/khh-Niloy/-cross-encoder-reranker-doc-hook-RAG"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-white"
+                  >
+                    <span>Reranker</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="animate-in fade-in duration-200">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="text-sm font-semibold text-white">
+                    ReleaseOps AI
+                  </h4>
+                  <span className="text-[10px] text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-full font-medium">
+                    AI CI/CD Agent
+                  </span>
+                </div>
+                <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+                  Autonomous AI CI/CD pipeline investigator that detects
+                  workflow failures, fetches targeted logs via Gemini tool
+                  calling, diagnoses root causes, and generates verified fixes.
+                </p>
+
+                <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
+                  <a
+                    href="https://ai-cicd-investigator-frontend.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:underline"
+                  >
+                    <span>Live Preview</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
+                  <a
+                    href="https://github.com/khh-Niloy/ai-cicd-investigator-frontend"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-white"
+                  >
+                    <span>Frontend</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                  <a
+                    href="https://github.com/khh-Niloy/ai-cicd-investigator"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-white"
+                  >
+                    <span>Backend</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                  <a
+                    href="https://github.com/khh-Niloy/releaseOps-project-checker"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playUiClick}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-white"
+                  >
+                    <span>Demo Checker</span>
+                    <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
             )}
           </div>
         ) : (

@@ -8,10 +8,21 @@ export default function ProjectCard({
   image,
   projectName,
   shortDes,
+  overview,
   techStack,
   liveSite,
   id,
 }) {
+  const rawDescription = overview || shortDes || "";
+  const displayDescription = rawDescription
+    .replace(/^#+\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1")
+    .replace(/^[-*•]\s+/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
   return (
     <div className="w-full bg-[#090D22]/40 border border-[#3637497D] rounded-xl p-5 relative hover:scale-[1.02] duration-500 transition-all">
       <div className="bg-[#13162d] rounded-xl relative overflow-hidden sm:h-52 h-40 mb-6">
@@ -25,7 +36,12 @@ export default function ProjectCard({
 
       <div>
         <h1 className="text-xl font-semibold">{projectName}</h1>
-        <p className="text-[#BEC1DD] text-xs mt-2 font-light">{shortDes}</p>
+        <p
+          className="text-[#BEC1DD] text-xs mt-2 font-light line-clamp-2"
+          title={displayDescription}
+        >
+          {displayDescription}
+        </p>
 
         <div className="flex sm:flex-row flex-col lg:flex-col xl:flex-row items-start sm:gap-0 gap-3 xl:gap-3 lg:gap-5 justify-between lg:items-start sm:items-center xl:items-center mt-4">
           <div className="flex items-center justify-center">

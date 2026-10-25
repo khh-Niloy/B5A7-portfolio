@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { SectionTabs } from "@/components/profile/SectionTabs";
@@ -118,7 +118,9 @@ export default function HomePage() {
                 Featured Projects
               </h2>
             </div>
-            <ProjectsView />
+            <Suspense fallback={null}>
+              <ProjectsView />
+            </Suspense>
           </div>
 
           {/* 5. Contact Section */}
