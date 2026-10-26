@@ -208,3 +208,116 @@ export interface SkillItem {
   skills: string[];
   order?: number;
 }
+
+export interface VisitorDailyStat {
+  _id?: string;
+  date: string;
+  count: number;
+}
+
+export interface VisitorStatsResponse {
+  summary: {
+    totalVisits: number;
+    totalLogs: number;
+    uniqueVisitors: number;
+    todayVisits: number;
+    avgDuration: number;
+  };
+  daily: VisitorDailyStat[];
+  deviceBreakdown: { name: string; count: number }[];
+  countryBreakdown: {
+    country: string;
+    countryCode: string;
+    countryFlag?: string;
+    count: number;
+  }[];
+  browserBreakdown: { name: string; count: number }[];
+  topPages: { pathname: string; count: number }[];
+}
+
+export interface VisitorLogItem {
+  _id: string;
+  visitorId: string;
+  sessionId: string;
+  isNewVisitor: boolean;
+  visitCount: number;
+
+  ip: string;
+  ipType?: string;
+  isLocalIp?: boolean;
+
+  country: string;
+  countryCode: string;
+  region?: string;
+  city: string;
+  zipCode?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
+  isp?: string;
+  org?: string;
+  asn?: string;
+  countryFlag?: string;
+
+  userAgent: string;
+  browserName: string;
+  browserVersion: string;
+  browserMajor?: string;
+  osName: string;
+  osVersion: string;
+  deviceType: string;
+  deviceVendor?: string;
+  deviceModel?: string;
+
+  isBot: boolean;
+  botName?: string;
+
+  screenWidth?: number;
+  screenHeight?: number;
+  screenResolution?: string;
+  viewportWidth?: number;
+  viewportHeight?: number;
+  viewportSize?: string;
+  devicePixelRatio?: number;
+  colorDepth?: number;
+  orientation?: string;
+  touchSupport?: boolean;
+  maxTouchPoints?: number;
+  hardwareConcurrency?: number;
+  deviceMemory?: number;
+
+  url: string;
+  pathname: string;
+  pageTitle?: string;
+  referrer: string;
+  referrerDomain?: string;
+
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+
+  language: string;
+  languages?: string[];
+  clientTimezone?: string;
+  clientLocalTime?: string;
+  connectionType?: string;
+
+  visitedAt: string;
+  lastActiveAt?: string;
+  durationSeconds: number;
+
+  rawHeaders?: Record<string, string>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface VisitorLogsResponse {
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  data: VisitorLogItem[];
+}
+

@@ -15,6 +15,7 @@ import {
   IconBrandFacebook,
   IconMail,
   IconWorld,
+  IconActivity,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -152,6 +153,18 @@ export function SidebarDemo({ children }: { children: React.ReactNode }) {
           className={cn(
             "h-5 w-5 shrink-0 transition-colors",
             pathname === "/dashboard/contact" ? "text-emerald-400" : "text-gray-400"
+          )}
+        />
+      ),
+    },
+    {
+      label: "Visitors & Logs",
+      href: "/dashboard/visitors",
+      icon: (
+        <IconActivity
+          className={cn(
+            "h-5 w-5 shrink-0 transition-colors",
+            pathname === "/dashboard/visitors" ? "text-emerald-400" : "text-gray-400"
           )}
         />
       ),

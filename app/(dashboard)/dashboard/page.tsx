@@ -26,7 +26,10 @@ import getAbout from "@/helper/getAbout";
 import getProjects from "@/helper/getProjects";
 import getSkills from "@/helper/getSkills";
 import getBlogs from "@/helper/getBlogs";
+import { getVisitorStats } from "@/actions/visitor/getVisitorStats";
 import { updateAbout } from "@/actions/about/updateAbout";
+import Link from "next/link";
+import { Activity } from "lucide-react";
 import type { PortfolioData, AiTool, CoreStack } from "@/interfaces/interface";
 
 interface HeroProfileFormValues {
@@ -52,6 +55,8 @@ export default function DashboardOverview() {
     projects: 0,
     skills: 0,
     blogs: 0,
+    visitors: 0,
+    todayVisitors: 0,
   });
 
   const {
@@ -100,22 +105,26 @@ export default function DashboardOverview() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [aboutRes, projectsRes, skillsRes, blogsRes] = await Promise.allSettled([
+      const [aboutRes, projectsRes, skillsRes, blogsRes, visitorRes] = await Promise.allSettled([
         getAbout(),
         getProjects(),
         getSkills(),
         getBlogs(),
+        getVisitorStats(),
       ]);
 
       const about = aboutRes.status === "fulfilled" ? aboutRes.value : null;
       const projects = projectsRes.status === "fulfilled" ? projectsRes.value : [];
       const skills = skillsRes.status === "fulfilled" ? skillsRes.value?.data || [] : [];
       const blogs = blogsRes.status === "fulfilled" ? blogsRes.value?.fullData || [] : [];
+      const visitorStats = visitorRes.status === "fulfilled" ? visitorRes.value : null;
 
       setStats({
         projects: projects?.length || 0,
         skills: skills?.length || 0,
         blogs: blogs?.length || 0,
+        visitors: visitorStats?.summary?.totalVisits || 0,
+        todayVisitors: visitorStats?.summary?.todayVisits || 0,
       });
 
       if (about) {
@@ -199,7 +208,10 @@ export default function DashboardOverview() {
         };
       }
 
-      const res = await updateAbout(payload as any, aboutData?._id);
+      const res = await updateAbout(
+        payload as unknown as Parameters<typeof updateAbout>[0],
+        aboutData?._id
+      );
 
       if (res?.success || res?.data) {
         toast.success("Hero & Profile updated successfully! 🚀");
@@ -271,7 +283,7 @@ export default function DashboardOverview() {
       </div>
 
       {/* Quick Portfolio Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-wider text-gray-400 font-medium">Projects</p>
@@ -304,6 +316,22 @@ export default function DashboardOverview() {
             <FileText className="w-6 h-6" />
           </div>
         </div>
+
+        <Link
+          href="/dashboard/visitors"
+          className="p-5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-emerald-500/30 transition-all backdrop-blur-sm flex items-center justify-between group cursor-pointer"
+        >
+          <div>
+            <p className="text-xs uppercase tracking-wider text-gray-400 font-medium">Total Visitors</p>
+            <h3 className="text-2xl font-bold text-white mt-1">{stats.visitors.toLocaleString()}</h3>
+            <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+              +{stats.todayVisitors} today • <span className="underline group-hover:text-emerald-300">View Logs &rarr;</span>
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+            <Activity className="w-6 h-6" />
+          </div>
+        </Link>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
