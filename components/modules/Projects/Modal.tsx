@@ -239,6 +239,7 @@ export function Modal({
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedDetails, setCopiedDetails] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("section-overview");
@@ -299,6 +300,118 @@ export function Modal({
     } catch (err) {
       console.error("Failed to copy link:", err);
       toast.error("Failed to copy link");
+    }
+  };
+
+  // Copies all project information, links, and case study sections as formatted text
+  const handleCopyAllDetails = async () => {
+    if (!project) return;
+    playUiClick();
+    try {
+      const sections: string[] = [];
+
+      // Title & Tagline
+      sections.push(`# ${project.projectName || "Project Details"}`);
+      if (project.tagline) {
+        sections.push(`> ${project.tagline}`);
+      }
+
+      // Metadata
+      const meta: string[] = [];
+      if (project.role) meta.push(`• Role: ${project.role}`);
+      if (project.status) meta.push(`• Status: ${project.status}`);
+      if (project.projectType) meta.push(`• Type: ${project.projectType}`);
+      const stack = toArrayConvert(project.techStack);
+      if (stack.length > 0) meta.push(`• Tech Stack: ${stack.join(", ")}`);
+      if (meta.length > 0) {
+        sections.push(`\n### Overview\n${meta.join("\n")}`);
+      }
+
+      // Links & Repositories
+      const links: string[] = [];
+      if (project.liveSite) links.push(`• Live Site: ${project.liveSite}`);
+      if (project.backendLive) links.push(`• Backend API: ${project.backendLive}`);
+      if (project.frontendRepo) links.push(`• Frontend Repo: ${project.frontendRepo}`);
+      if (project.backendRepo) links.push(`• Backend Repo: ${project.backendRepo}`);
+      if (project.githubRepo) links.push(`• GitHub Repo: ${project.githubRepo}`);
+      if (project.rerankerRepo) links.push(`• Reranker Repo: ${project.rerankerRepo}`);
+      if (project.demoCheckerRepo) links.push(`• Demo Checker Repo: ${project.demoCheckerRepo}`);
+      if (links.length > 0) {
+        sections.push(`\n### Links & Repositories\n${links.join("\n")}`);
+      }
+
+      // Technical Highlights
+      if (project.technicalHighlights) {
+        sections.push(`\n### Technical Highlights\n${project.technicalHighlights}`);
+      }
+
+      // Case Study Section 1: Overview
+      if (project.overview) {
+        sections.push(`\n### Case Study: 1. Overview\n${project.overview}`);
+      }
+
+      // Case Study Section 2: Problem
+      if (project.problem) {
+        sections.push(`\n### Case Study: 2. Problem Statement\n${project.problem}`);
+      }
+
+      // Case Study Section 3: My Contribution
+      if (project.myContribution) {
+        sections.push(`\n### Case Study: 3. Key Contribution\n${project.myContribution}`);
+      }
+
+      // Case Study Section 4: Key Decisions
+      if (project.keyDecisions) {
+        sections.push(`\n### Case Study: 4. Key Engineering Decisions\n${project.keyDecisions}`);
+      }
+
+      // Case Study Section 5: Results & Evidence
+      if (project.resultsEvidence) {
+        sections.push(`\n### Case Study: 5. Results & Evidence\n${project.resultsEvidence}`);
+      }
+
+      // Architecture
+      if (project.architecture) {
+        sections.push(`\n### Architecture & Flow\n${project.architecture}`);
+      }
+
+      // Limitations & Next Steps
+      if (project.limitationsNextSteps) {
+        sections.push(`\n### Case Study: Limitations & Next Steps\n${project.limitationsNextSteps}`);
+      }
+
+      // Features
+      if (project.features && project.features.length > 0) {
+        const featureList = toArrayConvert(project.features);
+        if (featureList.length > 0) {
+          sections.push(`\n### Key Features\n${featureList.map((f) => `• ${f}`).join("\n")}`);
+        }
+      }
+
+      // Problem & Solution
+      if (project.problemSolution) {
+        sections.push(`\n### Problem & Solution\n${project.problemSolution}`);
+      }
+
+      const fullDetails = sections.join("\n\n");
+
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(fullDetails);
+      } else if (typeof document !== "undefined") {
+        const textarea = document.createElement("textarea");
+        textarea.value = fullDetails;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      setCopiedDetails(true);
+      toast.success("All project details copied to clipboard!");
+      setTimeout(() => setCopiedDetails(false), 2500);
+    } catch (err) {
+      console.error("Failed to copy project details:", err);
+      toast.error("Failed to copy project details");
     }
   };
 
@@ -535,24 +648,45 @@ export function Modal({
                   )}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleCopyShareLink}
-                  className="inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white bg-[#18181b] hover:bg-[#202024] border border-white/10 hover:border-emerald-500/40 rounded-xl transition-all shadow-sm cursor-pointer select-none active:scale-95"
-                  title="Copy shareable link"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-400">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>Share</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleCopyAllDetails}
+                    className="inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white bg-[#18181b] hover:bg-[#202024] border border-white/10 hover:border-emerald-500/40 rounded-xl transition-all shadow-sm cursor-pointer select-none active:scale-95"
+                    title="Copy all project details to clipboard"
+                  >
+                    {copiedDetails ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                        <span>Copy Details</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyShareLink}
+                    className="inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white bg-[#18181b] hover:bg-[#202024] border border-white/10 hover:border-emerald-500/40 rounded-xl transition-all shadow-sm cursor-pointer select-none active:scale-95"
+                    title="Copy shareable link"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-3.5 h-3.5 text-zinc-400" />
+                        <span>Share</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </DialogHeader>
 
@@ -765,8 +899,27 @@ export function Modal({
 
                 <button
                   type="button"
+                  onClick={handleCopyAllDetails}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-zinc-300 bg-[#18181b] border border-white/10 rounded-xl hover:border-emerald-500/30 hover:text-white transition-all shadow-sm cursor-pointer select-none active:scale-95"
+                  title="Copy all project details to clipboard"
+                >
+                  {copiedDetails ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-emerald-400">Details Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>Copy All Details</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
                   onClick={handleCopyShareLink}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-zinc-300 bg-[#18181b] border border-white/10 rounded-xl hover:border-emerald-500/30 hover:text-white transition-all shadow-sm cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-zinc-300 bg-[#18181b] border border-white/10 rounded-xl hover:border-emerald-500/30 hover:text-white transition-all shadow-sm cursor-pointer select-none active:scale-95"
                 >
                   {copied ? (
                     <>
