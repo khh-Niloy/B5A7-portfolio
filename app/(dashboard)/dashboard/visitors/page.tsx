@@ -26,6 +26,7 @@ import {
   HardDrive,
   TrendingUp,
   Flame,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -538,9 +539,13 @@ export default function VisitorsPage() {
               <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-2">
                 Visitors & Audit Logs
               </h1>
-              <p className="mt-1 text-sm text-gray-400">
-                Audited traffic metrics, geographic footprints, user environments, and interaction logs.
-              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-400">
+                <span>Audited traffic metrics, geographic footprints, user environments, and interaction logs.</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  Excluded Owner Device (103.42.53.244)
+                </span>
+              </div>
             </div>
           </div>
         </div>

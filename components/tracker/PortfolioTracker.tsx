@@ -30,6 +30,21 @@ export function PortfolioTracker() {
   const visitorIdRef = useRef<string>("");
 
   useEffect(() => {
+    // Skip tracking for admin routes, logged-in admin, or excluded client devices
+    const isExcluded =
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/login") ||
+      (typeof window !== "undefined" &&
+        (localStorage.getItem("portfolio_excluded") === "true" ||
+          localStorage.getItem("is_admin") === "true"));
+
+    if (isExcluded) {
+      if (typeof window !== "undefined" && pathname.startsWith("/dashboard")) {
+        localStorage.setItem("portfolio_excluded", "true");
+      }
+      return;
+    }
+
     // 1. Identify or create persistent Visitor ID
     let visitorId = localStorage.getItem("portfolio_visitor_id");
     let isNewVisitor = false;
@@ -57,7 +72,14 @@ export function PortfolioTracker() {
 
     // Helper to send duration
     const sendDuration = (durationSec: number, path: string) => {
-      if (durationSec < 1 || !sessionIdRef.current) return;
+      if (
+        durationSec < 1 ||
+        !sessionIdRef.current ||
+        (typeof window !== "undefined" &&
+          localStorage.getItem("portfolio_excluded") === "true")
+      ) {
+        return;
+      }
 
       const durationPayload = JSON.stringify({
         visitorId: visitorIdRef.current,
@@ -171,7 +193,7 @@ export function PortfolioTracker() {
           utmContent,
         };
 
-        await fetch(`${BASE_API}/visitors/track`, {
+        const res = await fetch(`${BASE_API}/visitors/track`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -179,6 +201,11 @@ export function PortfolioTracker() {
           body: JSON.stringify(payload),
           credentials: "include",
         });
+
+        const resData = await res.json().catch(() => null);
+        if (resData?.excluded) {
+          localStorage.setItem("portfolio_excluded", "true");
+        }
       } catch (err) {
         // Tracker runs silently without throwing
       }
